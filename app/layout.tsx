@@ -18,7 +18,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: siteConfig.url,
-    title: siteConfig.title,
+    title: `${siteConfig.title} | Bespoke Luxury Fashion`,
     description: siteConfig.description,
     images: [
       {
