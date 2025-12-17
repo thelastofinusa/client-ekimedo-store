@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
+import { env } from "@/lib/env";
 import { fontVariables } from "@/fonts";
 import { siteConfig } from "@/config/site.config";
-import { env } from "@/lib/env";
 
 export const metadata: Metadata = {
   title: {
@@ -51,7 +51,7 @@ export const metadata: Metadata = {
 export default function RootLayout(props: Readonly<React.PropsWithChildren>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={fontVariables("antialiased font-sans")}>
+      <body className={fontVariables("font-sans antialiased")}>
         {props.children}
       </body>
     </html>
