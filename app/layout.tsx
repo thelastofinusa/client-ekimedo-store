@@ -51,7 +51,11 @@ export const metadata: Metadata = {
 export default function RootLayout(props: Readonly<React.PropsWithChildren>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={fontVariables("font-sans antialiased")}>
+      <body
+        className={fontVariables(
+          "flex min-h-dvh flex-col font-sans antialiased",
+        )}
+      >
         {props.children}
       </body>
     </html>
