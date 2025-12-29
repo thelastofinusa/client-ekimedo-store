@@ -1,100 +1,77 @@
 import Link from "next/link";
-import * as React from "react";
 
-import { cn } from "@/lib/utils";
+import { Logo } from "./logo";
 import { Container } from "./container";
-import { Separator } from "@/ui/separator";
-import { FOOTER_ELEMENTS } from "@/constants";
 import { siteConfig } from "@/config/site.config";
+import { NAVIGATIONS } from "@/constants";
+import { Icons } from "hugeicons-proxy";
 
 export const Footer = () => {
   return (
-    <footer className="py-10 sm:py-16 md:py-20">
+    <footer className="bg-foreground text-background border-border/10 border-t py-24">
       <Container>
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-2 xl:grid-cols-4">
-          <div className="flex w-full flex-col gap-4 md:gap-6">
-            <h3 className="text-xl font-semibold">{siteConfig.title}</h3>
-
-            <div className="flex items-center gap-2">
-              {FOOTER_ELEMENTS.socials.map((item, idx) => (
-                <React.Fragment key={idx}>
-                  <Link href={{ pathname: item.href }} className="group">
-                    <item.icon className="group-hover:text-primary text-muted-foreground size-7 transition-all duration-300 ease-out sm:size-6" />
-                  </Link>
-                  {idx < FOOTER_ELEMENTS.socials.length - 1 && (
-                    <Separator orientation="horizontal" className="w-2!" />
-                  )}
-                </React.Fragment>
-              ))}
-            </div>
-
-            <p className="text-sm font-medium">{siteConfig.description}</p>
-          </div>
-
-          <div className="flex w-full flex-col gap-4 md:gap-6">
-            <p className="font-serif text-base font-medium">
-              The Design Process
+        <div className="mb-16 grid grid-cols-1 gap-6 sm:grid-cols-2 md:mb-24 lg:grid-cols-4 xl:grid-cols-5">
+          {/* Brand Column */}
+          <div className="flex flex-col gap-6 xl:col-span-2">
+            <Logo
+              href="/"
+              srcDesktop="horizontal"
+              srcMobile="horizontal"
+              mobileSize={[110, 32]}
+              color="bone"
+              className="block font-serif text-xl tracking-[0.2em] uppercase"
+            />
+            <p className="text-muted-foreground max-w-xs text-sm leading-relaxed tracking-wide">
+              {siteConfig.description}
             </p>
-
-            <div className="flex flex-col gap-3">
-              {FOOTER_ELEMENTS.designProcess.map((process, idx) => {
-                const Comp = process.path ? Link : "p";
-
-                return (
-                  <Comp
-                    href={{ pathname: process.path }}
-                    key={idx}
-                    className={cn(
-                      "flex items-center gap-2.5 transition-all duration-300 ease-out",
-                      process.path && "hover:text-primary hover:underline",
-                    )}
-                  >
-                    <process.icon className="size-4.5" />
-                    <span className="flex-1 text-sm">{process.name}</span>
-                  </Comp>
-                );
-              })}
-            </div>
           </div>
 
-          <div className="flex w-full flex-col gap-4 md:gap-6">
-            <p className="font-serif text-base font-medium">Contact Us</p>
-
-            <div className="flex flex-col gap-3">
-              {FOOTER_ELEMENTS.contact.map((contact, idx) => (
-                <Link
-                  href={{ pathname: contact.href }}
-                  key={idx}
-                  className="hover:text-primary flex items-center gap-2.5 hover:underline"
-                >
-                  <contact.icon className="size-4.5" />
-                  <span className="flex-1 text-sm">{contact.name}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex w-full flex-col gap-4 md:gap-6">
-            <p className="font-serif text-base font-medium">Business Hours</p>
-
-            <div className="flex flex-col gap-3">
-              {FOOTER_ELEMENTS.businessHours.map((hr, idx) => (
-                <p
-                  key={idx}
-                  className="flex items-center justify-between text-sm font-medium"
-                >
-                  <span>{hr.day}</span>
-                  {!hr.open || !hr.close ? (
-                    <span>Closed</span>
-                  ) : (
-                    <span>
-                      {hr.open} - {hr.close}
-                    </span>
+          {NAVIGATIONS.FOOTER.map(
+            (
+              section: {
+                title: string;
+                routes: { label: string; path: string; newTab?: boolean }[];
+              },
+              secIdx,
+            ) => (
+              <div key={secIdx} className="flex flex-col gap-8">
+                <h4 className="text-muted-foreground font-mono text-xs tracking-[0.2em] uppercase">
+                  {section.title}
+                </h4>
+                <nav className="flex flex-col gap-4 text-xs tracking-widest uppercase">
+                  {section.routes.map(
+                    (route: (typeof section.routes)[number], routeIdx) => (
+                      <Link
+                        key={routeIdx}
+                        target={route.newTab ? "_blank" : "_self"}
+                        href={{ pathname: route.path }}
+                        className="text-background hover:text-muted-foreground"
+                      >
+                        {route.label}
+                      </Link>
+                    ),
                   )}
-                </p>
-              ))}
+                </nav>
+              </div>
+            ),
+          )}
+        </div>
+
+        <div className="border-border/10 flex flex-col items-center justify-between gap-6 border-t pt-12 md:flex-row md:gap-8">
+          <div className="text-background/50 flex gap-6 text-[10px] font-light tracking-[0.3em] uppercase md:gap-8">
+            <div className="flex items-center gap-2">
+              <Icons.Location06Icon className="size-4" />
+              <span>Maryland, USA</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Icons.Mail01Icon className="size-4" />
+              <span>info.e22fashion@gmail.com</span>
             </div>
           </div>
+
+          <p className="text-background/50 text-[10px] font-light tracking-[0.4em] uppercase">
+            © 2025 {siteConfig.title}. All rights reserved.
+          </p>
         </div>
       </Container>
     </footer>

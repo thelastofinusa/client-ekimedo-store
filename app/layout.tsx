@@ -1,40 +1,48 @@
 import type { Metadata } from "next";
 
 import "./globals.css";
-import { env } from "@/lib/env";
-import { fontVariables } from "@/fonts";
+import { variables } from "@/font";
 import { siteConfig } from "@/config/site.config";
 
 export const metadata: Metadata = {
   title: {
-    default: `${siteConfig.title} | Bespoke Luxury Fashion`,
-    template: `%s | ${siteConfig.title}`,
+    default: `${siteConfig.title} - ${siteConfig.tagline}`,
+    template: `%s - ${siteConfig.title}`,
   },
   description: siteConfig.description,
-  metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
-  keywords: siteConfig.keywords,
+  metadataBase: siteConfig.url,
   authors: [{ name: siteConfig.title }],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: siteConfig.url,
-    title: `${siteConfig.title} | Bespoke Luxury Fashion`,
+    title: `${siteConfig.title} - ${siteConfig.tagline}`,
     description: siteConfig.description,
     images: [
       {
         url: `${siteConfig.url}/og.png`,
         width: 1200,
         height: 630,
-        alt: "Ekie22 Fashion Luxury Bridal Collection",
+        alt: `${siteConfig.title} - ${siteConfig.tagline}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.title} | Bespoke Luxury Fashion`,
+    title: `${siteConfig.title} - ${siteConfig.tagline}`,
     description: siteConfig.description,
-    images: [`${siteConfig.url}/twitter-image.jpg`],
+    images: [`${siteConfig.url}/twitter-image.png`],
   },
+  icons: [
+    {
+      url: "/logo/logo-charcoal.svg",
+      media: "(prefers-color-scheme: light)",
+    },
+    {
+      url: "/logo/logo-bone.svg",
+      media: "(prefers-color-scheme: dark)",
+    },
+  ],
   robots: {
     index: true,
     follow: true,
@@ -48,16 +56,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout(props: Readonly<React.PropsWithChildren>) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body
-        className={fontVariables(
-          "flex min-h-dvh flex-col font-sans antialiased",
-        )}
-      >
-        {props.children}
-      </body>
+      <body className={variables("antialiased")}>{children}</body>
     </html>
   );
 }

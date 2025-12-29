@@ -1,5 +1,4 @@
 import type { NextConfig } from "next";
-import "./lib/env";
 
 const nextConfig: NextConfig = {
   cacheComponents: true,
@@ -8,13 +7,21 @@ const nextConfig: NextConfig = {
     typedEnv: true,
   },
   images: {
-    // remotePatterns: [
-    //   {
-    //     protocol: "https",
-    //     hostname: "cdn.sanity.io",
-    //     pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/**`,
-    //   },
-    // ],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cdn.sanity.io",
+        pathname: `/images/${process.env.NEXT_PUBLIC_SANITY_PROJECT_ID}/${process.env.NEXT_PUBLIC_SANITY_DATASET}/**`,
+      },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "ekie22fashion.com",
+      },
+    ],
     formats: ["image/webp", "image/avif"],
     qualities: [100, 80],
   },
