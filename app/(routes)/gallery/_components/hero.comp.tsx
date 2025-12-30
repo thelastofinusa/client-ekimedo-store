@@ -2,14 +2,22 @@ import React from "react";
 import { motion } from "motion/react";
 
 import { Container } from "@/components/shared/container";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/ui/select";
 
 interface Props {
   years: string[];
   categories: string[];
   activeCategory: string;
   activeYear: string;
-  setActiveCategory: React.Dispatch<React.SetStateAction<string>>;
-  setActiveYear: React.Dispatch<React.SetStateAction<string>>;
+  setActiveCategory: (value: string) => void;
+  setActiveYear: (value: string) => void;
 }
 
 export const HeroComp: React.FC<Props> = ({
@@ -26,56 +34,62 @@ export const HeroComp: React.FC<Props> = ({
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-4xl"
+          className="max-w-2xl"
         >
           <span className="text-muted-foreground mb-4 text-[10px] tracking-[0.4em] uppercase">
             Archive
           </span>
-          <h2 className="mt-4 mb-6 text-[12vw] leading-[0.9] tracking-tighter md:mb-12 md:text-[6vw]">
+          <h2 className="mt-4 mb-8 text-[12vw] leading-[0.9] tracking-tighter md:mb-12 md:text-[6vw]">
             The Gallery
           </h2>
 
-          <div className="flex flex-wrap gap-x-12 gap-y-6">
-            <div className="flex flex-col gap-4">
+          <div className="grid w-full max-w-lg grid-cols-2 gap-6">
+            <div className="flex flex-col gap-2">
               <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">
                 Occasion
               </span>
-              <div className="flex gap-6">
-                {categories.map((cat) => (
-                  <span
-                    key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    className={`cursor-pointer text-xs tracking-widest uppercase transition-colors ${
-                      activeCategory === cat
-                        ? "text-background"
-                        : "text-background/30 hover:text-background/60"
-                    }`}
-                  >
-                    {cat}
-                  </span>
-                ))}
-              </div>
+
+              <Select
+                value={activeCategory}
+                onValueChange={(e) => setActiveCategory(e)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {categories.map((year) => (
+                      <SelectItem key={year} value={year}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
 
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">
                 Collection Year
               </span>
-              <div className="flex gap-6">
-                {years.map((year) => (
-                  <span
-                    key={year}
-                    onClick={() => setActiveYear(year)}
-                    className={`cursor-pointer text-xs tracking-widest uppercase transition-colors ${
-                      activeYear === year
-                        ? "text-background"
-                        : "text-background/30 hover:text-background/60"
-                    }`}
-                  >
-                    {year}
-                  </span>
-                ))}
-              </div>
+
+              <Select
+                value={activeYear}
+                onValueChange={(e) => setActiveYear(e)}
+              >
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a year" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={year}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </motion.div>

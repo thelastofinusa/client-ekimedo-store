@@ -1,4 +1,3 @@
-import React from "react";
 import {
   Accordion,
   AccordionContent,
@@ -57,7 +56,7 @@ export const ServicesComp = () => {
                 <AccordionItem
                   key={service.id}
                   value={service.id}
-                  className="border-b py-4 first-of-type:pt-0 last-of-type:pb-0"
+                  className="border-border/20 border-b py-4 first-of-type:pt-0 last-of-type:pb-0"
                 >
                   <AccordionTrigger className="group hover:no-underline">
                     <div className="flex items-center gap-4 text-left md:gap-6 lg:gap-8">

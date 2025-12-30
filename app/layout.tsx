@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import NextTopLoader from "nextjs-toploader";
+import { Analytics } from "@vercel/analytics/next";
 
 import "./globals.css";
 import { variables } from "@/font";
@@ -63,7 +65,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={variables("antialiased")}>{children}</body>
+      <body className={variables("antialiased")}>
+        <Analytics />
+        <NextTopLoader color="var(--primary)" showSpinner={false} />
+        {children}
+      </body>
     </html>
   );
 }

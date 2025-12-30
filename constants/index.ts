@@ -5,10 +5,6 @@ export const NAVIGATIONS = {
       path: "/",
     },
     {
-      label: "Shop",
-      path: "/shop",
-    },
-    {
       label: "Gallery",
       path: "/gallery",
     },
@@ -90,6 +86,227 @@ export const NAVIGATIONS = {
     },
   ],
 };
+
+export const HERO_SLIDES = [
+  {
+    id: 1,
+    label: "FOR/HER",
+    number: "01",
+    title: "NOSTALGIA",
+    description:
+      "Morbi volutpat tortor sit amet leo pretium, ut scelerisque nunc fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing varius magna in dolor maximus accumsan.",
+    image:
+      "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
+    imageLarge:
+      "https://images.unsplash.com/photo-1594552072238-6d4e9b0d6f0e?q=80&w=1200&auto=format&fit=crop",
+  },
+  {
+    id: 2,
+    label: "FOR/HER",
+    number: "02",
+    title: "ELEGANCE",
+    description:
+      "Timeless sophistication meets contemporary design. Experience the art of bespoke couture tailored to your vision.",
+    image:
+      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1000&auto=format&fit=crop",
+    imageLarge:
+      "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=1200&auto=format&fit=crop",
+  },
+  {
+    id: 3,
+    label: "FOR/HER",
+    number: "03",
+    title: "RADIANCE",
+    description:
+      "Illuminate every moment with designs that capture the essence of refined luxury and modern grace.",
+    image:
+      "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop",
+    imageLarge:
+      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=1200&auto=format&fit=crop",
+  },
+];
+
+export const TESTIMONIALS = [
+  {
+    name: "Kiaira",
+    role: "Reception Dress",
+    content:
+      "If you’re looking to get a dress made by Eki… stop looking and just DO IT! when I tell you she executes I mean that! she does what needs to be done. I gave her a photo of what I was looking for and she made it 10x better. Customer service is everything. 😍 She’s so detail oriented and a perfectionist. My dress was beautiful, beyond what I expected.",
+    rating: 4,
+    date: "May 2024",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    workAssets: [
+      "https://images.unsplash.com/photo-1675489757010-e97edf0b8f3e?q=80&w=1286&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1686943662852-0b00148e632a?q=80&w=1364&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1526353191785-926dfb82058d?q=80&w=1287&auto=format&fit=crop",
+    ],
+  },
+  {
+    name: "Kiaira",
+    role: "Reception Dress",
+    content:
+      "If you’re looking to get a dress made by Eki… stop looking and just DO IT! when I tell you she executes I mean that! she does what needs to be done. I gave her a photo of what I was looking for and she made it 10x better. Customer service is everything. 😍 She’s so detail oriented and a perfectionist. My dress was beautiful, beyond what I expected.",
+    rating: 4,
+    date: "May 2024",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    workAssets: [
+      "https://images.unsplash.com/photo-1675489757010-e97edf0b8f3e?q=80&w=1286&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1686943662852-0b00148e632a?q=80&w=1364&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1526353191785-926dfb82058d?q=80&w=1287&auto=format&fit=crop",
+    ],
+  },
+  {
+    name: "Kiaira",
+    role: "Reception Dress",
+    content:
+      "If you’re looking to get a dress made by Eki… stop looking and just DO IT! when I tell you she executes I mean that! she does what needs to be done. I gave her a photo of what I was looking for and she made it 10x better. Customer service is everything. 😍 She’s so detail oriented and a perfectionist. My dress was beautiful, beyond what I expected.",
+    rating: 4,
+    date: "May 2024",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    workAssets: [
+      "https://images.unsplash.com/photo-1675489757010-e97edf0b8f3e?q=80&w=1286&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1686943662852-0b00148e632a?q=80&w=1364&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1526353191785-926dfb82058d?q=80&w=1287&auto=format&fit=crop",
+    ],
+  },
+  {
+    name: "Kiaira",
+    role: "Reception Dress",
+    content:
+      "If you’re looking to get a dress made by Eki… stop looking and just DO IT! when I tell you she executes I mean that! she does what needs to be done. I gave her a photo of what I was looking for and she made it 10x better. Customer service is everything. 😍 She’s so detail oriented and a perfectionist. My dress was beautiful, beyond what I expected.",
+    rating: 4,
+    date: "May 2024",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    workAssets: [
+      "https://images.unsplash.com/photo-1675489757010-e97edf0b8f3e?q=80&w=1286&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1686943662852-0b00148e632a?q=80&w=1364&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1526353191785-926dfb82058d?q=80&w=1287&auto=format&fit=crop",
+    ],
+  },
+  {
+    name: "Kiaira",
+    role: "Reception Dress",
+    content:
+      "If you’re looking to get a dress made by Eki… stop looking and just DO IT! when I tell you she executes I mean that! she does what needs to be done. I gave her a photo of what I was looking for and she made it 10x better. Customer service is everything. 😍 She’s so detail oriented and a perfectionist. My dress was beautiful, beyond what I expected.",
+    rating: 4,
+    date: "May 2024",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    workAssets: [
+      "https://images.unsplash.com/photo-1675489757010-e97edf0b8f3e?q=80&w=1286&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1686943662852-0b00148e632a?q=80&w=1364&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1526353191785-926dfb82058d?q=80&w=1287&auto=format&fit=crop",
+    ],
+  },
+  {
+    name: "Kiaira",
+    role: "Reception Dress",
+    content:
+      "If you’re looking to get a dress made by Eki… stop looking and just DO IT! when I tell you she executes I mean that! she does what needs to be done. I gave her a photo of what I was looking for and she made it 10x better. Customer service is everything. 😍 She’s so detail oriented and a perfectionist. My dress was beautiful, beyond what I expected.",
+    rating: 4,
+    date: "May 2024",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    workAssets: [
+      "https://images.unsplash.com/photo-1675489757010-e97edf0b8f3e?q=80&w=1286&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1686943662852-0b00148e632a?q=80&w=1364&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1526353191785-926dfb82058d?q=80&w=1287&auto=format&fit=crop",
+    ],
+  },
+  {
+    name: "Kiaira",
+    role: "Reception Dress",
+    content:
+      "If you’re looking to get a dress made by Eki… stop looking and just DO IT! when I tell you she executes I mean that! she does what needs to be done. I gave her a photo of what I was looking for and she made it 10x better. Customer service is everything. 😍 She’s so detail oriented and a perfectionist. My dress was beautiful, beyond what I expected.",
+    rating: 4,
+    date: "May 2024",
+    image:
+      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
+    workAssets: [
+      "https://images.unsplash.com/photo-1675489757010-e97edf0b8f3e?q=80&w=1286&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1686943662852-0b00148e632a?q=80&w=1364&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1526353191785-926dfb82058d?q=80&w=1287&auto=format&fit=crop",
+    ],
+  },
+];
+
+export const YEARS = [
+  "All",
+  ...Array.from({ length: 2025 - 2020 + 1 }, (_, i) => (2025 - i).toString()),
+];
+export const CATEGORIES = ["All", "Bridal", "Prom", "Special Events"];
+
+export const GALLERY_ITEMS = [
+  {
+    id: "g1",
+    year: "2023",
+    category: "bridal",
+    title: "Heritage Lace",
+    image:
+      "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop",
+  },
+  {
+    id: "g5",
+    year: "2023",
+    category: "prom",
+    title: "Velvet Dreams",
+    image:
+      "https://images.unsplash.com/photo-1525020017919-9428db8b3e75?q=80&w=3089&auto=format&fit=crop",
+  },
+  {
+    id: "g2",
+    year: "2024",
+    category: "prom",
+    title: "Midnight Gala",
+    image:
+      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1000&auto=format&fit=crop",
+  },
+  {
+    id: "g3",
+    year: "2024",
+    category: "bridal",
+    title: "The Ethereal Collection",
+    image: "/collections/bridal.avif",
+  },
+  {
+    id: "g4",
+    year: "2024",
+    category: "prom",
+    title: "The Ethereal Collection",
+    image: "/collections/prom.avif",
+  },
+];
+
+export const COLLECTIONS = [
+  {
+    name: "Bridal Couture",
+    image: "/collections/bridal.avif",
+    slug: "bridal",
+    tagline: "Timeless Couture",
+    description:
+      "Discover a collection of timeless silhouettes and intricate details crafted for your most memorable moment.",
+  },
+  {
+    name: "Prom Elegance",
+    image: "/collections/prom.avif",
+    slug: "prom",
+    tagline: "Modern Elegance",
+    description:
+      "Sophisticated designs and modern silhouettes that make a statement at every celebration.",
+  },
+  {
+    name: "Special Events",
+    image: "/collections/special-events.avif",
+    slug: "special-events",
+    tagline: "Exquisite Crafts",
+    description:
+      "Exquisite evening wear and cocktail dresses designed for luxury and effortless grace.",
+  },
+];
 
 export const DRESSES = [
   // Bridal
@@ -237,159 +454,5 @@ export const DRESSES = [
     sizes: ["XS", "S", "M", "L", "XL"],
     colors: ["Ivory", "Champagne", "Dove Grey"],
     deliveryTime: "2 to 3 weeks",
-  },
-];
-
-export const dresses = DRESSES;
-
-export const BUDGET_TIERS = [
-  {
-    id: "tier-1",
-    name: "Essential",
-    range: "$500 - $1,500",
-    description:
-      "Quality craftsmanship with classic designs and beautiful fabrics.",
-    features: [
-      "Premium fabrics",
-      "Standard customization",
-      "2-3 fittings",
-      "4-6 week delivery",
-    ],
-    exampleDresses: DRESSES.filter(
-      (d) => d.id.includes("prom-002") || d.id.includes("special-003"),
-    ),
-  },
-  {
-    id: "tier-2",
-    name: "Signature",
-    range: "$1,500 - $3,500",
-    description:
-      "Refined elegance with intricate detailing and enhanced customization.",
-    features: [
-      "Luxury fabrics",
-      "Enhanced customization",
-      "3-4 fittings",
-      "Hand-finished details",
-      "3-5 week delivery",
-    ],
-    exampleDresses: DRESSES.filter(
-      (d) => d.id.includes("prom-003") || d.id.includes("special-002"),
-    ),
-  },
-  {
-    id: "tier-3",
-    name: "Couture",
-    range: "$3,500 - $7,000+",
-    description:
-      "Bespoke luxury with the finest materials and complete creative freedom.",
-    features: [
-      "Finest imported fabrics",
-      "Fully bespoke design",
-      "Unlimited fittings",
-      "Hand-beaded embellishments",
-      "Rush delivery available",
-    ],
-    exampleDresses: DRESSES.filter((d) => d.category === "bridal"),
-  },
-];
-
-export const HERO_SLIDES = [
-  {
-    id: 1,
-    label: "FOR/HER",
-    number: "01",
-    title: "NOSTALGIA",
-    description:
-      "Morbi volutpat tortor sit amet leo pretium, ut scelerisque nunc fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing varius magna in dolor maximus accumsan.",
-    image:
-      "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
-    imageLarge:
-      "https://images.unsplash.com/photo-1594552072238-6d4e9b0d6f0e?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    label: "FOR/HER",
-    number: "02",
-    title: "ELEGANCE",
-    description:
-      "Timeless sophistication meets contemporary design. Experience the art of bespoke couture tailored to your vision.",
-    image:
-      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1000&auto=format&fit=crop",
-    imageLarge:
-      "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    label: "FOR/HER",
-    number: "03",
-    title: "RADIANCE",
-    description:
-      "Illuminate every moment with designs that capture the essence of refined luxury and modern grace.",
-    image:
-      "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop",
-    imageLarge:
-      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=1200&auto=format&fit=crop",
-  },
-];
-
-export const budgetTiers = BUDGET_TIERS;
-export const heroSlides = HERO_SLIDES;
-
-export const FAQS_CONTENT = [
-  {
-    title: "Do you take Aso Ebi?",
-    content:
-      "No. We do not take Aso Ebi. We are a family-owned business and do not sell any products that contain Aso Ebi.",
-  },
-  {
-    title: "Do you accept fabric?",
-    content:
-      "No. We do not accept fabric. We use only natural fibers to ensure the quality and sustainability of our products.",
-  },
-  {
-    title: "How far in advance should one book?",
-    content:
-      "Evening and reception dress 2-4 months; wedding dress 4-8 months.\n\nEvening and Reception dress made less than 2 months of event date and Wedding dresses made less than 4 months are considered Rush Orders. There will be an additional charge of 15% of total quote for Rush Orders.",
-  },
-  {
-    title: "Where are you located?",
-    content: "We are located at Capitol Heights, Maryland",
-  },
-  {
-    title: "Do you Ship internationally?",
-    content: "We ship internationally to most countries.",
-  },
-  {
-    title: "Do you style or dress brides on the day of their wedding?",
-    content:
-      "Day of service out of state: provide hotel and flight, transportation and service fee of $200 per day in state: $100 per hour.",
-  },
-  {
-    title: "What are your store hours?",
-    content: "Store hours: Tuesday - Friday 10am-6pm; Saturday 10am-4pm.",
-  },
-  {
-    title: "What are your Payment Methods?",
-    content: "Payment plans: Zelle, card payments, PayPal.",
-  },
-];
-
-export const TESTIMONIALS = [
-  {
-    id: "t1",
-    name: "Kiaira",
-    role: "Reception Dress",
-    content:
-      "If you’re looking to get a dress made by Eki… stop looking and just DO IT! when I tell you she executes I mean that! she does what needs to be done. I gave her a photo of what I was looking for and she made it 10x better. Customer service is everything. 😍 She’s so detail oriented and a perfectionist. My dress was beautiful, beyond what I expected.",
-    rating: 4,
-    date: "May 2024",
-    image:
-      "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=400&auto=format&fit=crop",
-    asset: "Teen Vogue",
-    workAssets: [
-      "https://ekie22fashion.com/index.php?gf-download=2023%2F05%2F49B7E4DE-9E0C-4C3E-9971-D77B069509F7.jpeg&form-id=2&field-id=7&hash=0191dde97288225473c356fc496dc7941e38a25118334eeec3bf00b9d2e5eaab",
-      "https://ekie22fashion.com/index.php?gf-download=2023%2F05%2F3D63C797-C188-485A-A159-556E57804C9D.jpeg&form-id=2&field-id=7&hash=b8f07c1ec2cce3e3b71b030befe052659e9bad9a286a655ecb9f6811f487d4b9",
-      "https://ekie22fashion.com/index.php?gf-download=2023%2F05%2FC1177658-7C6B-43E9-A465-2A02DABD4B30.jpeg&form-id=2&field-id=7&hash=8fe501c858cb10f11e7e2c932c4d03aaf8b4ab8e1e4cebcc7fbb5ade793bd861",
-    ],
   },
 ];

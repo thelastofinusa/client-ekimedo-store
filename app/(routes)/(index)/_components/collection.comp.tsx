@@ -1,27 +1,7 @@
 import { Container } from "@/components/shared/container";
+import { COLLECTIONS } from "@/constants";
 import Image from "next/image";
 import Link from "next/link";
-
-const CATEGORIES = [
-  {
-    name: "Bridal",
-    image: "/collections/bridal.avif",
-    slug: "bridal",
-    tagline: "Timeless Couture",
-  },
-  {
-    name: "Prom",
-    image: "/collections/prom.avif",
-    slug: "prom",
-    tagline: "Modern Elegance",
-  },
-  {
-    name: "Special Events",
-    image: "/collections/special-events.avif",
-    slug: "special-events",
-    tagline: "Exquisite Crafts",
-  },
-];
 
 export const CollectionComp = () => {
   return (
@@ -35,7 +15,7 @@ export const CollectionComp = () => {
         </header>
 
         <div className="grid grid-cols-1 gap-16 md:grid-cols-3 md:gap-8">
-          {CATEGORIES.map((cat) => (
+          {COLLECTIONS.map((cat) => (
             <Link
               key={cat.slug}
               href={{ pathname: `/category/${cat.slug}` }}

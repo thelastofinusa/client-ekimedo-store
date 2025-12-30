@@ -5,19 +5,19 @@
 
 :root {
   --background: oklch(0.9823 0.0029 84.5589);
-  --foreground: oklch(0.235 0 0);
+  --foreground: oklch(19.125% 0.00002 271.152);
   --card: oklch(0.9967 0.0013 106.423);
   --card-foreground: oklch(0.3211 0 0);
   --popover: oklch(0.9967 0.0013 106.423);
   --popover-foreground: oklch(0.3211 0 0);
-  --primary: oklch(0.235 0 0);
+  --primary: oklch(19.125% 0.00002 271.152);
   --primary-foreground: oklch(1 0 0);
   --secondary: oklch(0.9181 0.0098 72.6567);
-  --secondary-foreground: oklch(0.235 0 0);
+  --secondary-foreground: oklch(19.125% 0.00002 271.152);
   --muted: oklch(0.9181 0.0098 72.6567);
   --muted-foreground: oklch(56.671% 0.00121 14.256);
   --accent: oklch(0.9181 0.0098 72.6567);
-  --accent-foreground: oklch(0.235 0 0);
+  --accent-foreground: oklch(19.125% 0.00002 271.152);
   --destructive: oklch(0.5594 0.19 25.8625);
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.8576 0 0);
@@ -138,7 +138,7 @@
   }
 
   *::selection {
-    @apply bg-foreground text-background;
+    @apply bg-secondary text-foreground;
   }
 
   html {

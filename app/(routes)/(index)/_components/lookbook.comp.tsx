@@ -1,19 +1,16 @@
 import Link from "next/link";
 import Image from "next/image";
 
+import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/ui/button";
 import { Container } from "@/components/shared/container";
-
-const LOOKS = [
-  "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1509631179647-0177331693ae?q=80&w=1000&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1320&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=1000&auto=format&fit=crop",
-];
+import { GALLERY_ITEMS } from "@/constants";
 
 export const LookbookComp = () => {
+  const looks = GALLERY_ITEMS.map((item) => item.image);
+
   return (
-    <div className="from-secondary via-secondary/50 bg-linear-to-b to-transparent py-24 lg:py-32">
+    <div className="from-secondary via-secondary/50 overflow-x-clip bg-linear-to-b to-transparent py-24 lg:py-32">
       <Container size="sm">
         <div className="mb-20 flex items-end justify-between">
           <div className="space-y-4">
@@ -36,21 +33,27 @@ export const LookbookComp = () => {
 
       <Container>
         <div className="flex gap-4">
-          {LOOKS.map((url, i) => (
-            <div
-              key={i}
-              className={`relative shrink-0 shadow-xs ${i % 2 === 0 ? "aspect-3/4 w-[40vw] md:w-[25vw]" : "mt-12 aspect-4/5 w-[30vw] md:w-[20vw]"}`}
-            >
-              <Image
-                src={url || "/placeholder.svg"}
-                alt={`Look ${i + 1}`}
-                fill
-                priority
-                quality={100}
-                className="object-cover grayscale transition-all duration-700 hover:grayscale-0"
-              />
-            </div>
-          ))}
+          {looks
+            .slice(0, 5)
+            .reverse()
+            .map((url, idx) => (
+              <div
+                key={idx}
+                className={cn("relative shrink-0 shadow-xs", {
+                  "aspect-3/4 w-[40vw] md:w-[25vw]": idx % 2 === 0,
+                  "mt-10 aspect-4/5 w-[30vw] md:w-[20vw]": idx % 2 !== 0,
+                })}
+              >
+                <Image
+                  src={url}
+                  alt={`Look ${idx + 1}`}
+                  fill
+                  loading="lazy"
+                  quality={100}
+                  className="object-cover transition-all duration-700"
+                />
+              </div>
+            ))}
         </div>
       </Container>
     </div>

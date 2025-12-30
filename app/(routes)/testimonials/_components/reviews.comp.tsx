@@ -2,12 +2,12 @@
 
 import Image from "next/image";
 import { motion } from "motion/react";
+import { Icons } from "hugeicons-proxy";
 import { PiQuotesFill } from "react-icons/pi";
 
-import { TESTIMONIALS } from "@/constants";
-import { Icons } from "hugeicons-proxy";
-import { Container } from "@/components/shared/container";
 import { cn } from "@/lib/utils";
+import { TESTIMONIALS } from "@/constants";
+import { Container } from "@/components/shared/container";
 
 export const ReviewsComp = () => {
   return (
@@ -16,8 +16,8 @@ export const ReviewsComp = () => {
         <div className="flex flex-col gap-48">
           {TESTIMONIALS.map((testimonial, index) => (
             <div
-              key={testimonial.id}
-              className={`flex flex-col items-start gap-20 lg:flex-row ${index % 2 !== 0 ? "lg:flex-row-reverse" : ""}`}
+              key={index}
+              className={`flex flex-col items-start gap-10 md:gap-16 lg:flex-row lg:gap-20 ${index % 2 !== 0 ? "lg:flex-row-reverse" : ""}`}
             >
               <motion.div
                 initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
@@ -65,7 +65,7 @@ export const ReviewsComp = () => {
                     size={120}
                     strokeWidth={0.5}
                   />
-                  <h3 className="relative z-10 font-serif text-2xl leading-[1.2] text-balance opacity-95 md:text-4xl">
+                  <h3 className="relative z-10 font-serif text-xl leading-[1.3] text-balance opacity-95 sm:text-2xl sm:leading-[1.2] md:text-4xl">
                     &quot;{testimonial.content}&quot;
                   </h3>
                 </div>
@@ -78,12 +78,8 @@ export const ReviewsComp = () => {
                 className="w-full lg:w-1/2"
               >
                 <div className="flex flex-col gap-6">
-                  <span className="text-muted-foreground text-[10px] tracking-[0.4em] uppercase">
-                    The Artisan Result — {testimonial.workAssets?.length || 0}{" "}
-                    Assets
-                  </span>
-                  <div className="grid h-[600px] grid-cols-6 grid-rows-2 gap-4">
-                    <div className="group bg-secondary/20 relative col-span-4 row-span-2 overflow-hidden transition-all duration-700">
+                  <div className="grid aspect-[1.1] grid-cols-6 gap-3 md:aspect-[1.3] md:gap-4 lg:h-[600px]">
+                    <div className="group border-border/30 bg-secondary/20 relative col-span-4 row-span-2 overflow-hidden border shadow-md transition-all duration-700">
                       <Image
                         src={testimonial.workAssets?.[0] || "/placeholder.svg"}
                         alt="Primary Work Asset"
@@ -91,7 +87,7 @@ export const ReviewsComp = () => {
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
                       />
                     </div>
-                    <div className="group bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden transition-all duration-700">
+                    <div className="group border-border/30 bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden border shadow-md transition-all duration-700">
                       <Image
                         src={testimonial.workAssets?.[1] || "/placeholder.svg"}
                         alt="Secondary Work Asset"
@@ -99,7 +95,7 @@ export const ReviewsComp = () => {
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
                       />
                     </div>
-                    <div className="group bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden transition-all duration-700">
+                    <div className="group border-border/30 bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden border shadow-md transition-all duration-700">
                       <Image
                         src={testimonial.workAssets?.[2] || "/placeholder.svg"}
                         alt="Tertiary Work Asset"
@@ -108,24 +104,6 @@ export const ReviewsComp = () => {
                       />
                     </div>
                   </div>
-                  {testimonial.workAssets &&
-                    testimonial.workAssets.length > 3 && (
-                      <div className="mt-4 grid grid-cols-2 gap-4">
-                        {testimonial.workAssets.slice(3, 5).map((asset, i) => (
-                          <div
-                            key={i}
-                            className="group relative aspect-video overflow-hidden transition-all duration-700"
-                          >
-                            <Image
-                              src={asset || "/placeholder.svg"}
-                              alt={`Additional Asset ${i + 4}`}
-                              fill
-                              className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    )}
                 </div>
               </motion.div>
             </div>

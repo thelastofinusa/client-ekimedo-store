@@ -1,9 +1,7 @@
 import React from "react";
-
-import { Footer } from "@/components/shared/footer";
 import { Header } from "@/components/shared/header";
 
-export default function RoutesLayout({
+export default function CategoryLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -12,7 +10,6 @@ export default function RoutesLayout({
     <React.Fragment>
       <Header />
       {children}
-      <Footer />
     </React.Fragment>
   );
 }

@@ -1,6 +1,14 @@
+import type { Metadata } from "next";
+
+import { siteConfig } from "@/config/site.config";
 import { Button } from "@/ui/button";
 import { HeroComp } from "./_components/hero.comp";
 import { ReviewsComp } from "./_components/reviews.comp";
+
+export const metadata: Metadata = {
+  title: "Client Testimonials",
+  description: `Read stories from ${siteConfig.title} clients reflecting on their bespoke bridal, prom, and special-event couture experiences.`,
+};
 
 export default function Testimonials() {
   return (

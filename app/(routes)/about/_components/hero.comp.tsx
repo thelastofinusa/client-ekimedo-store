@@ -18,11 +18,13 @@ export const HeroComp = () => {
 
         <div className="grid grid-cols-1 items-end gap-12 lg:grid-cols-12 lg:gap-24">
           <div className="space-y-12 lg:col-span-5">
-            <div className="bg-muted relative aspect-4/5 overflow-hidden">
+            <div className="bg-secondary relative aspect-4/5 overflow-hidden shadow-xs">
               <Image
                 src="https://images.unsplash.com/photo-1548313093-370cf4ba3892?q=80&w=1364&auto=format&fit=crop"
                 alt="Atelier detail"
                 fill
+                priority
+                quality={100}
                 className="origin-bottom object-cover grayscale transition-transform duration-700 hover:scale-105"
               />
             </div>
@@ -49,11 +51,13 @@ export const HeroComp = () => {
                 </p>
               </div>
             </div>
-            <div className="bg-muted relative h-[400px] overflow-hidden md:h-[600px]">
+            <div className="bg-secondary relative h-[400px] overflow-hidden shadow-xs md:h-[600px]">
               <Image
                 src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2000&auto=format&fit=crop"
                 alt="Craftsmanship"
                 fill
+                priority
+                quality={100}
                 className="origin-bottom-right object-cover brightness-90 transition-transform duration-700 hover:scale-105"
               />
             </div>

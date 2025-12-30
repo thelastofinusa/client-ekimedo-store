@@ -1,53 +1,53 @@
-import { create } from "zustand";
+// import { create } from "zustand";
 
-interface CartItem {
-  dress: {
-    id: string;
-    name: string;
-    price: number;
-  };
-  quantity: number;
-}
+// interface CartItem {
+//   dress: {
+//     id: string;
+//     name: string;
+//     price: number;
+//   };
+//   quantity: number;
+// }
 
-interface ConsultationForm {
-  category: string;
-  inspirationImages: string[];
-  description: string;
-  currentStep: number;
-}
+// interface ConsultationForm {
+//   category: string;
+//   inspirationImages: string[];
+//   description: string;
+//   currentStep: number;
+// }
 
-interface AppState {
-  currentSlide: number;
-  setSlide: (index: number) => void;
-  totalSlides: number;
-  cart: CartItem[];
-  addToCart: (item: CartItem) => void;
-  removeFromCart: (dressId: string) => void;
-  consultation: ConsultationForm;
-  updateConsultation: (data: Partial<ConsultationForm>) => void;
-}
+// interface AppState {
+//   currentSlide: number;
+//   setSlide: (index: number) => void;
+//   totalSlides: number;
+//   cart: CartItem[];
+//   addToCart: (item: CartItem) => void;
+//   removeFromCart: (dressId: string) => void;
+//   consultation: ConsultationForm;
+//   updateConsultation: (data: Partial<ConsultationForm>) => void;
+// }
 
-export const useStore = create<AppState>((set) => ({
-  currentSlide: 0,
-  totalSlides: 3,
-  setSlide: (index) => set({ currentSlide: index }),
-  cart: [],
-  addToCart: (item) =>
-    set((state) => ({
-      cart: [...state.cart, item],
-    })),
-  removeFromCart: (dressId) =>
-    set((state) => ({
-      cart: state.cart.filter((item) => item.dress.id !== dressId),
-    })),
-  consultation: {
-    category: "bridal",
-    inspirationImages: [],
-    description: "",
-    currentStep: 1,
-  },
-  updateConsultation: (data) =>
-    set((state) => ({
-      consultation: { ...state.consultation, ...data },
-    })),
-}));
+// export const useStore = create<AppState>((set) => ({
+//   currentSlide: 0,
+//   totalSlides: 3,
+//   setSlide: (index) => set({ currentSlide: index }),
+//   cart: [],
+//   addToCart: (item) =>
+//     set((state) => ({
+//       cart: [...state.cart, item],
+//     })),
+//   removeFromCart: (dressId) =>
+//     set((state) => ({
+//       cart: state.cart.filter((item) => item.dress.id !== dressId),
+//     })),
+//   consultation: {
+//     category: "bridal",
+//     inspirationImages: [],
+//     description: "",
+//     currentStep: 1,
+//   },
+//   updateConsultation: (data) =>
+//     set((state) => ({
+//       consultation: { ...state.consultation, ...data },
+//     })),
+// }));

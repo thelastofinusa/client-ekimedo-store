@@ -3,6 +3,7 @@ import { z } from "zod";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { isValidPhoneNumber } from "react-phone-number-input";
 
 import {
   Form,
@@ -24,6 +25,7 @@ import {
   SelectValue,
 } from "@/ui/select";
 import { Textarea } from "@/ui/textarea";
+import { PhoneInput } from "@/ui/phone-input";
 
 const inquiryTypes = [
   "General Inquiry",
@@ -34,18 +36,21 @@ const inquiryTypes = [
 
 const formSchema = z.object({
   fName: z
-    .string()
+    .string("First name is required")
     .min(2, "First name too short")
     .max(50, "First name too long"),
-  lName: z.string().min(2, "Last name too short").max(50, "Last name too long"),
-  email: z.email("Invalid email address"),
+  lName: z
+    .string("Last name is required")
+    .min(2, "Last name too short")
+    .max(50, "Last name too long"),
+  email: z.email("Email address is required").min(4, "Invalid email address"),
   inquiryType: z.enum(inquiryTypes, "Select an inquiry type"),
   phone: z
-    .string()
-    .min(7, "Phone number too short")
-    .max(20, "Phone number too long"),
+    .string("Phone number is required")
+    .min(2, "Phone number is required")
+    .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
   message: z
-    .string()
+    .string("Message is required")
     .min(10, "Message too short")
     .max(1000, "Message too long"),
 });
@@ -72,13 +77,13 @@ export const ContactFormComp = () => {
     <div className="py-24 lg:py-32">
       <Container size="sm">
         <div className="grid grid-cols-1 gap-8 py-16 sm:gap-10 md:grid-cols-2 md:gap-16 lg:gap-24">
-          <div className="flex flex-col gap-16">
+          <div className="flex flex-col gap-10 md:gap-16">
             <header>
-              <span className="text-muted-foreground mb-6 text-[10px] tracking-[0.4em] uppercase">
+              <span className="text-muted-foreground mb-4 text-[10px] tracking-[0.4em] uppercase md:mb-6">
                 Get in touch
               </span>
               <h2 className="font-serif text-5xl md:text-7xl">Inquire</h2>
-              <p className="mt-8 max-w-md text-sm leading-relaxed opacity-60">
+              <p className="mt-6 max-w-md text-sm leading-relaxed opacity-60 md:mt-8">
                 Whether you have a specific vision or are just beginning your
                 journey, our atelier is ready to assist you.
               </p>
@@ -170,7 +175,7 @@ export const ContactFormComp = () => {
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <PhoneInput {...field} defaultCountry="US" />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -192,45 +197,48 @@ export const ContactFormComp = () => {
                   )}
                 />
                 <Button type="submit" size="xl" className="w-full">
-                  Submit
+                  <span>Continue</span>
                 </Button>
               </form>
             </Form>
           </div>
 
-          <div className="space-y-24 pt-12 md:pt-32">
-            <div className="space-y-12">
-              <div className="space-y-4">
-                <h4 className="text-[10px] tracking-[0.4em] uppercase opacity-60">
+          <div className="flex flex-col gap-6 pt-12 md:pt-32 lg:gap-8">
+            <div className="flex flex-col gap-4 md:gap-6 lg:gap-8">
+              <div className="flex flex-col gap-2">
+                <h4 className="text-[10px] tracking-[0.4em] uppercase">
                   The Atelier
                 </h4>
-                <p className="font-serif text-xl">Capital Heights Maryland</p>
+                <h4 className="text-lg">
+                  Capital Heights <br /> Maryland USA
+                </h4>
               </div>
-              <div className="space-y-4">
-                <h4 className="text-[10px] tracking-[0.4em] uppercase opacity-60">
+              <div className="flex flex-col gap-2">
+                <h4 className="text-[10px] tracking-[0.4em] uppercase">
                   Contact Info
                 </h4>
-                <p className="font-serif text-xl">
-                  202-907-4865 <br /> info.e22fashion@gmail.com
-                </p>
+                <h4 className="text-lg">
+                  (+1) 202-907-4865 <br /> info.e22fashion@gmail.com
+                </h4>
               </div>
-              <div className="space-y-4">
-                <h4 className="text-[10px] tracking-[0.4em] uppercase opacity-60">
+              <div className="flex flex-col gap-2">
+                <h4 className="text-[10px] tracking-[0.4em] uppercase">
                   Business Hours
                 </h4>
-                <p className="font-serif text-xl">
+                <h4 className="text-lg">
                   Mon - Fri: 10:00 AM - 06:00 PM <br />
                   Sat - Sun: Closed
-                </p>
+                </h4>
               </div>
             </div>
 
-            <div className="bg-secondary relative aspect-video overflow-hidden shadow-xs grayscale transition-all duration-300 hover:grayscale-0">
+            <div className="bg-secondary relative aspect-video overflow-hidden shadow-xs transition-all duration-300">
               <Image
-                src="https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=1000&auto=format&fit=crop"
+                src="https://images.unsplash.com/photo-1549488497-94b52bddac5d?q=80&w=2670&auto=format&fit=crop"
                 alt="Location"
-                className="absolute inset-0 h-full w-full object-cover opacity-60"
-                fill
+                className="absolute inset-0 h-auto w-full object-cover opacity-60"
+                width={2670}
+                height={0}
                 priority
                 quality={100}
               />
