@@ -4,16 +4,23 @@ import Link from "next/link";
 import { toast } from "sonner";
 import * as React from "react";
 import { Icons } from "hugeicons-proxy";
-import { AnimatePresence, motion } from "motion/react";
+import { motion } from "motion/react";
 
 import { Logo } from "./logo";
-import { Button } from "@/ui/button";
+import { Button, buttonVariants } from "@/ui/button";
 import { NAVIGATIONS } from "@/constants";
 import { useAppStore } from "@/lib/store";
-import { ScrollArea } from "@/ui/scroll-area";
 import { siteConfig } from "@/config/site.config";
-import { Container, containerVariants } from "./container";
+import { Container } from "./container";
 import { Notify } from "./notify";
+import {
+  Sheet,
+  SheetContent,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/ui/sheet";
 
 export const Header = () => {
   const { cart, addToCart } = useAppStore();
@@ -61,84 +68,101 @@ export const Header = () => {
                 </span>
               )}
             </Button>
-            <Button
-              size="icon-sm"
-              variant="secondary"
-              className="pointer-events-auto"
-              onClick={() => setOpenMenu(true)}
-            >
-              <Icons.Menu09Icon className="size-4.5" />
-            </Button>
-          </div>
-        </Container>
-      </nav>
-
-      {/* Slide-out Menu */}
-      <AnimatePresence>
-        {openMenu && (
-          <motion.div
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
-            transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-            className="bg-primary text-background fixed inset-0 z-60"
-          >
-            <ScrollArea
-              className={containerVariants({
-                className: "relative flex h-full flex-col overflow-y-auto",
-              })}
-            >
-              <div className="flex w-full items-center justify-between py-6 md:py-8">
-                <Logo
-                  href="/"
-                  srcDesktop="horizontal"
-                  color="bone"
-                  className="pointer-events-auto"
-                />
-
+            <Sheet open={openMenu} onOpenChange={setOpenMenu}>
+              <SheetTrigger asChild>
                 <Button
                   size="icon-sm"
                   variant="secondary"
-                  onClick={() => setOpenMenu(false)}
-                  className="mr-1"
+                  className="pointer-events-auto"
+                  onClick={() => setOpenMenu(true)}
                 >
-                  <Icons.Cancel01Icon className="size-4.5" />
+                  <Icons.Menu09Icon className="size-4.5" />
                 </Button>
-              </div>
+              </SheetTrigger>
+              <SheetContent background="dark" className="sm:max-w-md">
+                <SheetHeader className="border-b-border/10 border-b bg-black/30">
+                  <SheetTitle>Maison Menu</SheetTitle>
+                </SheetHeader>
 
-              <nav className="flex flex-1 flex-col justify-center gap-6 py-6 md:gap-8 md:py-8 2xl:pt-16">
-                {NAVIGATIONS.HEADER.map((route, routeIdx) => (
-                  <Link
-                    key={routeIdx}
-                    href={{ pathname: route.path }}
-                    onClick={() => setOpenMenu(false)}
-                    className="w-fit font-serif text-4xl transition-transform duration-500 hover:translate-x-4 md:text-6xl 2xl:text-7xl"
-                  >
-                    {route.label}
-                  </Link>
-                ))}
-              </nav>
+                <div className="flex flex-1 flex-col justify-center px-8 py-12 md:px-12">
+                  <nav className="flex flex-col gap-6">
+                    {NAVIGATIONS.HEADER.map((item, index) => {
+                      return (
+                        <motion.div
+                          key={item.path}
+                          initial={{ opacity: 0, x: 20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.1 + index * 0.05 }}
+                          onClick={() => setOpenMenu(false)}
+                        >
+                          <Link
+                            href={{ pathname: item.path }}
+                            className="group flex w-fit items-baseline gap-4"
+                          >
+                            <span className="font-sans text-[10px] opacity-20 transition-opacity duration-500 group-hover:opacity-100">
+                              0{index + 1}
+                            </span>
+                            <span className="font-serif text-2xl transition-all duration-500 md:text-4xl">
+                              {item.label}
+                            </span>
+                          </Link>
+                        </motion.div>
+                      );
+                    })}
 
-              <div className="border-border/10 flex flex-col items-end justify-between gap-8 border-t py-10 md:mt-10 md:flex-row">
-                <div className="flex flex-col gap-1">
-                  <span className="text-[10px] tracking-widest uppercase opacity-40">
-                    Consultation
-                  </span>
-                  <Link
-                    href="/"
-                    className="border-ivory/20 border-b pb-1 text-sm"
-                  >
-                    Start your journey
-                  </Link>
+                    <motion.div
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 }}
+                      onClick={() => setOpenMenu(false)}
+                    >
+                      <Link
+                        href="/cart"
+                        className="group border-background/5 mt-4 flex w-full items-baseline gap-4 border-t pt-6"
+                      >
+                        <span className="font-serif text-2xl transition-all duration-500 md:text-4xl">
+                          View Cart
+                        </span>
+                        {cart.length > 0 && (
+                          <span className="font-sans text-sm tracking-tighter opacity-40">
+                            [{cart.length}]
+                          </span>
+                        )}
+                      </Link>
+                    </motion.div>
+                  </nav>
                 </div>
-                <p className="text-[10px] tracking-widest uppercase opacity-40">
-                  © 2025 {siteConfig.title}. All rights reserved.
-                </p>
-              </div>
-            </ScrollArea>
-          </motion.div>
-        )}
-      </AnimatePresence>
+
+                <SheetFooter className="gap-6 bg-black/20">
+                  <div className="space-y-2">
+                    <span className="text-[8px] tracking-[0.3em] uppercase opacity-30">
+                      The Atelier
+                    </span>
+                    <p className="max-w-[220px] text-[10px] leading-relaxed opacity-60">
+                      Private consultations by appointment only.
+                    </p>
+                  </div>
+                  <div className="flex items-end justify-between">
+                    <Link
+                      href="/consultation"
+                      className={buttonVariants({
+                        variant: "outline",
+                        size: "sm",
+                        className: "hover:text-background",
+                      })}
+                    >
+                      Book a visit
+                    </Link>
+                    <p className="text-[8px] tracking-widest uppercase opacity-20">
+                      © 2025 {siteConfig.title}
+                    </p>
+                  </div>
+                </SheetFooter>
+              </SheetContent>
+            </Sheet>
+          </div>
+        </Container>
+      </nav>
     </React.Fragment>
   );
 };

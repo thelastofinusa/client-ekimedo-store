@@ -9,6 +9,10 @@ export const NAVIGATIONS = {
       path: "/gallery",
     },
     {
+      label: "Shop",
+      path: "/shop",
+    },
+    {
       label: "About",
       path: "/about",
     },
