@@ -37,8 +37,8 @@ export const MenuSheet: React.FC<CompProps> = ({
           <SheetTitle>Maison Menu</SheetTitle>
         </SheetHeader>
 
-        <div className="flex flex-1 flex-col justify-center px-8 py-12 md:px-12">
-          <nav className="flex flex-col gap-6">
+        <div className="flex flex-1 flex-col justify-center p-8 md:px-12">
+          <nav className="flex flex-col gap-4 md:gap-6">
             {NAVIGATIONS.HEADER.map((item, index) => {
               return (
                 <motion.div
