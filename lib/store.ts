@@ -5,7 +5,10 @@ interface CartItem {
     id: string;
     name: string;
     price: number;
+    category: string;
+    image: string;
   };
+  selectedSize: string | number;
   quantity: number;
 }
 
@@ -14,6 +17,7 @@ interface AppStoreProps {
   // ACTIONS
   addToCart: (item: CartItem) => void;
   removeFromCart: (dressId: string) => void;
+  clearCart: () => void;
 }
 
 export const useAppStore = create<AppStoreProps>((setFn) => ({
@@ -25,6 +29,10 @@ export const useAppStore = create<AppStoreProps>((setFn) => ({
   removeFromCart: (dressId: string) =>
     setFn((state: AppStoreProps) => ({
       cart: state.cart.filter((item) => item.dress.id !== dressId),
+    })),
+  clearCart: () =>
+    setFn(() => ({
+      cart: [],
     })),
 }));
 
