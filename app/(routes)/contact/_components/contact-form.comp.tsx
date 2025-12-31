@@ -1,6 +1,7 @@
 "use client";
 import { z } from "zod";
 import Image from "next/image";
+import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isValidPhoneNumber } from "react-phone-number-input";
@@ -24,8 +25,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/select";
+import { sleep } from "@/lib/utils";
 import { Textarea } from "@/ui/textarea";
 import { PhoneInput } from "@/ui/phone-input";
+import { Notify } from "@/components/shared/notify";
 
 const inquiryTypes = [
   "General Inquiry",
@@ -56,6 +59,7 @@ const formSchema = z.object({
 });
 
 type FormType = z.infer<typeof formSchema>;
+
 export const ContactFormComp = () => {
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
@@ -63,14 +67,24 @@ export const ContactFormComp = () => {
       fName: "",
       lName: "",
       email: "",
-      inquiryType: inquiryTypes[0],
+      inquiryType: "" as (typeof inquiryTypes)[number],
       phone: "",
       message: "",
     },
   });
 
-  function onSubmit(values: FormType) {
+  async function onSubmit(values: FormType) {
+    await sleep();
+    toast.custom(() => {
+      return (
+        <Notify
+          type="success"
+          title={`Messages has been sent, ${values.fName}`}
+        />
+      );
+    });
     console.log(values);
+    form.reset();
   }
 
   return (
@@ -92,9 +106,9 @@ export const ContactFormComp = () => {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="space-y-6"
+                className="flex flex-col gap-4 md:gap-6"
               >
-                <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 md:gap-6 lg:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="fName"
@@ -102,7 +116,11 @@ export const ContactFormComp = () => {
                       <FormItem>
                         <FormLabel>First Name</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input
+                            {...field}
+                            type="text"
+                            disabled={form.formState.isSubmitting}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -115,7 +133,11 @@ export const ContactFormComp = () => {
                       <FormItem>
                         <FormLabel>Last Name</FormLabel>
                         <FormControl>
-                          <Input {...field} />
+                          <Input
+                            {...field}
+                            type="text"
+                            disabled={form.formState.isSubmitting}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -131,22 +153,29 @@ export const ContactFormComp = () => {
                       <FormLabel>Inquiry Type</FormLabel>
                       <FormControl>
                         <Select
-                          defaultValue={inquiryTypes[0]}
                           value={field.value}
                           onValueChange={field.onChange}
                         >
-                          <SelectTrigger className="w-full">
+                          <SelectTrigger
+                            className="w-full"
+                            aria-invalid={Boolean(
+                              form.formState.errors.inquiryType,
+                            )}
+                            disabled={form.formState.isSubmitting}
+                          >
                             <SelectValue />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectGroup>
-                              {inquiryTypes.map((type) => (
-                                <SelectItem key={type} value={type}>
-                                  {type}
-                                </SelectItem>
-                              ))}
-                            </SelectGroup>
-                          </SelectContent>
+                          {!form.formState.isSubmitting && (
+                            <SelectContent>
+                              <SelectGroup>
+                                {inquiryTypes.map((type) => (
+                                  <SelectItem key={type} value={type}>
+                                    {type}
+                                  </SelectItem>
+                                ))}
+                              </SelectGroup>
+                            </SelectContent>
+                          )}
                         </Select>
                       </FormControl>
                       <FormMessage />
@@ -154,7 +183,7 @@ export const ContactFormComp = () => {
                   )}
                 />
 
-                <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2">
+                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 md:gap-6 lg:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="email"
@@ -162,7 +191,11 @@ export const ContactFormComp = () => {
                       <FormItem>
                         <FormLabel>Email Address</FormLabel>
                         <FormControl>
-                          <Input type="email" {...field} />
+                          <Input
+                            type="email"
+                            {...field}
+                            disabled={form.formState.isSubmitting}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -175,7 +208,11 @@ export const ContactFormComp = () => {
                       <FormItem>
                         <FormLabel>Phone Number</FormLabel>
                         <FormControl>
-                          <PhoneInput {...field} defaultCountry="US" />
+                          <PhoneInput
+                            {...field}
+                            defaultCountry="US"
+                            disabled={form.formState.isSubmitting}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -190,44 +227,55 @@ export const ContactFormComp = () => {
                     <FormItem>
                       <FormLabel>Message</FormLabel>
                       <FormControl>
-                        <Textarea {...field} />
+                        <Textarea
+                          {...field}
+                          disabled={form.formState.isSubmitting}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" size="xl" className="w-full">
+                <Button
+                  size="xl"
+                  type="submit"
+                  className="w-full"
+                  loadingText="Please wait..."
+                  isLoading={form.formState.isSubmitting}
+                >
                   <span>Continue</span>
                 </Button>
               </form>
             </Form>
           </div>
 
-          <div className="flex flex-col gap-6 pt-12 md:pt-32 lg:gap-8">
+          <div className="flex flex-col gap-8 pt-12 md:pt-32 lg:gap-16">
             <div className="flex flex-col gap-4 md:gap-6 lg:gap-8">
-              <div className="flex flex-col gap-2">
-                <h4 className="text-[10px] tracking-[0.4em] uppercase">
+              <div className="flex flex-col gap-3">
+                <p className="text-[10px] tracking-[0.4em] uppercase">
                   The Atelier
-                </h4>
+                </p>
                 <h4 className="text-lg">
-                  Capital Heights <br /> Maryland USA
+                  <p>Capital Heights</p>
+                  <p>Maryland USA</p>
                 </h4>
               </div>
-              <div className="flex flex-col gap-2">
-                <h4 className="text-[10px] tracking-[0.4em] uppercase">
+              <div className="flex flex-col gap-3">
+                <p className="text-[10px] tracking-[0.4em] uppercase">
                   Contact Info
-                </h4>
+                </p>
                 <h4 className="text-lg">
-                  (+1) 202-907-4865 <br /> info.e22fashion@gmail.com
+                  <p>(+1) 202-907-4865</p>
+                  <p>info.e22fashion@gmail.com</p>
                 </h4>
               </div>
-              <div className="flex flex-col gap-2">
-                <h4 className="text-[10px] tracking-[0.4em] uppercase">
+              <div className="flex flex-col gap-3">
+                <p className="text-[10px] tracking-[0.4em] uppercase">
                   Business Hours
-                </h4>
+                </p>
                 <h4 className="text-lg">
-                  Mon - Fri: 10:00 AM - 06:00 PM <br />
-                  Sat - Sun: Closed
+                  <p>Tuesday to Saturday: 10:00 AM to 6:00 PM.</p>
+                  <p>Sunday and Monday: Closed.</p>
                 </h4>
               </div>
             </div>

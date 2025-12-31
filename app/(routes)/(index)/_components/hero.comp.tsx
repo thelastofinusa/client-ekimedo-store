@@ -33,18 +33,18 @@ export const HeroComp = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 1 }}
-          className="flex flex-col items-center justify-center gap-8 pt-8 md:flex-row md:pt-12"
+          className="flex flex-col items-center justify-center gap-4 pt-8 sm:gap-6 md:flex-row md:gap-8 md:pt-12"
         >
           <Link
-            href="/"
-            className={buttonVariants({ variant: "outline", size: "xl" })}
+            href="/#collections"
+            className={buttonVariants({ variant: "outline", size: "lg" })}
           >
             Explore Collections
           </Link>
           <div className="bg-border hidden h-6 w-px md:block" />
           <Link
-            href="/"
-            className={buttonVariants({ variant: "link", size: "xl" })}
+            href="/consultation"
+            className={buttonVariants({ variant: "link", size: "lg" })}
           >
             Private Consultation
           </Link>

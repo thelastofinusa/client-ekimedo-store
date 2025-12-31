@@ -1,18 +1,22 @@
 "use client";
 
 import Link from "next/link";
+import { toast } from "sonner";
 import * as React from "react";
 import { Icons } from "hugeicons-proxy";
 import { AnimatePresence, motion } from "motion/react";
 
-import { Button } from "@/ui/button";
-import { Container, containerVariants } from "./container";
-import { NAVIGATIONS } from "@/constants";
-import { siteConfig } from "@/config/site.config";
-import { ScrollArea } from "@/ui/scroll-area";
 import { Logo } from "./logo";
+import { Button } from "@/ui/button";
+import { NAVIGATIONS } from "@/constants";
+import { useAppStore } from "@/lib/store";
+import { ScrollArea } from "@/ui/scroll-area";
+import { siteConfig } from "@/config/site.config";
+import { Container, containerVariants } from "./container";
+import { Notify } from "./notify";
 
 export const Header = () => {
+  const { cart, addToCart } = useAppStore();
   const [openMenu, setOpenMenu] = React.useState(false);
 
   return (
@@ -26,13 +30,36 @@ export const Header = () => {
             className="pointer-events-auto"
           />
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Button
-              size="icon-sm"
               variant="secondary"
               className="pointer-events-auto"
+              size={cart.length > 0 ? "sm" : "icon-sm"}
+              onClick={() => {
+                toast.custom(() => {
+                  return (
+                    <Notify
+                      type="success"
+                      title={`"${cart.length + 1}" product(s) added to cart`}
+                    />
+                  );
+                });
+                addToCart({
+                  dress: {
+                    id: "10",
+                    name: "Some kind of nonsense",
+                    price: 500,
+                  },
+                  quantity: 2,
+                });
+              }}
             >
               <Icons.ShoppingCart02Icon className="size-4.5" />
+              {cart.length > 0 && (
+                <span className="font-mono text-xs tracking-normal">
+                  {cart.length > 9 ? "+9" : cart.length}
+                </span>
+              )}
             </Button>
             <Button
               size="icon-sm"

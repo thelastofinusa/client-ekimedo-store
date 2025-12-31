@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next";
 
 import "./globals.css";
 import { variables } from "@/font";
+import { Toaster } from "@/ui/sonner";
 import { siteConfig } from "@/config/site.config";
 
 export const metadata: Metadata = {
@@ -67,6 +68,7 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={variables("antialiased")}>
         <Analytics />
+        <Toaster position="top-center" richColors />
         <NextTopLoader color="var(--primary)" showSpinner={false} />
         {children}
       </body>

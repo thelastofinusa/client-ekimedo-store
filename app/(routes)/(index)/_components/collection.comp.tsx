@@ -5,7 +5,10 @@ import Link from "next/link";
 
 export const CollectionComp = () => {
   return (
-    <div className="from-secondary via-secondary/50 bg-linear-to-t to-transparent py-24 lg:py-32">
+    <div
+      id="collections"
+      className="from-secondary via-secondary/50 bg-linear-to-t to-transparent py-24 lg:py-32"
+    >
       <Container>
         <header className="mb-14 text-center md:mb-20">
           <span className="text-muted-foreground text-[10px] tracking-[0.4em] uppercase">

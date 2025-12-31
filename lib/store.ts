@@ -1,13 +1,32 @@
-// import { create } from "zustand";
+import { create } from "zustand";
 
-// interface CartItem {
-//   dress: {
-//     id: string;
-//     name: string;
-//     price: number;
-//   };
-//   quantity: number;
-// }
+interface CartItem {
+  dress: {
+    id: string;
+    name: string;
+    price: number;
+  };
+  quantity: number;
+}
+
+interface AppStoreProps {
+  cart: CartItem[];
+  // ACTIONS
+  addToCart: (item: CartItem) => void;
+  removeFromCart: (dressId: string) => void;
+}
+
+export const useAppStore = create<AppStoreProps>((setFn) => ({
+  cart: [],
+  addToCart: (item: CartItem) =>
+    setFn((state: AppStoreProps) => ({
+      cart: [...state.cart, item],
+    })),
+  removeFromCart: (dressId: string) =>
+    setFn((state: AppStoreProps) => ({
+      cart: state.cart.filter((item) => item.dress.id !== dressId),
+    })),
+}));
 
 // interface ConsultationForm {
 //   category: string;

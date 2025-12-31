@@ -1,5 +1,5 @@
 export const siteConfig = {
-  title: "Ekiemedo",
+  title: "Ekimedo",
   tagline: "Where luxury meets timeless Designs",
   description:
     "Our elegant designs blend tradition with contemporary style, ensuring you shine on your special day and beyond.",
