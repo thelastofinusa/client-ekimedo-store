@@ -50,7 +50,8 @@ export const CartComp = () => {
                           {item.dress.name}
                         </h3>
                         <p className="text-[10px] tracking-widest uppercase opacity-40">
-                          {item.selectedSize} / {item.selectedColor}
+                          {item.selectedSize}
+                          {item.selectedColor ? ` / ${item.selectedColor}` : null}
                         </p>
                       </div>
                       <Button
@@ -65,10 +66,10 @@ export const CartComp = () => {
                     </div>
                     <div className="flex items-end justify-between">
                       <p className="text-[10px] tracking-widest uppercase opacity-40">
-                        Delivery: {item.dress.deliveryTime}
+                        {item.dress.deliveryTime ? `Delivery: ${item.dress.deliveryTime}` : ""}
                       </p>
                       <span className="text-charcoal text-sm font-medium">
-                        {item.dress.priceRange}
+                        {item.dress.priceRange ?? `$${(item.dress.price || 0).toLocaleString()}`}
                       </span>
                     </div>
                   </div>

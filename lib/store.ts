@@ -7,8 +7,13 @@ interface CartItem {
     price: number;
     category: string;
     image: string;
+    // Optional metadata used in some UIs
+    priceRange?: string;
+    deliveryTime?: string;
   };
   selectedSize: string | number;
+  // Optional color selection; not all flows set this yet
+  selectedColor?: string;
   quantity: number;
 }
 
