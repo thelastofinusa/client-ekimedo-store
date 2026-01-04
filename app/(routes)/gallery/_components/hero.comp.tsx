@@ -40,7 +40,7 @@ export const HeroComp: React.FC<Props> = ({
             Archive
           </span>
           <h2 className="mt-4 mb-8 text-[12vw] leading-[0.9] tracking-tighter md:mb-12 md:text-[6vw]">
-            The Gallery
+            Gallery
           </h2>
 
           <div className="grid w-full max-w-lg grid-cols-2 gap-6">

@@ -75,7 +75,7 @@ export default async function Prom({ params }: PageProps) {
         title="Can't find exactly what you're looking for?"
         label="Custom Dress Consultation"
       />
-      <footer className="border-primary/10 border-t py-12 text-center">
+      <footer className="border-primary/10 border-t py-8 text-center md:py-12">
         <p className="text-muted-foreground text-[10px] tracking-[0.3em] uppercase">
           {siteConfig.title} Couture © 2025
         </p>

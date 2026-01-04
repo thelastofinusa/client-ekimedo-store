@@ -6,7 +6,7 @@ import { HeroComp } from "./_components/hero.comp";
 import { ReviewsComp } from "./_components/reviews.comp";
 
 export const metadata: Metadata = {
-  title: "Client Testimonials",
+  title: "Client Voices",
   description: `Read stories from ${siteConfig.title} clients reflecting on their bespoke bridal, prom, and special-event couture experiences.`,
 };
 

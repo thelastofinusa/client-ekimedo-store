@@ -5,23 +5,23 @@ export const NAVIGATIONS = {
       path: "/",
     },
     {
-      label: "Gallery",
+      label: "Archive Gallery",
       path: "/gallery",
     },
     {
-      label: "Shop",
+      label: "The Shop",
       path: "/shop",
     },
     {
-      label: "About",
+      label: "Maison Story",
       path: "/about",
     },
     {
-      label: "Testimonials",
+      label: "Client Voices",
       path: "/testimonials",
     },
     {
-      label: "Contact",
+      label: "Contact & Atelier",
       path: "/contact",
     },
   ],
@@ -83,52 +83,13 @@ export const NAVIGATIONS = {
         },
         {
           label: "Capitol Heights, Maryland",
-          path: "/",
+          path: "https://maps.app.goo.gl/8d2LfPehk2PMqN5Q8",
           newTab: true,
         },
       ],
     },
   ],
 };
-
-export const HERO_SLIDES = [
-  {
-    id: 1,
-    label: "FOR/HER",
-    number: "01",
-    title: "NOSTALGIA",
-    description:
-      "Morbi volutpat tortor sit amet leo pretium, ut scelerisque nunc fringilla. Lorem ipsum dolor sit amet, consectetur adipiscing varius magna in dolor maximus accumsan.",
-    image:
-      "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
-    imageLarge:
-      "https://images.unsplash.com/photo-1594552072238-6d4e9b0d6f0e?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: 2,
-    label: "FOR/HER",
-    number: "02",
-    title: "ELEGANCE",
-    description:
-      "Timeless sophistication meets contemporary design. Experience the art of bespoke couture tailored to your vision.",
-    image:
-      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?q=80&w=1000&auto=format&fit=crop",
-    imageLarge:
-      "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=1200&auto=format&fit=crop",
-  },
-  {
-    id: 3,
-    label: "FOR/HER",
-    number: "03",
-    title: "RADIANCE",
-    description:
-      "Illuminate every moment with designs that capture the essence of refined luxury and modern grace.",
-    image:
-      "https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=1000&auto=format&fit=crop",
-    imageLarge:
-      "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?q=80&w=1200&auto=format&fit=crop",
-  },
-];
 
 export const TESTIMONIALS = [
   {

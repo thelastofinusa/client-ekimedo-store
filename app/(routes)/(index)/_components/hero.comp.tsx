@@ -29,6 +29,16 @@ export const HeroComp = () => {
           {siteConfig.tagline}
         </motion.h1>
 
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4, duration: 1 }}
+          className="text-primary/60 mx-auto max-w-md font-sans text-sm leading-relaxed md:text-base"
+        >
+          Transform your closets into functional works of art with{" "}
+          {siteConfig.title}&apos;s custom couture design solutions.
+        </motion.p>
+
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

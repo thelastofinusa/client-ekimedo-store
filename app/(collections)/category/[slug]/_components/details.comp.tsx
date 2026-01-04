@@ -47,7 +47,10 @@ export const DetailsComp: React.FC<CompProps> = ({ info, dresses }) => {
               transition={{ duration: 0.8 }}
               className="group"
             >
-              <Link href="/" className="block">
+              <Link
+                href={{ pathname: `/product/${dress.id}` }}
+                className="block"
+              >
                 <div className="bg-secondary/50 relative mb-6 aspect-3/4 overflow-hidden shadow-sm">
                   <Image
                     src={

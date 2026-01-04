@@ -194,7 +194,7 @@ const FlagComponent = ({ country, countryName }: RPNInput.FlagProps) => {
   const Flag = flags[country];
 
   return (
-    <span className="bg-foreground/20 flex h-4 w-6 overflow-hidden rounded-sm shadow-xs [&_svg:not([class*='size-'])]:size-full">
+    <span className="bg-foreground/20 flex h-3.5 w-5.5 overflow-hidden rounded-sm shadow-xs [&_svg:not([class*='size-'])]:size-full">
       {Flag && <Flag title={countryName} />}
     </span>
   );

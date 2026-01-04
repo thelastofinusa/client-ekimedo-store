@@ -1,10 +1,9 @@
 "use client";
-import { z } from "zod";
+import Link from "next/link";
 import Image from "next/image";
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { isValidPhoneNumber } from "react-phone-number-input";
 
 import {
   Form,
@@ -29,36 +28,7 @@ import { sleep } from "@/lib/utils";
 import { Textarea } from "@/ui/textarea";
 import { PhoneInput } from "@/ui/phone-input";
 import { Notify } from "@/components/shared/notify";
-
-const inquiryTypes = [
-  "General Inquiry",
-  "Bridal Consultation",
-  "Prom Design",
-  "Special Event",
-] as const;
-
-const formSchema = z.object({
-  fName: z
-    .string("First name is required")
-    .min(2, "First name too short")
-    .max(50, "First name too long"),
-  lName: z
-    .string("Last name is required")
-    .min(2, "Last name too short")
-    .max(50, "Last name too long"),
-  email: z.email("Email address is required").min(4, "Invalid email address"),
-  inquiryType: z.enum(inquiryTypes, "Select an inquiry type"),
-  phone: z
-    .string("Phone number is required")
-    .min(2, "Phone number is required")
-    .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
-  message: z
-    .string("Message is required")
-    .min(10, "Message too short")
-    .max(1000, "Message too long"),
-});
-
-type FormType = z.infer<typeof formSchema>;
+import { formSchema, FormType, inquiryTypes } from "@/lib/validators";
 
 export const ContactFormComp = () => {
   const form = useForm<FormType>({
@@ -243,7 +213,7 @@ export const ContactFormComp = () => {
                   loadingText="Please wait..."
                   isLoading={form.formState.isSubmitting}
                 >
-                  <span>Continue</span>
+                  <span>Send Inquiry</span>
                 </Button>
               </form>
             </Form>
@@ -255,25 +225,33 @@ export const ContactFormComp = () => {
                 <p className="text-[10px] tracking-[0.4em] uppercase">
                   The Atelier
                 </p>
-                <h4 className="text-lg">
+                <Link
+                  target="_blank"
+                  className="w-max font-serif text-lg hover:underline"
+                  href="https://maps.app.goo.gl/8d2LfPehk2PMqN5Q8"
+                >
                   <p>Capital Heights</p>
                   <p>Maryland USA</p>
-                </h4>
+                </Link>
               </div>
               <div className="flex flex-col gap-3">
                 <p className="text-[10px] tracking-[0.4em] uppercase">
                   Contact Info
                 </p>
-                <h4 className="text-lg">
+                <Link
+                  target="_blank"
+                  className="w-max font-serif text-lg hover:underline"
+                  href="tel:+12029074865"
+                >
                   <p>(+1) 202-907-4865</p>
                   <p>info.e22fashion@gmail.com</p>
-                </h4>
+                </Link>
               </div>
               <div className="flex flex-col gap-3">
                 <p className="text-[10px] tracking-[0.4em] uppercase">
                   Business Hours
                 </p>
-                <h4 className="text-lg">
+                <h4 className="w-max font-serif text-lg">
                   <p>Tuesday to Saturday: 10:00 AM to 6:00 PM.</p>
                   <p>Sunday and Monday: Closed.</p>
                 </h4>

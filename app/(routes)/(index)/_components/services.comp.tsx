@@ -9,27 +9,21 @@ import { Container } from "@/components/shared/container";
 const SERVICES = [
   {
     id: "01",
-    title: "Bespoke Couture",
+    title: "Bridal Consultation",
     content:
-      "One-of-a-one garments tailored specifically to your measurements and vision. A process that spans multiple fittings and months of dedication.",
+      "A one-on-one consultation with the head designer covering sketching, fabric selection, and custom bridal gown design. Consultation fees apply toward dress production if you proceed.",
   },
   {
     id: "02",
-    title: "Bridal Consultation",
+    title: "Premade Dresses Try-On",
     content:
-      "Crafting the centerpiece for your most significant day. We guide you through fabric selection, silhouette design, and intricate detailing.",
+      "An in-person styling session to try on selected premade dresses for special occasions, allowing you to assess fit, style, and overall look before purchase.",
   },
   {
     id: "03",
-    title: "Red Carpet Styling",
+    title: "Special Event Consultation",
     content:
-      "From international film festivals to exclusive galas, our styling team ensures your presence is unforgettable and uniquely yours.",
-  },
-  {
-    id: "04",
-    title: "Alteration Atelier",
-    content:
-      "Maintaining the integrity of your heritage pieces with master-level adjustments and restoration services.",
+      "A focused consultation for special events, providing expert guidance on design direction, styling options, and custom or semi-custom outfit planning.",
   },
 ];
 
@@ -68,7 +62,7 @@ export const ServicesComp = () => {
                       </span>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="max-w-xl pb-4 pl-6 text-sm leading-relaxed opacity-60 sm:pb-6 md:pb-8 md:pl-10 lg:pl-14">
+                  <AccordionContent className="max-w-xl pb-4 text-sm leading-relaxed opacity-60 sm:pb-6 md:pb-8">
                     {service.content}
                   </AccordionContent>
                 </AccordionItem>

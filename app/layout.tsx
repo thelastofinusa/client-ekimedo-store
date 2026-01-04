@@ -68,8 +68,8 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={variables("antialiased")}>
         <Analytics />
-        <Toaster position="bottom-left" richColors />
-        <NextTopLoader color="var(--primary)" showSpinner={false} />
+        <Toaster position="bottom-center" richColors />
+        <NextTopLoader showSpinner={false} />
         {children}
       </body>
     </html>

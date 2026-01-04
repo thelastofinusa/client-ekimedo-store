@@ -98,7 +98,7 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
     >
       <div className="flex flex-col gap-1.5">{props.children}</div>
       <SheetPrimitive.Close
-        className={buttonVariants({ size: "icon-sm", variant: "secondary" })}
+        className={buttonVariants({ size: "icon-sm", variant: "outline" })}
       >
         <Icons.Cancel01Icon className="size-4" />
         <span className="sr-only">Close</span>
@@ -127,7 +127,7 @@ function SheetTitle({
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn("text-base font-semibold", className)}
+      className={cn("font-mono text-xs font-semibold uppercase", className)}
       {...props}
     />
   );

@@ -23,7 +23,7 @@ export const Footer = () => {
               color="bone"
               className="block font-serif text-xl tracking-[0.2em] uppercase"
             />
-            <p className="text-[10px] leading-relaxed font-light tracking-[0.3em] uppercase opacity-40">
+            <p className="text-[11px] leading-relaxed font-light tracking-[0.3em] uppercase opacity-40">
               {siteConfig.tagline}
             </p>
 
@@ -49,10 +49,10 @@ export const Footer = () => {
                 key={itemIdx}
                 className="space-y-6 last-of-type:col-span-2 lg:last-of-type:col-span-1"
               >
-                <span className="block text-[10px] tracking-widest uppercase opacity-20">
+                <span className="block text-[11px] tracking-widest uppercase opacity-20">
                   {item.title}
                 </span>
-                <nav className="flex flex-col gap-3 text-[10px] tracking-widest uppercase">
+                <nav className="flex flex-col gap-3 text-[11px] tracking-widest uppercase">
                   {item.routes.map((route, routeIdx) => (
                     <Link
                       key={routeIdx}

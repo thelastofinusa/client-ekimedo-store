@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 
 import { siteConfig } from "@/config/site.config";
 import { HeroComp } from "./_components/hero.comp";
-import { PerfomanceComp } from "./_components/perfomance.comp";
 import { QuoteComp } from "./_components/quote.comp";
+import { PerfomanceComp } from "./_components/perfomance.comp";
 
 export const metadata: Metadata = {
-  title: "About the Maison",
+  title: "Maison Story",
   description: `Learn about ${siteConfig.title}, a luxury couture maison crafting timeless bridal, prom, and special-event designs with meticulous artistry.`,
 };
 

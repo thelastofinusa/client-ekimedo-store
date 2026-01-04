@@ -34,8 +34,8 @@ export const Header = () => {
               >
                 <Icons.ShoppingCart02Icon className="size-4.5" />
                 {cart.length > 0 && (
-                  <span className="font-mono text-xs tracking-normal">
-                    {cart.length > 9 ? "+9" : cart.length}
+                  <span className="font-mono text-xs tracking-tighter">
+                    [{cart.length > 9 ? "+9" : cart.length}]
                   </span>
                 )}
               </Button>

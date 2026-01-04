@@ -6,7 +6,7 @@ import { GallerySection } from "./_components/gallery.sec";
 import { SplashScreen } from "@/components/shared/splash-screen";
 
 export const metadata: Metadata = {
-  title: "The Gallery Archive",
+  title: "Archive Gallery",
   description: `Explore the gallery of ${siteConfig.title}—a curated archive of bridal, prom, and special-event looks captured across recent collections.`,
 };
 

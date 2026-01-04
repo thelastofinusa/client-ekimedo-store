@@ -32,11 +32,35 @@ export const CartSheet: React.FC<CompProps> = ({ children }) => {
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent className="gap-0">
         <SheetHeader>
-          <SheetTitle>Your Selection</SheetTitle>
+          <SheetTitle
+            onClick={() => {
+              toast.custom(() => {
+                return (
+                  <Notify
+                    type="success"
+                    title={`"${cart.length + 1}" product(s) added to cart`}
+                  />
+                );
+              });
+              addToCart({
+                dress: {
+                  id: String(Math.random() * Date.now()),
+                  name: "First item added",
+                  price: 500,
+                  category: "bridal",
+                  image: "/collections/bridal.avif",
+                },
+                selectedSize: "2xl",
+                quantity: 2,
+              });
+            }}
+          >
+            Your Selection
+          </SheetTitle>
         </SheetHeader>
 
         {cart.length > 0 ? (
-          <ScrollArea className="h-full px-4 sm:px-6 md:px-8">
+          <ScrollArea className="h-[800px] px-4 sm:px-6 md:px-8">
             {cart.map((item, index) => (
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
@@ -56,12 +80,15 @@ export const CartSheet: React.FC<CompProps> = ({ children }) => {
                 <div className="flex-1 space-y-1">
                   <div className="flex justify-between">
                     <h4 className="font-serif text-sm">{item.dress.name}</h4>
-                    <button
+                    <Button
+                      variant="outline"
+                      size="icon-xs"
                       onClick={() => removeFromCart(item.dress.id)}
-                      className="opacity-0 transition-opacity group-hover:opacity-40"
+                      className="opacity-0 transition-opacity group-hover:opacity-100"
+                      aria-label="Remove item"
                     >
-                      <Icons.Cancel01Icon size={14} />
-                    </button>
+                      <Icons.Cancel01Icon className="size-3" />
+                    </Button>
                   </div>
                   <p className="text-muted-foreground text-[10px] tracking-widest uppercase">
                     {item.dress.category} — {item.selectedSize}
@@ -148,21 +175,23 @@ export const CartSheet: React.FC<CompProps> = ({ children }) => {
                 }}
                 className="flex-1"
               >
-                Clear Cart
+                <span>Clear Cart</span>
               </Button>
             )}
-            <Link
-              href="/"
-              aria-disabled={cart.length === 0}
-              className={buttonVariants({
-                variant: "default",
-                size: "lg",
-                className:
-                  "flex-1 aria-disabled:pointer-events-none aria-disabled:opacity-50",
-              })}
-            >
-              <span>Checkout</span>
-            </Link>
+            <SheetClose asChild>
+              <Link
+                href="/cart"
+                aria-disabled={cart.length === 0}
+                className={buttonVariants({
+                  variant: "default",
+                  size: "lg",
+                  className:
+                    "flex-1 aria-disabled:pointer-events-none aria-disabled:opacity-50",
+                })}
+              >
+                <span>View Cart</span>
+              </Link>
+            </SheetClose>
           </div>
         </SheetFooter>
       </SheetContent>
