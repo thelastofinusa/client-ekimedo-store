@@ -48,7 +48,7 @@ export const DetailsComp: React.FC<CompProps> = ({ info, dresses }) => {
               className="group"
             >
               <Link
-                href={{ pathname: `/product/${dress.id}` }}
+                href={{ pathname: `/shop/${dress.id}` }}
                 className="block"
               >
                 <div className="bg-secondary/50 relative mb-6 aspect-3/4 overflow-hidden shadow-sm">

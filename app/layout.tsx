@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import NextTopLoader from "nextjs-toploader";
 import { Analytics } from "@vercel/analytics/next";
+import { ClerkProvider } from "@clerk/nextjs";
 
 import "./globals.css";
 import { variables } from "@/font";
@@ -65,13 +66,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className={variables("antialiased")}>
-        <Analytics />
-        <Toaster position="bottom-center" richColors />
-        <NextTopLoader showSpinner={false} />
-        {children}
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en" suppressHydrationWarning>
+        <body className={variables("antialiased")}>
+          <Analytics />
+          <Toaster position="bottom-center" richColors />
+          <NextTopLoader showSpinner={false} />
+          {children}
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }

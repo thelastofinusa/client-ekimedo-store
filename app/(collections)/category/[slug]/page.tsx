@@ -2,10 +2,10 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { CTA } from "@/components/shared/cta";
-import { COLLECTIONS, DRESSES } from "@/constants";
 import { HeroComp } from "./_components/hero.comp";
 import { siteConfig } from "@/config/site.config";
 import { DetailsComp } from "./_components/details.comp";
+import { client } from "@/sanity/lib/client";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -13,8 +13,9 @@ interface PageProps {
 
 // Generate static paths at build time
 export async function generateStaticParams() {
-  return COLLECTIONS.map((collection) => ({
-    slug: collection.slug,
+  const categories = await client.fetch(`*[_type == "category"]{ "slug": slug.current }`);
+  return categories.map((category: any) => ({
+    slug: category.slug,
   }));
 }
 
@@ -23,8 +24,15 @@ export const generateMetadata = async ({
 }: PageProps): Promise<Metadata> => {
   const { slug } = await params;
 
-  const info = COLLECTIONS.find(
-    (cl) => String(cl.slug).toLowerCase() === String(slug).toLowerCase(),
+  const info = await client.fetch(
+    `*[_type == "category" && slug.current == $slug][0]{
+      name,
+      "tagline": "Timeless Couture", // Default or add to schema
+      "description": "Discover a collection of timeless silhouettes and intricate details.", // Default or add
+      "image": billboard.asset->url,
+      "slug": slug.current
+    }`,
+    { slug }
   );
 
   if (!info) notFound();
@@ -55,21 +63,54 @@ export const generateMetadata = async ({
   };
 };
 
-export default async function Prom({ params }: PageProps) {
+export default async function Page({ params }: PageProps) {
   const { slug } = await params;
 
-  const info = COLLECTIONS.find(
-    (cl) => String(cl.slug).toLowerCase() === String(slug).toLowerCase(),
+  // Fetch category info
+  const info = await client.fetch(
+    `*[_type == "category" && slug.current == $slug][0]{
+        name,
+        "slug": slug.current,
+        "image": billboard.asset->url,
+        "tagline": "Timeless Couture",
+        "description": "Discover our exclusive collection."
+    }`,
+    { slug }
   );
 
   if (!info) notFound();
 
-  const dresses = DRESSES.filter((d) => d.category === slug);
+  // Fetch products in this category
+  // Assuming 'categories' in product is array of references
+  const dresses = await client.fetch(
+    `*[_type == "product" && references(*[_type=="category" && slug.current == $slug]._id)]{
+        _id,
+        name,
+        "category": $slug,
+        "priceRange": price, // Map single price to range prop or update component
+        description,
+        "image": images[0].asset->url,
+        "images": images[].asset->url,
+        sizes,
+        colors,
+        "deliveryTime": "4-6 weeks" // Default
+    }`,
+    { slug }
+  );
+
+  // Remap dresses to match component expectation if needed
+  // The component seems to expect `priceRange` string, but we have `price` number.
+  // We can format it here.
+  const formattedDresses = dresses.map((d: any) => ({
+      ...d,
+      priceRange: d.priceRange ? `$${d.priceRange}` : "Inquire for price",
+      id: d._id
+  }));
 
   return (
     <div className="flex-1 overflow-x-clip">
       <HeroComp info={info} />
-      <DetailsComp info={info} dresses={dresses} />
+      <DetailsComp info={info} dresses={formattedDresses} />
       <CTA
         href="/consultation"
         title="Can't find exactly what you're looking for?"

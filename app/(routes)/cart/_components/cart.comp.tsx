@@ -1,7 +1,10 @@
 "use client";
-import React from "react";
+import React, { useMemo, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useUser } from "@clerk/nextjs";
 
 import { useAppStore } from "@/lib/store";
 import { Icons } from "hugeicons-proxy";
@@ -10,6 +13,48 @@ import { Button, buttonVariants } from "@/ui/button";
 
 export const CartComp = () => {
   const { cart, removeFromCart } = useAppStore();
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { isSignedIn } = useUser();
+
+  const subtotal = useMemo(() => {
+    return cart.reduce(
+      (acc, item) => acc + item.dress.price * item.quantity,
+      0,
+    );
+  }, [cart]);
+
+  const onCheckout = async () => {
+    if (!isSignedIn) {
+      window.location.href = "/sign-in?redirect_url=/cart";
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items: cart }),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText || "Something went wrong");
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error(error);
+      const errorMessage = error instanceof Error ? error.message : "Something went wrong during checkout.";
+      toast.error(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="pb-24 lg:pb-32">
@@ -51,13 +96,21 @@ export const CartComp = () => {
                         </h3>
                         <p className="text-[10px] tracking-widest uppercase opacity-40">
                           {item.selectedSize}
-                          {item.selectedColor ? ` / ${item.selectedColor}` : null}
+                          {item.selectedColor
+                            ? ` / ${item.selectedColor}`
+                            : null}
                         </p>
                       </div>
                       <Button
                         variant="outline"
                         size="icon-sm"
-                        onClick={() => removeFromCart(item.dress.id)}
+                        onClick={() =>
+                          removeFromCart(
+                            item.dress.id,
+                            item.selectedSize,
+                            item.selectedColor,
+                          )
+                        }
                         className="opacity-0 transition-opacity group-hover:opacity-100"
                         aria-label="Remove item"
                       >
@@ -66,11 +119,21 @@ export const CartComp = () => {
                     </div>
                     <div className="flex items-end justify-between">
                       <p className="text-[10px] tracking-widest uppercase opacity-40">
-                        {item.dress.deliveryTime ? `Delivery: ${item.dress.deliveryTime}` : ""}
+                        {item.dress.deliveryTime
+                          ? `Delivery: ${item.dress.deliveryTime}`
+                          : ""}
                       </p>
-                      <span className="text-charcoal text-sm font-medium">
-                        {item.dress.priceRange ?? `$${(item.dress.price || 0).toLocaleString()}`}
-                      </span>
+                      <div className="text-right">
+                        <span className="text-charcoal block text-sm font-medium">
+                          ${(item.dress.price * item.quantity).toLocaleString()}
+                        </span>
+                        {item.quantity > 1 && (
+                          <span className="text-muted-foreground block text-xs">
+                            {item.quantity} x $
+                            {item.dress.price.toLocaleString()}
+                          </span>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -93,22 +156,43 @@ export const CartComp = () => {
                   </div>
                   <div className="border-charcoal/10 text-charcoal flex justify-between border-t pt-4 font-serif text-xl">
                     <span>Total</span>
-                    <span>{cart.length} Item(s)</span>
+                    <span>
+                      {cart.reduce((acc, item) => acc + item.quantity, 0)}{" "}
+                      Item(s)
+                    </span>
+                  </div>
+                  <div className="text-right text-lg font-medium">
+                    ${subtotal.toLocaleString()}
                   </div>
                 </div>
 
-                <Link
-                  href="/consultation"
-                  className={buttonVariants({
-                    size: "lg",
-                    className: "w-full",
-                  })}
+                <Button
+                  onClick={onCheckout}
+                  disabled={loading}
+                  size="lg"
+                  className="w-full"
                 >
-                  Schedule Consultation
-                </Link>
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <Icons.Loading03Icon className="h-4 w-4 animate-spin" />
+                      <span>Processing...</span>
+                    </div>
+                  ) : isSignedIn ? (
+                    "Proceed to Checkout"
+                  ) : (
+                    "Sign in to Checkout"
+                  )}
+                </Button>
+                <div className="flex justify-center">
+                  <Link
+                    href="/consultation"
+                    className="text-muted-foreground hover:text-charcoal text-xs underline underline-offset-4"
+                  >
+                    Or Schedule a Consultation
+                  </Link>
+                </div>
                 <p className="text-center text-[10px] leading-relaxed opacity-40">
-                  All purchases require a consultation to ensure perfect fit and
-                  customization.
+                  Secure checkout powered by Stripe.
                 </p>
               </div>
 

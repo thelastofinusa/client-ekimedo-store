@@ -53,7 +53,7 @@ export const HeroComp: React.FC<Props> = ({
                 value={activeCategory}
                 onValueChange={(e) => setActiveCategory(e)}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full bg-transparent">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -77,7 +77,7 @@ export const HeroComp: React.FC<Props> = ({
                 value={activeYear}
                 onValueChange={(e) => setActiveYear(e)}
               >
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="w-full bg-transparent">
                   <SelectValue placeholder="Select a year" />
                 </SelectTrigger>
                 <SelectContent>

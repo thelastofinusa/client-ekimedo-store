@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
 
@@ -25,38 +25,21 @@ interface CompProps {
 }
 
 export const CartSheet: React.FC<CompProps> = ({ children }) => {
-  const { cart, clearCart, addToCart, removeFromCart } = useAppStore();
+  const { cart, clearCart, removeFromCart } = useAppStore();
+
+  const subtotal = useMemo(() => {
+    return cart.reduce(
+      (acc, item) => acc + item.dress.price * item.quantity,
+      0,
+    );
+  }, [cart]);
 
   return (
     <Sheet>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent className="gap-0">
         <SheetHeader>
-          <SheetTitle
-            onClick={() => {
-              toast.custom(() => {
-                return (
-                  <Notify
-                    type="success"
-                    title={`"${cart.length + 1}" product(s) added to cart`}
-                  />
-                );
-              });
-              addToCart({
-                dress: {
-                  id: String(Math.random() * Date.now()),
-                  name: "First item added",
-                  price: 500,
-                  category: "bridal",
-                  image: "/collections/bridal.avif",
-                },
-                selectedSize: "2xl",
-                quantity: 2,
-              });
-            }}
-          >
-            Your Selection
-          </SheetTitle>
+          <SheetTitle>Your Selection</SheetTitle>
         </SheetHeader>
 
         {cart.length > 0 ? (
@@ -66,7 +49,7 @@ export const CartSheet: React.FC<CompProps> = ({ children }) => {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 + index * 0.05 }}
-                key={`${item.dress.id}-${item.selectedSize}`}
+                key={`${item.dress.id}-${item.selectedSize}-${item.selectedColor || ""}`}
                 className="group flex gap-6 border-b py-6 last-of-type:border-b-0"
               >
                 <div className="bg-foreground/5 relative aspect-[0.9] w-24 overflow-hidden">
@@ -83,8 +66,14 @@ export const CartSheet: React.FC<CompProps> = ({ children }) => {
                     <Button
                       variant="outline"
                       size="icon-xs"
-                      onClick={() => removeFromCart(item.dress.id)}
-                      className="opacity-0 transition-opacity group-hover:opacity-100"
+                      onClick={() =>
+                        removeFromCart(
+                          item.dress.id,
+                          item.selectedSize,
+                          item.selectedColor,
+                        )
+                      }
+                      className="mr-1 opacity-0 transition-opacity group-hover:opacity-100"
                       aria-label="Remove item"
                     >
                       <Icons.Cancel01Icon className="size-3" />
@@ -92,10 +81,16 @@ export const CartSheet: React.FC<CompProps> = ({ children }) => {
                   </div>
                   <p className="text-muted-foreground text-[10px] tracking-widest uppercase">
                     {item.dress.category} — {item.selectedSize}
+                    {item.selectedColor && ` / ${item.selectedColor}`}
                   </p>
-                  <p className="mt-2 font-serif text-xs">
-                    ${(item.dress.price || 0).toLocaleString()}
-                  </p>
+                  <div className="mt-2 flex items-center justify-between">
+                    <p className="font-serif text-xs">
+                      ${(item.dress.price || 0).toLocaleString()}
+                    </p>
+                    <p className="text-muted-foreground text-[10px]">
+                      Qty: {item.quantity}
+                    </p>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -109,7 +104,7 @@ export const CartSheet: React.FC<CompProps> = ({ children }) => {
               <div className="flex flex-col gap-3">
                 <SheetClose asChild>
                   <Link
-                    href="/"
+                    href="/shop"
                     className={buttonVariants({
                       variant: "outline",
                       size: "sm",
@@ -118,31 +113,6 @@ export const CartSheet: React.FC<CompProps> = ({ children }) => {
                     Browse Collection
                   </Link>
                 </SheetClose>
-                <Button
-                  onClick={() => {
-                    toast.custom(() => {
-                      return (
-                        <Notify
-                          type="success"
-                          title={`"${cart.length + 1}" product(s) added to cart`}
-                        />
-                      );
-                    });
-                    addToCart({
-                      dress: {
-                        id: "10",
-                        name: "First item added",
-                        price: 500,
-                        category: "bridal",
-                        image: "/collections/bridal.avif",
-                      },
-                      selectedSize: "2xl",
-                      quantity: 2,
-                    });
-                  }}
-                >
-                  Quickly add to cart
-                </Button>
               </div>
             </div>
           </div>
@@ -154,7 +124,7 @@ export const CartSheet: React.FC<CompProps> = ({ children }) => {
               Subtotal
             </p>
             <p className="max-w-[220px] text-sm leading-relaxed opacity-60">
-              ${cart.map((item) => item.dress.price)}
+              ${subtotal.toLocaleString()}
             </p>
           </div>
           <div className="flex items-center justify-between gap-4">
@@ -189,7 +159,7 @@ export const CartSheet: React.FC<CompProps> = ({ children }) => {
                     "flex-1 aria-disabled:pointer-events-none aria-disabled:opacity-50",
                 })}
               >
-                <span>View Cart</span>
+                <span>Proceed To Checkout</span>
               </Link>
             </SheetClose>
           </div>

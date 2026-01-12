@@ -6,15 +6,28 @@ import { Icons } from "hugeicons-proxy";
 import { PiQuotesFill } from "react-icons/pi";
 
 import { cn } from "@/lib/utils";
-import { TESTIMONIALS } from "@/constants";
 import { Container } from "@/components/shared/container";
 
-export const ReviewsComp = () => {
+interface Testimonial {
+  name: string;
+  role: string;
+  content: string;
+  rating: number;
+  image: string;
+  date?: string; // Optional if not in schema yet
+  workAssets?: string[]; // Optional
+}
+
+interface ReviewsCompProps {
+  testimonials?: Testimonial[];
+}
+
+export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
   return (
     <div className="bg-foreground text-background py-24 lg:py-32">
       <Container>
         <div className="flex flex-col gap-48">
-          {TESTIMONIALS.map((testimonial, index) => (
+          {testimonials.map((testimonial, index) => (
             <div
               key={index}
               className={`flex flex-col items-start gap-10 md:gap-16 lg:flex-row lg:gap-20 ${index % 2 !== 0 ? "lg:flex-row-reverse" : ""}`}
@@ -41,7 +54,7 @@ export const ReviewsComp = () => {
                       {testimonial.name}
                     </h4>
                     <p className="text-muted-foreground font-sans text-[9px] tracking-[0.3em] uppercase">
-                      {testimonial.role} — {testimonial.date}
+                      {testimonial.role} {testimonial.date && `— ${testimonial.date}`}
                     </p>
                     <div className="mt-2 flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
@@ -79,25 +92,26 @@ export const ReviewsComp = () => {
               >
                 <div className="flex flex-col gap-6">
                   <div className="grid aspect-[1.1] grid-cols-6 gap-3 md:aspect-[1.3] md:gap-4 lg:h-[600px]">
+                     {/* Placeholder logic for workAssets as they are not yet in basic schema, but we can keep structure */}
                     <div className="group border-border/30 bg-secondary/20 relative col-span-4 row-span-2 overflow-hidden border shadow-md transition-all duration-700">
                       <Image
-                        src={testimonial.workAssets?.[0] || "/placeholder.svg"}
+                        src={testimonial.workAssets?.[0] || testimonial.image || "/placeholder.svg"} 
                         alt="Primary Work Asset"
                         fill
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
                       />
                     </div>
                     <div className="group border-border/30 bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden border shadow-md transition-all duration-700">
-                      <Image
-                        src={testimonial.workAssets?.[1] || "/placeholder.svg"}
+                       <Image
+                        src={testimonial.workAssets?.[1] || testimonial.image || "/placeholder.svg"} 
                         alt="Secondary Work Asset"
                         fill
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
                       />
                     </div>
                     <div className="group border-border/30 bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden border shadow-md transition-all duration-700">
-                      <Image
-                        src={testimonial.workAssets?.[2] || "/placeholder.svg"}
+                       <Image
+                        src={testimonial.workAssets?.[2] || testimonial.image || "/placeholder.svg"} 
                         alt="Tertiary Work Asset"
                         fill
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"

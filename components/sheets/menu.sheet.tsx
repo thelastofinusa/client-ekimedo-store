@@ -5,6 +5,7 @@ import { motion } from "motion/react";
 
 import {
   Sheet,
+  SheetClose,
   SheetContent,
   SheetFooter,
   SheetHeader,
@@ -12,7 +13,8 @@ import {
   SheetTrigger,
 } from "@/ui/sheet";
 import { NAVIGATIONS } from "@/constants";
-import { buttonVariants } from "@/ui/button";
+import { buttonVariants, Button } from "@/ui/button";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 interface CompProps {
   children: React.ReactNode;
@@ -61,18 +63,29 @@ export const MenuSheet: React.FC<CompProps> = ({
           </nav>
         </div>
 
-        <SheetFooter className="gap-6 bg-black/20">
-          <Link
-            href="/consultation"
-            onClick={() => setOpenMenu(false)}
-            className={buttonVariants({
-              variant: "secondary",
-              size: "xl",
-              className: "w-full",
-            })}
-          >
-            Book an Appointment
-          </Link>
+        <SheetFooter className="flex flex-row items-center gap-4 bg-black/20">
+          <SignedOut>
+            <SignInButton>
+              <SheetClose asChild>
+                <Button variant="outline" size="lg" className="flex-1">
+                  Sign In
+                </Button>
+              </SheetClose>
+            </SignInButton>
+          </SignedOut>
+          <SheetClose asChild>
+            <Link
+              href="/consultation"
+              onClick={() => setOpenMenu(false)}
+              className={buttonVariants({
+                variant: "secondary",
+                size: "lg",
+                className: "flex-1",
+              })}
+            >
+              Consult Now
+            </Link>
+          </SheetClose>
         </SheetFooter>
       </SheetContent>
     </Sheet>

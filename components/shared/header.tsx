@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Icons } from "hugeicons-proxy";
+import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/nextjs";
 
 import { Logo } from "./logo";
 import { Button } from "@/ui/button";
@@ -9,6 +10,7 @@ import { useAppStore } from "@/lib/store";
 import { Container } from "./container";
 import { MenuSheet } from "../sheets/menu.sheet";
 import { CartSheet } from "../sheets/cart.sheet";
+import { Separator } from "@/ui/separator";
 
 export const Header = () => {
   const { cart } = useAppStore();
@@ -50,6 +52,28 @@ export const Header = () => {
                 <Icons.Menu09Icon className="size-4.5" />
               </Button>
             </MenuSheet>
+            <div className="pointer-events-auto hidden items-center gap-3 md:flex">
+              <SignedIn>
+                <Separator
+                  orientation="horizontal"
+                  className="bg-border/20 h-px w-2! sm:w-4!"
+                />
+                <Button
+                  size="icon-sm"
+                  variant={"secondary"}
+                  className="mix-blend-normal"
+                >
+                  <UserButton />
+                </Button>
+              </SignedIn>
+              <SignedOut>
+                <SignInButton>
+                  <Button variant="secondary" size="sm">
+                    Sign In
+                  </Button>
+                </SignInButton>
+              </SignedOut>
+            </div>
           </div>
         </Container>
       </nav>
