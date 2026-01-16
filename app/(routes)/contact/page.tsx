@@ -1,14 +1,13 @@
-import type { Metadata } from "next";
-
-import { siteConfig } from "@/config/site.config";
+import { Metadata } from "next";
 import { ContactFormComp } from "./_components/contact-form.comp";
 
 export const metadata: Metadata = {
-  title: "Contact & Atelier",
-  description: `Get in touch with ${siteConfig.title} in Capitol Heights, Maryland to begin a bespoke bridal, prom, or special-event couture inquiry.`,
+  title: "Let's Talk",
+  description:
+    "Get in touch with us for any inquiries, support, or feedback. We're here to help and would love to hear from you!",
 };
 
-export default function Contact() {
+export default function ContactPage() {
   return (
     <div className="flex-1 overflow-x-clip">
       <ContactFormComp />

@@ -36,7 +36,7 @@ export const ServicesComp = () => {
             <span className="text-muted-foreground text-[10px] tracking-[0.4em] uppercase">
               Expertise
             </span>
-            <h4 className="">Maison Services</h4>
+            <h4 className="">Our Services</h4>
             <p className="mt-4 text-sm leading-relaxed opacity-60">
               Beyond the garment, we provide a holistic experience of luxury,
               ensuring every interaction with EKIMEDO is as refined as our

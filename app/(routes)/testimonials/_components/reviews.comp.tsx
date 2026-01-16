@@ -26,7 +26,7 @@ export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
   return (
     <div className="bg-foreground text-background py-24 lg:py-32">
       <Container>
-        <div className="flex flex-col gap-48">
+        <div className="flex flex-col gap-24 lg:gap-32">
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
@@ -54,7 +54,8 @@ export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
                       {testimonial.name}
                     </h4>
                     <p className="text-muted-foreground font-sans text-[9px] tracking-[0.3em] uppercase">
-                      {testimonial.role} {testimonial.date && `— ${testimonial.date}`}
+                      {testimonial.role}{" "}
+                      {testimonial.date && `— ${testimonial.date}`}
                     </p>
                     <div className="mt-2 flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
@@ -92,26 +93,38 @@ export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
               >
                 <div className="flex flex-col gap-6">
                   <div className="grid aspect-[1.1] grid-cols-6 gap-3 md:aspect-[1.3] md:gap-4 lg:h-[600px]">
-                     {/* Placeholder logic for workAssets as they are not yet in basic schema, but we can keep structure */}
+                    {/* Placeholder logic for workAssets as they are not yet in basic schema, but we can keep structure */}
                     <div className="group border-border/30 bg-secondary/20 relative col-span-4 row-span-2 overflow-hidden border shadow-md transition-all duration-700">
                       <Image
-                        src={testimonial.workAssets?.[0] || testimonial.image || "/placeholder.svg"} 
+                        src={
+                          testimonial.workAssets?.[0] ||
+                          testimonial.image ||
+                          "/placeholder.svg"
+                        }
                         alt="Primary Work Asset"
                         fill
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
                       />
                     </div>
                     <div className="group border-border/30 bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden border shadow-md transition-all duration-700">
-                       <Image
-                        src={testimonial.workAssets?.[1] || testimonial.image || "/placeholder.svg"} 
+                      <Image
+                        src={
+                          testimonial.workAssets?.[1] ||
+                          testimonial.image ||
+                          "/placeholder.svg"
+                        }
                         alt="Secondary Work Asset"
                         fill
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
                       />
                     </div>
                     <div className="group border-border/30 bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden border shadow-md transition-all duration-700">
-                       <Image
-                        src={testimonial.workAssets?.[2] || testimonial.image || "/placeholder.svg"} 
+                      <Image
+                        src={
+                          testimonial.workAssets?.[2] ||
+                          testimonial.image ||
+                          "/placeholder.svg"
+                        }
                         alt="Tertiary Work Asset"
                         fill
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"

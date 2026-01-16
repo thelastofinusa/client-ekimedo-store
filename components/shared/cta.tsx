@@ -1,5 +1,7 @@
-import React from "react";
 import Link from "next/link";
+import { Route } from "next";
+import * as React from "react";
+
 import { Container } from "./container";
 import { buttonVariants } from "@/ui/button";
 
@@ -15,7 +17,7 @@ export const CTA: React.FC<CompProps> = ({ title, href, label }) => {
       <Container className="flex flex-col items-center justify-center text-center">
         <h3 className="mb-8 max-w-3xl leading-tight">{title}</h3>
         <Link
-          href={{ pathname: href }}
+          href={href as Route}
           className={buttonVariants({
             variant: "outline",
             size: "xl",

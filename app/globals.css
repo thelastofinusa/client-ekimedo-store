@@ -4,8 +4,8 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: oklch(0.9823 0.0029 84.5589);
-  --foreground: oklch(19.125% 0.00002 271.152);
+  --background: #faf9f7;
+  --foreground: #141414;
   --card: oklch(0.9967 0.0013 106.423);
   --card-foreground: oklch(0.3211 0 0);
   --popover: oklch(0.9967 0.0013 106.423);
@@ -45,22 +45,17 @@
   --shadow-color: #a5a5a5;
   --shadow-2xs: 2px 2px 0px 0px hsl(0 0% 64.7059% / 0.28);
   --shadow-xs: 2px 2px 0px 0px hsl(0 0% 64.7059% / 0.28);
-  --shadow-sm:
-    2px 2px 0px 0px hsl(0 0% 64.7059% / 0.57),
+  --shadow-sm: 2px 2px 0px 0px hsl(0 0% 64.7059% / 0.57),
     2px 1px 2px -1px hsl(0 0% 64.7059% / 0.57);
-  --shadow:
-    2px 2px 0px 0px hsl(0 0% 64.7059% / 0.57),
+  --shadow: 2px 2px 0px 0px hsl(0 0% 64.7059% / 0.57),
     2px 1px 2px -1px hsl(0 0% 64.7059% / 0.57);
-  --shadow-md:
-    2px 2px 0px 0px hsl(0 0% 64.7059% / 0.57),
+  --shadow-md: 2px 2px 0px 0px hsl(0 0% 64.7059% / 0.57),
     2px 2px 4px -1px hsl(0 0% 64.7059% / 0.57);
-  --shadow-lg:
-    2px 2px 0px 0px hsl(0 0% 64.7059% / 0.57),
+  --shadow-lg: 2px 2px 0px 0px hsl(0 0% 64.7059% / 0.57),
     2px 4px 6px -1px hsl(0 0% 64.7059% / 0.57);
-  --shadow-xl:
-    2px 2px 0px 0px hsl(0 0% 64.7059% / 0.57),
+  --shadow-xl: 2px 2px 0px 0px hsl(0 0% 64.7059% / 0.57),
     2px 8px 10px -1px hsl(0 0% 64.7059% / 0.57);
-  --shadow-2xl: 2px 2px 0px 0px hsl(0 0% 64.7059% / 1.42);
+  --shadow-2xl: 2px 2px 0px 0px hsl(0 0% 10.7059% / 0.1);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 }

@@ -88,7 +88,7 @@ function SheetContent({
 
 function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div
+    <header
       data-slot="sheet-header"
       className={cn(
         "flex w-full items-center justify-between border-b p-6 md:px-8",
@@ -103,13 +103,13 @@ function SheetHeader({ className, ...props }: React.ComponentProps<"div">) {
         <Icons.Cancel01Icon className="size-4" />
         <span className="sr-only">Close</span>
       </SheetPrimitive.Close>
-    </div>
+    </header>
   );
 }
 
 function SheetFooter({ className, ...props }: React.ComponentProps<"div">) {
   return (
-    <div
+    <footer
       data-slot="sheet-footer"
       className={cn(
         "mt-auto flex w-full flex-col gap-2 p-6 md:p-8!",
@@ -127,7 +127,10 @@ function SheetTitle({
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
-      className={cn("font-mono text-xs font-semibold uppercase", className)}
+      className={cn(
+        "font-mono text-xs font-semibold tracking-wide uppercase",
+        className,
+      )}
       {...props}
     />
   );

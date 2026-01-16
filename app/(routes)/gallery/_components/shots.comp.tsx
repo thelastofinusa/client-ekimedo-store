@@ -6,15 +6,11 @@ import { AnimatePresence, motion } from "motion/react";
 import { Container } from "@/components/shared/container";
 import { Icons } from "hugeicons-proxy";
 import { Button } from "@/ui/button";
+import { GALLERY_QUERYResult } from "@/sanity.types";
+import { formatSanityDate } from "@/lib/utils";
 
 interface Props {
-  shots: {
-    id: string;
-    year: string;
-    category: string;
-    title: string;
-    image: string;
-  }[];
+  shots: GALLERY_QUERYResult;
 }
 
 export const ShotsComp: React.FC<Props> = ({ shots }) => {
@@ -50,7 +46,7 @@ export const ShotsComp: React.FC<Props> = ({ shots }) => {
             <AnimatePresence mode="popLayout">
               {shots.map((item, index) => (
                 <motion.div
-                  key={item.id}
+                  key={item._id}
                   layout
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
@@ -61,14 +57,15 @@ export const ShotsComp: React.FC<Props> = ({ shots }) => {
                 >
                   <Image
                     src={item.image || "/placeholder.svg"}
-                    alt={item.title}
+                    alt={item.title || ""}
                     width={880}
                     height={0}
                     className="h-auto object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-50"
                   />
                   <div className="bg-foreground/40 absolute inset-0 flex flex-col justify-end p-6 opacity-0 transition-opacity duration-500 group-hover:opacity-100 md:p-8">
                     <span className="mb-1 text-[10px] tracking-widest uppercase md:mb-2">
-                      {item.year} — {item.category.replace("-", " ")}
+                      {formatSanityDate(item.year!)} —{" "}
+                      {item.category?.name?.replace("-", " ")}
                     </span>
                     <h3 className="font-serif text-xl md:text-2xl">
                       {item.title}
@@ -146,7 +143,7 @@ export const ShotsComp: React.FC<Props> = ({ shots }) => {
               <div className="relative h-full w-full">
                 <Image
                   src={shots[selectedIndex].image || "/placeholder.svg"}
-                  alt={shots[selectedIndex].title}
+                  alt={shots[selectedIndex].title ?? ""}
                   fill
                   className="object-contain"
                   priority
@@ -155,9 +152,6 @@ export const ShotsComp: React.FC<Props> = ({ shots }) => {
               </div>
 
               <div className="absolute right-0 -bottom-16 left-0 text-center">
-                <span className="mb-2 block text-[10px] tracking-[0.4em] uppercase opacity-40">
-                  {shots[selectedIndex].year} Collection
-                </span>
                 <h2 className="font-serif text-xl md:text-3xl">
                   {shots[selectedIndex].title}
                 </h2>

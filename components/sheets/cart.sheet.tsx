@@ -1,7 +1,8 @@
-"use client";
-import React, { useMemo } from "react";
 import Link from "next/link";
-import { motion } from "motion/react";
+import * as React from "react";
+import Image from "next/image";
+import { toast } from "sonner";
+import { Icons } from "hugeicons-proxy";
 
 import {
   Sheet,
@@ -12,159 +13,291 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/ui/sheet";
-import { useAppStore } from "@/lib/store";
-import { Button, buttonVariants } from "@/ui/button";
-import { ScrollArea } from "@/ui/scroll-area";
-import { toast } from "sonner";
-import { Notify } from "../shared/notify";
-import Image from "next/image";
-import { Icons } from "hugeicons-proxy";
+import {
+  useCartActions,
+  useCartItem,
+  useCartItems,
+  useTotalItems,
+  useTotalPrice,
+} from "@/providers/cart.provider";
+import { Badge } from "@/ui/badge";
+import { cn, formatPrice } from "@/lib/utils";
+import { ButtonGroup } from "@/ui/button-group";
+import { useCartStock } from "@/hooks/cart-stock";
+import { buttonVariants, Button } from "@/ui/button";
+import { Notify, renderToastIcon } from "@/shared/notify";
+import { isLowStock as checkLowStock } from "@/constants/stock";
+import { Alert, AlertTitle, AlertDescription } from "@/ui/alert";
+import { StockBadge } from "../shared/stock-badge";
 
-interface CompProps {
+interface Props {
   children: React.ReactNode;
+  openCart: boolean;
+  setOpenCart: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const CartSheet: React.FC<CompProps> = ({ children }) => {
-  const { cart, clearCart, removeFromCart } = useAppStore();
-
-  const subtotal = useMemo(() => {
-    return cart.reduce(
-      (acc, item) => acc + item.dress.price * item.quantity,
-      0,
-    );
-  }, [cart]);
+export const CartSheet: React.FC<Props> = ({
+  children,
+  openCart,
+  setOpenCart,
+}) => {
+  const items = useCartItems();
+  const totalItems = useTotalItems();
+  const totalPrice = useTotalPrice();
+  const { removeItem } = useCartActions();
+  const { stockMap, isLoading, hasStockIssues } = useCartStock(items);
 
   return (
-    <Sheet>
+    <Sheet open={openCart} onOpenChange={setOpenCart}>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent className="gap-0">
         <SheetHeader>
-          <SheetTitle>Your Selection</SheetTitle>
+          <SheetTitle className="flex items-center gap-2">
+            Shopping Cart{" "}
+            <span className="mb-0.5">
+              {isLoading ? (
+                <Icons.Loading03Icon className="size-4 animate-spin" />
+              ) : (
+                `[${totalItems}]`
+              )}
+            </span>
+          </SheetTitle>
         </SheetHeader>
 
-        {cart.length > 0 ? (
-          <ScrollArea className="h-[800px] px-4 sm:px-6 md:px-8">
-            {cart.map((item, index) => (
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.1 + index * 0.05 }}
-                key={`${item.dress.id}-${item.selectedSize}-${item.selectedColor || ""}`}
-                className="group flex gap-6 border-b py-6 last-of-type:border-b-0"
-              >
-                <div className="bg-foreground/5 relative aspect-[0.9] w-24 overflow-hidden">
-                  <Image
-                    src={item.dress.image || "/placeholder.svg"}
-                    alt={item.dress.name}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-                <div className="flex-1 space-y-1">
-                  <div className="flex justify-between">
-                    <h4 className="font-serif text-sm">{item.dress.name}</h4>
-                    <Button
-                      variant="outline"
-                      size="icon-xs"
-                      onClick={() =>
-                        removeFromCart(
-                          item.dress.id,
-                          item.selectedSize,
-                          item.selectedColor,
-                        )
-                      }
-                      className="mr-1 opacity-0 transition-opacity group-hover:opacity-100"
-                      aria-label="Remove item"
-                    >
-                      <Icons.Cancel01Icon className="size-3" />
-                    </Button>
-                  </div>
-                  <p className="text-muted-foreground text-[10px] tracking-widest uppercase">
-                    {item.dress.category} — {item.selectedSize}
-                    {item.selectedColor && ` / ${item.selectedColor}`}
-                  </p>
-                  <div className="mt-2 flex items-center justify-between">
-                    <p className="font-serif text-xs">
-                      ${(item.dress.price || 0).toLocaleString()}
-                    </p>
-                    <p className="text-muted-foreground text-[10px]">
-                      Qty: {item.quantity}
-                    </p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </ScrollArea>
-        ) : (
+        {items.length === 0 ? (
           <div className="flex h-full flex-col items-center justify-center">
-            <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
-              <p className="text-muted-foreground font-serif text-sm">
-                The atelier is empty.
+            <div className="flex h-full flex-col items-center justify-center gap-1 text-center">
+              <h3 className="text-lg font-medium text-zinc-900 dark:text-zinc-100">
+                Your cart is empty
+              </h3>
+              <p className="mb-4 text-sm text-zinc-500 dark:text-zinc-400">
+                Add some items to get started
               </p>
-              <div className="flex flex-col gap-3">
-                <SheetClose asChild>
-                  <Link
-                    href="/shop"
-                    className={buttonVariants({
-                      variant: "outline",
-                      size: "sm",
-                    })}
-                  >
-                    Browse Collection
-                  </Link>
-                </SheetClose>
-              </div>
+
+              <SheetClose asChild>
+                <Link
+                  href="/products"
+                  className={buttonVariants({ variant: "outline" })}
+                >
+                  Browse Collection
+                </Link>
+              </SheetClose>
             </div>
           </div>
-        )}
-
-        <SheetFooter className="bg-card gap-4">
-          <div className="flex items-center justify-between">
-            <p className="max-w-[220px] text-sm leading-relaxed opacity-60">
-              Subtotal
-            </p>
-            <p className="max-w-[220px] text-sm leading-relaxed opacity-60">
-              ${subtotal.toLocaleString()}
-            </p>
-          </div>
-          <div className="flex items-center justify-between gap-4">
-            {cart.length > 0 && (
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => {
-                  clearCart();
-                  toast.custom(() => {
-                    return (
-                      <Notify
-                        type="success"
-                        title="Successfully cleared cart"
-                      />
-                    );
-                  });
-                }}
-                className="flex-1"
-              >
-                <span>Clear Cart</span>
-              </Button>
+        ) : (
+          <React.Fragment>
+            {/* Stock Issues Banner */}
+            {hasStockIssues && !isLoading && (
+              <Alert className="border-none bg-amber-600/10 text-amber-600 dark:bg-amber-400/10 dark:text-amber-400">
+                {renderToastIcon("warning")}
+                <AlertTitle>Stock Issues</AlertTitle>
+                <AlertDescription className="text-amber-600/80 dark:text-amber-400/80">
+                  Some items have stock issues. Please review before checkout.
+                </AlertDescription>
+              </Alert>
             )}
-            <SheetClose asChild>
-              <Link
-                href="/cart"
-                aria-disabled={cart.length === 0}
-                className={buttonVariants({
-                  variant: "default",
-                  size: "lg",
-                  className:
-                    "flex-1 aria-disabled:pointer-events-none aria-disabled:opacity-50",
+
+            {/* Cart Items */}
+            <div className="flex-1 overflow-y-auto px-5">
+              <div className="space-y-4 divide-y divide-zinc-200 py-4 dark:divide-zinc-800">
+                {items.map((item, idx) => {
+                  const stockInfo = stockMap.get(item.productId);
+
+                  const isOutOfStock = stockInfo?.isOutOfStock ?? false;
+                  const exceedsStock = stockInfo?.exceedsStock ?? false;
+                  const currentStock = stockInfo?.currentStock ?? 999;
+                  const hasIssue = isOutOfStock || exceedsStock;
+
+                  return (
+                    <div
+                      key={idx}
+                      className={cn(
+                        "bg-card flex w-full gap-4 border p-4 shadow-xs",
+                        hasIssue && "bg-red-50",
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "relative aspect-square w-26 shrink-0 overflow-hidden rounded-md bg-zinc-100 shadow-xs dark:bg-zinc-800",
+                          isOutOfStock && "opacity-50",
+                        )}
+                      >
+                        {item.image ? (
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                            sizes="80px"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs text-zinc-400">
+                            No image
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex flex-1 flex-col justify-between">
+                        <div className="flex flex-col">
+                          <p className="font-serif text-base">{item.name}</p>
+                          <p className="text-muted-foreground mt-1 text-sm font-medium">
+                            {formatPrice(item.price)}
+                          </p>
+                        </div>
+
+                        <div className="flex items-end justify-between">
+                          <div className="flex items-center gap-4">
+                            <StockBadge
+                              productId={item.productId}
+                              stock={currentStock}
+                            />
+                            <div className="w-36">
+                              <AddToCartButton
+                                productId={item.productId}
+                                name={item.name}
+                                price={item.price}
+                                image={item.image}
+                                stock={currentStock}
+                              />
+                            </div>
+                          </div>
+
+                          <Button
+                            variant="outline"
+                            size="icon-xs"
+                            aria-label="Remove item"
+                            onClick={() => removeItem(item.productId)}
+                          >
+                            <Icons.Cancel01Icon className="size-3" />
+                            <span className="sr-only">Remove {item.name}</span>
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
                 })}
-              >
-                <span>Proceed To Checkout</span>
-              </Link>
-            </SheetClose>
-          </div>
-        </SheetFooter>
+              </div>
+            </div>
+
+            {totalItems > 0 && (
+              <SheetFooter className="bg-card">
+                <div className="flex justify-between text-base font-medium text-zinc-900 dark:text-zinc-100">
+                  <span>Subtotal</span>
+                  <span>{formatPrice(totalPrice)}</span>
+                </div>
+
+                <div className="mt-2 flex flex-col gap-2 text-center">
+                  {hasStockIssues ? (
+                    <Button disabled className="w-full" size="lg">
+                      Resolve stock issues to checkout
+                    </Button>
+                  ) : (
+                    <SheetClose asChild>
+                      <Link
+                        href="/checkout"
+                        className={buttonVariants({
+                          size: "lg",
+                          className: "w-full",
+                        })}
+                      >
+                        Proceed to Checkout
+                      </Link>
+                    </SheetClose>
+                  )}
+
+                  <p className="text-muted-foreground text-xs">
+                    Shipping calculated at checkout
+                  </p>
+                </div>
+              </SheetFooter>
+            )}
+          </React.Fragment>
+        )}
       </SheetContent>
     </Sheet>
+  );
+};
+
+interface AddToCartButtonProps {
+  productId: string;
+  name: string;
+  price: number;
+  image?: string;
+  stock: number;
+  className?: string;
+}
+
+const AddToCartButton: React.FC<AddToCartButtonProps> = ({
+  productId,
+  name,
+  price,
+  image,
+  stock,
+  className,
+}) => {
+  const { addItem, updateQuantity } = useCartActions();
+  const cartItem = useCartItem(productId);
+
+  const quantityInCart = cartItem?.quantity ?? 0;
+  const isOutOfStock = stock <= 0;
+  const isAtMax = quantityInCart >= stock;
+
+  const handleAdd = () => {
+    if (quantityInCart < stock) {
+      addItem({ productId, name, price, image }, 1);
+      toast.custom(() => <Notify type="success" title={`Added ${name}`} />);
+    }
+  };
+
+  const handleDecrement = () => {
+    if (quantityInCart > 0) {
+      updateQuantity(productId, quantityInCart - 1);
+    }
+  };
+
+  // Out of stock
+  if (isOutOfStock) {
+    return (
+      <Button disabled size="xs" className={cn("w-max", className)}>
+        Out of Stock
+      </Button>
+    );
+  }
+
+  // Not in cart - show Add to Basket button
+  if (quantityInCart === 0) {
+    return (
+      <Button onClick={handleAdd} size="xs" className={cn("w-full", className)}>
+        Add to Basket
+      </Button>
+    );
+  }
+
+  // In cart - show quantity controls
+  return (
+    <ButtonGroup>
+      <Button
+        variant="outline"
+        size="icon-sm"
+        type="button"
+        aria-label="Decrement"
+        onClick={handleDecrement}
+      >
+        <Icons.MinusSignIcon className="size-3" />
+      </Button>
+      <div className="flex size-8 items-center justify-center border px-2 text-xs font-medium shadow-xs">
+        {quantityInCart}
+      </div>
+      <Button
+        variant="outline"
+        size="icon-sm"
+        type="button"
+        aria-label="Increment"
+        onClick={handleAdd}
+        disabled={isAtMax}
+      >
+        <Icons.PlusSignIcon className="size-3" />
+      </Button>
+    </ButtonGroup>
   );
 };

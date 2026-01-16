@@ -1,82 +1,101 @@
 "use client";
-
 import * as React from "react";
+import { Package } from "lucide-react";
 import { Icons } from "hugeicons-proxy";
-import { SignedIn, SignedOut, UserButton, SignInButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
 
 import { Logo } from "./logo";
 import { Button } from "@/ui/button";
-import { useAppStore } from "@/lib/store";
 import { Container } from "./container";
-import { MenuSheet } from "../sheets/menu.sheet";
-import { CartSheet } from "../sheets/cart.sheet";
 import { Separator } from "@/ui/separator";
+import { MenuSheet } from "@/sheets/menu.sheet";
+import { CartSheet } from "@/sheets/cart.sheet";
+import { SigninDialog } from "@/dialogs/signin.dialog";
+import { useTotalItems } from "@/providers/cart.provider";
 
 export const Header = () => {
-  const { cart } = useAppStore();
+  const totalItems = useTotalItems();
   const [openMenu, setOpenMenu] = React.useState(false);
+  const [openCart, setOpenCart] = React.useState(false);
 
   return (
-    <React.Fragment>
-      <nav className="pointer-events-none fixed top-0 left-0 z-50 flex w-full items-center justify-between mix-blend-difference">
-        <Container className="flex w-full items-center justify-between py-6 md:py-8">
-          <Logo
-            href="/"
-            srcDesktop="horizontal"
-            color="bone"
-            className="pointer-events-auto"
-          />
+    <header className="pointer-events-none fixed top-0 left-0 z-50 w-full mix-blend-difference">
+      <Container className="flex w-full items-center justify-between py-6 lg:py-8">
+        <Logo
+          href="/"
+          srcDesktop="horizontal"
+          color="bone"
+          className="pointer-events-auto"
+        />
 
-          <div className="flex items-center gap-3">
-            <CartSheet>
-              <Button
-                variant="secondary"
-                className="pointer-events-auto"
-                size={cart.length > 0 ? "sm" : "icon-sm"}
-              >
-                <Icons.ShoppingCart02Icon className="size-4.5" />
-                {cart.length > 0 && (
-                  <span className="font-mono text-xs tracking-tighter">
-                    [{cart.length > 9 ? "+9" : cart.length}]
-                  </span>
-                )}
-              </Button>
-            </CartSheet>
-            <MenuSheet openMenu={openMenu} setOpenMenu={setOpenMenu}>
-              <Button
-                size="icon-sm"
-                variant="secondary"
-                className="pointer-events-auto"
-                onClick={() => setOpenMenu(true)}
-              >
-                <Icons.Menu09Icon className="size-4.5" />
-              </Button>
-            </MenuSheet>
-            <div className="pointer-events-auto hidden items-center gap-3 md:flex">
-              <SignedIn>
-                <Separator
-                  orientation="horizontal"
-                  className="bg-border/20 h-px w-2! sm:w-4!"
-                />
+        <div className="pointer-events-auto flex items-center gap-2.5">
+          <CartSheet openCart={openCart} setOpenCart={setOpenCart}>
+            <Button
+              size={totalItems > 0 ? "sm" : "icon-sm"}
+              variant="secondary"
+            >
+              <Icons.ShoppingCart02Icon className="size-4.5" />
+              {totalItems > 0 && (
+                <span className="font-mono text-xs tracking-tighter">
+                  [{totalItems > 99 ? "99+" : totalItems}]
+                </span>
+              )}
+              <span className="sr-only">Open cart ({totalItems} items)</span>
+            </Button>
+          </CartSheet>
+
+          <MenuSheet openMenu={openMenu} setOpenMenu={setOpenMenu}>
+            <Button
+              size="icon-sm"
+              onClick={() => setOpenMenu(true)}
+              variant="secondary"
+            >
+              <Icons.Menu09Icon className="size-4.5" />
+              <span className="sr-only">Open menu</span>
+            </Button>
+          </MenuSheet>
+          <div className="hidden items-center gap-2.5 md:flex">
+            <SignedIn>
+              <React.Fragment>
+                <Separator orientation="vertical" className="h-3! w-px" />
                 <Button
                   size="icon-sm"
-                  variant={"secondary"}
-                  className="mix-blend-normal"
+                  variant="secondary"
+                  className="isolate mix-blend-normal"
                 >
-                  <UserButton />
+                  <UserButton
+                    afterSwitchSessionUrl="/"
+                    appearance={{
+                      elements: {
+                        avatarBox: "h-9 w-9",
+                      },
+                    }}
+                  >
+                    <UserButton.MenuItems>
+                      <UserButton.Link
+                        label="My Orders"
+                        labelIcon={<Package className="mt-px size-3.5" />}
+                        href="/orders"
+                      />
+                    </UserButton.MenuItems>
+                  </UserButton>
                 </Button>
-              </SignedIn>
-              <SignedOut>
-                <SignInButton>
-                  <Button variant="secondary" size="sm">
-                    Sign In
+              </React.Fragment>
+            </SignedIn>
+            <SignedOut>
+              <React.Fragment>
+                <Separator orientation="vertical" className="h-3! w-px" />
+                <SigninDialog>
+                  <Button size="icon-sm" variant="secondary">
+                    <Icons.UserCircleIcon className="size-4.5" />
+                    <span className="sr-only">Sign in</span>
                   </Button>
-                </SignInButton>
-              </SignedOut>
-            </div>
+                </SigninDialog>
+              </React.Fragment>
+            </SignedOut>
           </div>
-        </Container>
-      </nav>
-    </React.Fragment>
+        </div>
+      </Container>
+    </header>
   );
 };

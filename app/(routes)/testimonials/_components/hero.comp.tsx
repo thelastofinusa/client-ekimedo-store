@@ -15,10 +15,10 @@ export const HeroComp = () => {
             className="max-w-3xl pt-16"
           >
             <span className="text-muted-foreground block text-[10px] tracking-[0.4em] uppercase">
-              Client Chronicles
+              Testimonials
             </span>
             <h1 className="mb-0 font-serif text-6xl leading-[1.1] tracking-tight md:text-7xl lg:text-8xl xl:text-9xl">
-              THE ARCHIVE <br /> OF VOICES
+              Words from Our Clients
             </h1>
           </motion.div>
           <motion.div

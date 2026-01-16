@@ -28,7 +28,11 @@ import { sleep } from "@/lib/utils";
 import { Textarea } from "@/ui/textarea";
 import { PhoneInput } from "@/ui/phone-input";
 import { Notify } from "@/components/shared/notify";
-import { formSchema, FormType, inquiryTypes } from "@/lib/validators";
+import {
+  formSchema,
+  FormType,
+  inquiryTypes,
+} from "@/lib/validators/contact-form";
 
 export const ContactFormComp = () => {
   const form = useForm<FormType>({

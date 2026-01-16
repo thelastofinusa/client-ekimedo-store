@@ -10,10 +10,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/select";
+import { CATEGORIES_QUERYResult } from "@/sanity.types";
 
 interface Props {
   years: string[];
-  categories: string[];
+  categories: CATEGORIES_QUERYResult;
   activeCategory: string;
   activeYear: string;
   setActiveCategory: (value: string) => void;
@@ -29,7 +30,7 @@ export const HeroComp: React.FC<Props> = ({
   activeYear,
 }) => {
   return (
-    <header className="border-border/10 border-b py-24 lg:pt-40 lg:pb-20">
+    <header className="border-border/10 border-b pb-24 lg:pb-20">
       <Container size="sm">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -59,8 +60,8 @@ export const HeroComp: React.FC<Props> = ({
                 <SelectContent>
                   <SelectGroup>
                     {categories.map((year) => (
-                      <SelectItem key={year} value={year}>
-                        {year}
+                      <SelectItem key={year._id} value={year.slug!}>
+                        {year.name}
                       </SelectItem>
                     ))}
                   </SelectGroup>

@@ -19,7 +19,13 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./*"],
+      "@/shared/*": ["./components/shared/*"],
+      "@/providers/*": ["./components/providers/*"],
+      "@/dialogs/*": ["./components/dialogs/*"],
+      "@/sheets/*": ["./components/sheets/*"],
+      "@/constants/*": ["./lib/constants/*"],
+      "@/store/*": ["./lib/store/*"]
     }
   },
   "include": [

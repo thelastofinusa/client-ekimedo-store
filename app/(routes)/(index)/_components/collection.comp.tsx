@@ -1,5 +1,5 @@
 import { Container } from "@/components/shared/container";
-import { COLLECTIONS } from "@/constants";
+import { COLLECTIONS } from "@/constants/collection";
 import Image from "next/image";
 import Link from "next/link";
 

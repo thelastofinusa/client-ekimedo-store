@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import NextTopLoader from "nextjs-toploader";
-import { Analytics } from "@vercel/analytics/next";
-import { ClerkProvider } from "@clerk/nextjs";
 
 import "./globals.css";
-import { variables } from "@/font";
-import { Toaster } from "@/ui/sonner";
-import { siteConfig } from "@/config/site.config";
+import { fontVariables } from "@/fonts";
+import { siteConfig } from "@/site.config";
 
 export const metadata: Metadata = {
   title: {
@@ -66,15 +62,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider>
-      <html lang="en" suppressHydrationWarning>
-        <body className={variables("antialiased")}>
-          <Analytics />
-          <Toaster position="bottom-center" richColors />
-          <NextTopLoader showSpinner={false} />
-          {children}
-        </body>
-      </html>
-    </ClerkProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body className={fontVariables("antialiased")}>{children}</body>
+    </html>
   );
 }

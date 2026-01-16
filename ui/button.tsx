@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { Icons } from "hugeicons-proxy";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs active:shadow-none active:translate-y-0.5 active:translate-x-0.5 whitespace-nowrap rounded-md text-[10px] font-medium tracking-[0.3em] uppercase transition-all duration-100 disabled:pointer-events-none disabled:shadow-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-0 aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
+  "inline-flex items-center justify-center gap-2 cursor-pointer shadow-xs active:shadow-none active:translate-y-0.5 active:translate-x-0.5 whitespace-nowrap rounded-md text-[10px] font-medium tracking-[0.3em] uppercase transition-all duration-50 disabled:pointer-events-none disabled:shadow-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-0 aria-invalid:ring-destructive/20 aria-invalid:border-destructive",
   {
     variants: {
       variant: {
@@ -60,9 +60,9 @@ function Button({
       data-slot="button"
       data-variant={variant}
       data-size={size}
-      disabled={isLoading}
       className={cn(buttonVariants({ variant, size, className }))}
       {...props}
+      disabled={isLoading || props.disabled}
     >
       {isLoading ? (
         <>

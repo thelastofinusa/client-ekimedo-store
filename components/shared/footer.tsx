@@ -5,9 +5,10 @@ import { RiVisaLine } from "react-icons/ri";
 import { Logo } from "./logo";
 import { Button } from "@/ui/button";
 import { Container } from "./container";
-import { NAVIGATIONS } from "@/constants";
-import { siteConfig } from "@/config/site.config";
+
+import { siteConfig } from "@/site.config";
 import { Icons } from "hugeicons-proxy";
+import { footerRoutes } from "@/lib/constants/navigation";
 
 export const Footer = () => {
   return (
@@ -44,7 +45,7 @@ export const Footer = () => {
           </div>
 
           <div className="grid w-full grid-cols-2 gap-8 lg:w-max lg:grid-cols-3 lg:gap-10">
-            {NAVIGATIONS.FOOTER.map((item, itemIdx) => (
+            {footerRoutes.map((item, itemIdx) => (
               <div
                 key={itemIdx}
                 className="space-y-6 last-of-type:col-span-2 lg:last-of-type:col-span-1"

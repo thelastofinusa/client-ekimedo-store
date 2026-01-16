@@ -4,64 +4,104 @@ import * as React from "react";
 import { HeroComp } from "./hero.comp";
 import { ShotsComp } from "./shots.comp";
 import { useRouter, useSearchParams } from "next/navigation";
-import { CATEGORIES, GALLERY_ITEMS, YEARS } from "@/constants";
+import { CATEGORIES_QUERYResult, GALLERY_QUERYResult } from "@/sanity.types";
+import { START_YEAR_KEY } from "@/lib/constants/keys";
 
-export const GallerySection = () => {
+interface Props {
+  gallery: GALLERY_QUERYResult;
+  category: CATEGORIES_QUERYResult;
+}
+
+export const GallerySection: React.FC<Props> = ({ gallery, category }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const categoryParam = searchParams.get(
-    "category",
-  ) as (typeof CATEGORIES)[number];
-  const yearParam = searchParams.get("year") as (typeof YEARS)[number];
+  const categories: CATEGORIES_QUERYResult = React.useMemo(
+    () => [
+      { _id: "all", name: "All", slug: "all" },
+      ...category.filter((c) => c.name && c.slug),
+    ],
+    [category],
+  );
+
+  const categoryParam = searchParams.get("category") ?? "";
+  const yearParam = searchParams.get("year") ?? "";
 
   const activeCategory =
-    CATEGORIES.find(
-      (c) => c.toLowerCase().replace(" ", "-") === categoryParam,
-    ) ?? "";
+    categories.find((c) => c.slug === categoryParam)?.slug ?? "";
 
-  const activeYear = YEARS.find((y) => y === yearParam) ?? "";
+  const years = React.useMemo(() => {
+    let maxYear = START_YEAR_KEY;
+
+    gallery.forEach((item) => {
+      if (!item.year) return;
+
+      const year = Number(item.year.slice(0, 4));
+      if (year > maxYear) {
+        maxYear = year;
+      }
+    });
+
+    const range: string[] = [];
+
+    for (let y = maxYear; y >= START_YEAR_KEY; y--) {
+      range.push(String(y));
+    }
+
+    return ["All", ...range];
+  }, [gallery]);
+
+  const activeYear = years.includes(yearParam) ? yearParam : "";
 
   const setActiveCategory = React.useCallback(
-    (value: (typeof CATEGORIES)[number]) => {
+    (slug: string) => {
       const params = new URLSearchParams(searchParams);
-      if (value === "All") {
+
+      if (slug === "all") {
         params.delete("category");
       } else {
-        params.set("category", value.toLowerCase().replace(" ", "-"));
+        params.set("category", slug.toLowerCase().replace(" ", "-"));
       }
+
       router.push(`?${params.toString()}`);
     },
-    [searchParams, router],
+    [router, searchParams],
   );
 
   const setActiveYear = React.useCallback(
-    (value: (typeof YEARS)[number]) => {
+    (year: string) => {
       const params = new URLSearchParams(searchParams);
-      if (value === "All") {
+
+      if (year.toLowerCase() === "all") {
         params.delete("year");
       } else {
-        params.set("year", value);
+        params.set("year", year);
       }
+
       router.push(`?${params.toString()}`);
     },
-    [searchParams, router],
+    [router, searchParams],
   );
 
-  const filteredItems = GALLERY_ITEMS.filter((item) => {
-    const categoryMatch =
-      !activeCategory ||
-      item.category === activeCategory.toLowerCase().replace(" ", "-");
+  const filteredItems = React.useMemo(
+    () =>
+      gallery.filter((item) => {
+        const categoryMatch =
+          !activeCategory ||
+          item.category?.slug ===
+            activeCategory.toLowerCase().replace(" ", "-");
 
-    const yearMatch = !activeYear || item.year === activeYear;
+        const yearMatch = !activeYear || item.year === activeYear;
 
-    return categoryMatch && yearMatch;
-  });
+        return categoryMatch && yearMatch;
+      }),
+    [gallery, activeCategory, activeYear],
+  );
 
   const heroCompProps = React.useMemo(
     () => ({
-      years: YEARS,
-      categories: CATEGORIES,
+      years,
+      categories,
       activeCategory,
       setActiveCategory,
       activeYear,

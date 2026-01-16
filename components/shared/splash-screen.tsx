@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { siteConfig } from "@/config/site.config";
+import { siteConfig } from "@/site.config";
 
 export const SplashScreen = () => {
   return (

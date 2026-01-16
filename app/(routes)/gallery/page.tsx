@@ -1,20 +1,38 @@
 import React from "react";
-import type { Metadata } from "next";
+import { Metadata } from "next";
 
-import { siteConfig } from "@/config/site.config";
+import { siteConfig } from "@/site.config";
 import { GallerySection } from "./_components/gallery.sec";
 import { SplashScreen } from "@/components/shared/splash-screen";
+import { sanityFetch } from "@/sanity/lib/live";
+import { GALLERY_QUERY } from "@/sanity/queries/gallery";
+import { CATEGORIES_QUERYResult, GALLERY_QUERYResult } from "@/sanity.types";
+import { CATEGORIES_QUERY } from "@/sanity/queries/category";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Archive Gallery",
+  title: "Our Gallery",
   description: `Explore the gallery of ${siteConfig.title}—a curated archive of bridal, prom, and special-event looks captured across recent collections.`,
 };
 
-export default function Gallery() {
+export default async function GalleryPage() {
+  const galleryResult = await sanityFetch({
+    query: GALLERY_QUERY,
+  });
+  const categoryResult = await sanityFetch({
+    query: CATEGORIES_QUERY,
+  });
+
+  const gallery: GALLERY_QUERYResult =
+    galleryResult.data as GALLERY_QUERYResult;
+  const category: CATEGORIES_QUERYResult =
+    categoryResult.data as CATEGORIES_QUERYResult;
+
   return (
-    <div className="bg-foreground text-background flex-1 overflow-x-clip">
+    <div className="bg-foreground text-background flex-1 overflow-x-clip py-28 lg:py-36">
       <React.Suspense fallback={<SplashScreen />}>
-        <GallerySection />
+        <GallerySection gallery={gallery} category={category} />
       </React.Suspense>
     </div>
   );

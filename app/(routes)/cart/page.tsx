@@ -1,11 +1,5 @@
-import { CartComp } from "./_components/cart.comp";
-import { HeroComp } from "./_components/hero.comp";
+import React from "react";
 
-export default function Cart() {
-  return (
-    <div className="flex-1 overflow-x-clip">
-      <HeroComp />
-      <CartComp />
-    </div>
-  );
+export default function CartPage() {
+  return <div>CartPage</div>;
 }

@@ -4,9 +4,9 @@ import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/ui/button";
 import { Container } from "@/components/shared/container";
-import { GALLERY_ITEMS } from "@/constants";
+import { GALLERY_ITEMS } from "@/lib/constants/filters";
 
-export const LookbookComp = () => {
+export const LookBookComp = () => {
   const looks = GALLERY_ITEMS.map((item) => item.image);
 
   return (

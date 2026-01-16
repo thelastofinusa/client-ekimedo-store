@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { Route } from "next";
 import { motion } from "motion/react";
 
-import { siteConfig } from "@/config/site.config";
+import { siteConfig } from "@/site.config";
 import { buttonVariants } from "@/ui/button";
 
 export const HeroComp = () => {
@@ -11,15 +12,6 @@ export const HeroComp = () => {
     <section className="bg-background relative flex h-dvh w-full items-center justify-center overflow-hidden">
       {/* Content */}
       <div className="relative z-10 max-w-5xl space-y-8 px-6 text-center">
-        {/* <motion.span
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2, duration: 0.8 }}
-          className="text-muted-foreground block text-[10px] font-medium tracking-[0.4em] uppercase"
-        >
-          {siteConfig.tagline}
-        </motion.span> */}
-
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -46,14 +38,14 @@ export const HeroComp = () => {
           className="flex flex-col items-center justify-center gap-4 pt-8 sm:gap-6 md:flex-row md:gap-8 md:pt-12"
         >
           <Link
-            href="/#collections"
+            href="/products"
             className={buttonVariants({ variant: "outline", size: "lg" })}
           >
-            Explore Collections
+            Explore Products
           </Link>
           <div className="bg-border hidden h-6 w-px md:block" />
           <Link
-            href="/consultation"
+            href={"/consultation" as Route}
             className={buttonVariants({ variant: "link", size: "lg" })}
           >
             Private Consultation
