@@ -15,6 +15,7 @@ import {
 import { buttonVariants, Button } from "@/ui/button";
 import { SigninDialog } from "@/dialogs/signin.dialog";
 import { headerRoutes } from "@/lib/constants/navigation";
+import { Route } from "next";
 
 interface Props {
   children: React.ReactNode;
@@ -72,7 +73,7 @@ export const MenuSheet: React.FC<Props> = ({
           </SignedOut>
           <SheetClose asChild>
             <Link
-              href={{ pathname: "/consultation" }}
+              href={"/consultation" as Route}
               onClick={() => setOpenMenu(false)}
               className={buttonVariants({
                 variant: "secondary",

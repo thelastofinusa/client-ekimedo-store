@@ -1,4 +1,4 @@
-import { Metadata } from "next";
+import { Metadata, Route } from "next";
 
 import { HeroComp } from "./_components/hero.comp";
 import Link from "next/link";
@@ -21,7 +21,7 @@ export default function TestimonialsPage() {
       <section className="bg-bone px-8 py-40 text-center">
         <h3 className="mb-8">Your vision, our artisan hands.</h3>
         <Link
-          href="/consultation"
+          href={"/consultation" as Route}
           className={buttonVariants({ size: "lg", variant: "default" })}
         >
           Begin the Consultation
