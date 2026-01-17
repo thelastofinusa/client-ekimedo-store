@@ -51,7 +51,7 @@ export const MenuSheet: React.FC<Props> = ({
                     href={{ pathname: item.path }}
                     className="group flex w-fit items-baseline gap-4"
                   >
-                    <span className="font-serif text-2xl transition-all duration-500 md:text-4xl">
+                    <span className="font-serif text-3xl transition-all duration-500 md:text-4xl">
                       {item.label}
                     </span>
                   </Link>

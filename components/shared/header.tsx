@@ -2,7 +2,7 @@
 import * as React from "react";
 import { Package } from "lucide-react";
 import { Icons } from "hugeicons-proxy";
-import { SignedIn, SignedOut, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 
 import { Logo } from "./logo";
 import { Button } from "@/ui/button";
@@ -54,7 +54,7 @@ export const Header = () => {
               <span className="sr-only">Open menu</span>
             </Button>
           </MenuSheet>
-          <div className="hidden items-center gap-2.5 md:flex">
+          <div className="flex items-center gap-2.5">
             <SignedIn>
               <React.Fragment>
                 <Separator orientation="vertical" className="h-3! w-px" />
@@ -85,12 +85,12 @@ export const Header = () => {
             <SignedOut>
               <React.Fragment>
                 <Separator orientation="vertical" className="h-3! w-px" />
-                <SigninDialog>
+                <SignInButton mode="modal">
                   <Button size="icon-sm" variant="secondary">
                     <Icons.UserCircleIcon className="size-4.5" />
                     <span className="sr-only">Sign in</span>
                   </Button>
-                </SigninDialog>
+                </SignInButton>
               </React.Fragment>
             </SignedOut>
           </div>

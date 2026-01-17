@@ -20,13 +20,11 @@ import {
   useTotalItems,
   useTotalPrice,
 } from "@/providers/cart.provider";
-import { Badge } from "@/ui/badge";
 import { cn, formatPrice } from "@/lib/utils";
 import { ButtonGroup } from "@/ui/button-group";
 import { useCartStock } from "@/hooks/cart-stock";
 import { buttonVariants, Button } from "@/ui/button";
 import { Notify, renderToastIcon } from "@/shared/notify";
-import { isLowStock as checkLowStock } from "@/constants/stock";
 import { Alert, AlertTitle, AlertDescription } from "@/ui/alert";
 import { StockBadge } from "../shared/stock-badge";
 
@@ -118,7 +116,7 @@ export const CartSheet: React.FC<Props> = ({
                     >
                       <div
                         className={cn(
-                          "relative aspect-square w-26 shrink-0 overflow-hidden rounded-md bg-zinc-100 shadow-xs dark:bg-zinc-800",
+                          "relative aspect-square w-20 shrink-0 overflow-hidden rounded-md bg-zinc-100 shadow-xs md:w-26 dark:bg-zinc-800",
                           isOutOfStock && "opacity-50",
                         )}
                       >

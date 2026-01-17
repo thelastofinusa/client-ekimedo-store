@@ -5,14 +5,11 @@ import { useSearchParams } from "next/navigation";
 
 import {
   Empty,
-  EmptyContent,
   EmptyDescription,
   EmptyHeader,
   EmptyMedia,
   EmptyTitle,
 } from "@/ui/empty";
-import { Button } from "@/ui/button";
-import { ProductType } from "@/lib/constants/products";
 import { ProductCard } from "@/components/shared/product-card";
 import { Icons } from "hugeicons-proxy";
 import { PRODUCT_QUERYResult } from "@/sanity.types";
@@ -28,8 +25,28 @@ export const ProductGrid: React.FC<Props> = ({ products }) => {
   const filteredProducts = React.useMemo(() => {
     let filtered = products;
 
+    // Filter by categories
+    const categories = searchParams.getAll("category");
+    if (categories.length > 0) {
+      filtered = filtered.filter((product) => {
+        // category is a single object with slug property
+        const productCategory = product.category?.slug;
+        return productCategory ? categories.includes(productCategory) : false;
+      });
+    }
+
+    // Filter by price range
+    const priceRange = searchParams.get("price");
+    if (priceRange) {
+      const [min, max] = priceRange.split("-").map(Number);
+      filtered = filtered.filter((product) => {
+        const price = product.price || 0;
+        return price >= min && price <= max;
+      });
+    }
+
     return filtered;
-  }, [searchParams]);
+  }, [products, searchParams]);
 
   return (
     <div className="flex-1">

@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import { SignInButton, useAuth } from "@clerk/nextjs";
 import { Icons } from "hugeicons-proxy";
 
 import {
@@ -27,9 +28,12 @@ import Image from "next/image";
 import { createCheckoutSession } from "@/lib/actions/checkout";
 import { Route } from "next";
 import { toast } from "sonner";
+import { SigninDialog } from "@/components/dialogs/signin.dialog";
 
 export const CheckoutItems = () => {
   const router = useRouter();
+  const { userId } = useAuth();
+  const isSignedIn = !!userId;
   const items = useCartItems();
   const totalPrice = useTotalPrice();
   const totalItems = useTotalItems();
@@ -40,6 +44,8 @@ export const CheckoutItems = () => {
   const [error, setError] = React.useState<string | null>(null);
 
   const handleCheckout = () => {
+    if (!isSignedIn) return;
+
     setError(null);
 
     startTransition(async () => {
@@ -228,15 +234,23 @@ export const CheckoutItems = () => {
 
           <div className="mt-6">
             <div className="flex flex-col gap-2">
-              <Button
-                size="lg"
-                isLoading={isPending}
-                loadingText="Processing..."
-                onClick={handleCheckout}
-                disabled={hasStockIssues || isLoading || items.length === 0}
-              >
-                <span>Pay with Stripe</span>
-              </Button>
+              {isSignedIn ? (
+                <Button
+                  size="lg"
+                  isLoading={isPending}
+                  loadingText="Processing..."
+                  onClick={handleCheckout}
+                  disabled={hasStockIssues || isLoading || items.length === 0}
+                >
+                  <span>Pay with Stripe</span>
+                </Button>
+              ) : (
+                <SignInButton mode="modal">
+                  <Button size="lg" className="w-full">
+                    <span>Sign in to proceed</span>
+                  </Button>
+                </SignInButton>
+              )}
               {error && (
                 <p className="text-center text-sm text-red-600 dark:text-red-400">
                   {error}

@@ -5,24 +5,15 @@ import { motion } from "motion/react";
 import { Icons } from "hugeicons-proxy";
 import { PiQuotesFill } from "react-icons/pi";
 
-import { cn } from "@/lib/utils";
+import { cn, formatSanityDate } from "@/lib/utils";
 import { Container } from "@/components/shared/container";
+import { TESTIMONIAL_QUERYResult } from "@/sanity.types";
 
-interface Testimonial {
-  name: string;
-  role: string;
-  content: string;
-  rating: number;
-  image: string;
-  date?: string; // Optional if not in schema yet
-  workAssets?: string[]; // Optional
+interface Props {
+  testimonials: TESTIMONIAL_QUERYResult;
 }
 
-interface ReviewsCompProps {
-  testimonials?: Testimonial[];
-}
-
-export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
+export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
   return (
     <div className="bg-foreground text-background py-24 lg:py-32">
       <Container>
@@ -41,8 +32,8 @@ export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
                 <div className="flex items-center gap-6">
                   <div className="border-primary/10 ring-primary/5 ring-offset-charcoal relative h-16 w-16 overflow-hidden rounded-full border ring-1 ring-offset-4 grayscale">
                     <Image
-                      src={testimonial.image || "/placeholder.svg"}
-                      alt={testimonial.name}
+                      src={testimonial.avatar || "/placeholder.svg"}
+                      alt={testimonial.name!}
                       fill
                       quality={100}
                       priority
@@ -54,18 +45,19 @@ export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
                       {testimonial.name}
                     </h4>
                     <p className="text-muted-foreground font-sans text-[9px] tracking-[0.3em] uppercase">
-                      {testimonial.role}{" "}
-                      {testimonial.date && `— ${testimonial.date}`}
+                      {testimonial.category?.name}{" "}
+                      {testimonial.date &&
+                        `— ${formatSanityDate(testimonial.date)}`}
                     </p>
                     <div className="mt-2 flex gap-0.5">
                       {[...Array(5)].map((_, i) => (
                         <Icons.StarIcon
                           key={i}
                           fill={
-                            i < testimonial.rating ? "currentColor" : "none"
+                            i < testimonial.rating! ? "currentColor" : "none"
                           }
                           className={cn("text-muted-foreground size-4", {
-                            "text-background": i < testimonial.rating,
+                            "text-background": i < testimonial.rating!,
                           })}
                         />
                       ))}
@@ -80,7 +72,7 @@ export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
                     strokeWidth={0.5}
                   />
                   <h3 className="relative z-10 font-serif text-xl leading-[1.3] text-balance opacity-95 sm:text-2xl sm:leading-[1.2] md:text-4xl">
-                    &quot;{testimonial.content}&quot;
+                    &quot;{testimonial.review}&quot;
                   </h3>
                 </div>
               </motion.div>
@@ -96,11 +88,7 @@ export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
                     {/* Placeholder logic for workAssets as they are not yet in basic schema, but we can keep structure */}
                     <div className="group border-border/30 bg-secondary/20 relative col-span-4 row-span-2 overflow-hidden border shadow-md transition-all duration-700">
                       <Image
-                        src={
-                          testimonial.workAssets?.[0] ||
-                          testimonial.image ||
-                          "/placeholder.svg"
-                        }
+                        src={testimonial.workAssets?.[0] ?? ""}
                         alt="Primary Work Asset"
                         fill
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
@@ -108,11 +96,7 @@ export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
                     </div>
                     <div className="group border-border/30 bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden border shadow-md transition-all duration-700">
                       <Image
-                        src={
-                          testimonial.workAssets?.[1] ||
-                          testimonial.image ||
-                          "/placeholder.svg"
-                        }
+                        src={testimonial.workAssets?.[1] ?? ""}
                         alt="Secondary Work Asset"
                         fill
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
@@ -120,11 +104,7 @@ export const ReviewsComp = ({ testimonials = [] }: ReviewsCompProps) => {
                     </div>
                     <div className="group border-border/30 bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden border shadow-md transition-all duration-700">
                       <Image
-                        src={
-                          testimonial.workAssets?.[2] ||
-                          testimonial.image ||
-                          "/placeholder.svg"
-                        }
+                        src={testimonial.workAssets?.[2] ?? ""}
                         alt="Tertiary Work Asset"
                         fill
                         className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"

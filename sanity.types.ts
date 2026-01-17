@@ -13,6 +13,119 @@
  */
 
 // Source: schema.json
+export type Testimonial = {
+  _id: string;
+  _type: "testimonial";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  category?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "category";
+  };
+  review?: string;
+  rating?: number;
+  date?: string;
+  avatar?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  workAssets?: Array<{
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    description?: string;
+    _type: "asset";
+    _key: string;
+  }>;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
+export type Order = {
+  _id: string;
+  _type: "order";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  orderNumber?: string;
+  items?: Array<{
+    product?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "product";
+    };
+    quantity?: number;
+    priceAtPurchase?: number;
+    _key: string;
+  }>;
+  total?: number;
+  status?: "paid" | "shipped" | "delivered" | "cancelled";
+  customer?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "customer";
+  };
+  clerkUserId?: string;
+  email?: string;
+  address?: {
+    name?: string;
+    line1?: string;
+    line2?: string;
+    city?: string;
+    postcode?: string;
+    country?: string;
+  };
+  stripePaymentId?: string;
+  createdAt?: string;
+};
+
+export type Customer = {
+  _id: string;
+  _type: "customer";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  email?: string;
+  name?: string;
+  clerkUserId?: string;
+  stripeCustomerId?: string;
+  createdAt?: string;
+};
+
 export type Product = {
   _id: string;
   _type: "product";
@@ -46,22 +159,6 @@ export type Product = {
   colors?: Array<string>;
   stock?: number;
   details?: Array<string>;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type Slug = {
@@ -205,9 +302,12 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | Product
+  | Testimonial
   | SanityImageCrop
   | SanityImageHotspot
+  | Order
+  | Customer
+  | Product
   | Slug
   | Gallery
   | Category
@@ -229,6 +329,28 @@ export type CATEGORIES_QUERYResult = Array<{
   slug: string | null;
 }>;
 
+// Source: ./sanity/queries/customer.ts
+// Variable: CUSTOMER_BY_EMAIL_QUERY
+// Query: *[  _type == "customer"  && email == $email][0]{  _id,  email,  name,  clerkUserId,  stripeCustomerId,  createdAt}
+export type CUSTOMER_BY_EMAIL_QUERYResult = {
+  _id: string;
+  email: string | null;
+  name: string | null;
+  clerkUserId: string | null;
+  stripeCustomerId: string | null;
+  createdAt: string | null;
+} | null;
+// Variable: CUSTOMER_BY_STRIPE_ID_QUERY
+// Query: *[  _type == "customer"  && stripeCustomerId == $stripeCustomerId][0]{  _id,  email,  name,  clerkUserId,  stripeCustomerId,  createdAt}
+export type CUSTOMER_BY_STRIPE_ID_QUERYResult = {
+  _id: string;
+  email: string | null;
+  name: string | null;
+  clerkUserId: string | null;
+  stripeCustomerId: string | null;
+  createdAt: string | null;
+} | null;
+
 // Source: ./sanity/queries/gallery.ts
 // Variable: GALLERY_QUERY
 // Query: *[_type == "gallery"] | order(_createdAt desc) {    _id,    title,    year,    category -> {        _id,        name,        "slug": slug.current    },    "image": image.asset->url,    }
@@ -243,6 +365,71 @@ export type GALLERY_QUERYResult = Array<{
   } | null;
   image: string | null;
 }>;
+
+// Source: ./sanity/queries/orders.ts
+// Variable: ORDERS_BY_USER_QUERY
+// Query: *[  _type == "order"  && clerkUserId == $clerkUserId] | order(createdAt desc) {  _id,  orderNumber,  total,  status,  createdAt,  "itemCount": count(items),  "itemNames": items[].product->name,  "itemImages": items[].product->images[0].asset->url}
+export type ORDERS_BY_USER_QUERYResult = Array<{
+  _id: string;
+  orderNumber: string | null;
+  total: number | null;
+  status: "cancelled" | "delivered" | "paid" | "shipped" | null;
+  createdAt: string | null;
+  itemCount: number | null;
+  itemNames: Array<string | null> | null;
+  itemImages: Array<string | null> | null;
+}>;
+// Variable: ORDER_BY_ID_QUERY
+// Query: *[  _type == "order"  && _id == $id][0] {  _id,  orderNumber,  clerkUserId,  email,  items[]{    _key,    quantity,    priceAtPurchase,    product->{      _id,      name,      "slug": slug.current,      "image": images[0]{        asset->{          _id,          url        }      }    }  },  total,  status,  address{    name,    line1,    line2,    city,    postcode,    country  },  stripePaymentId,  createdAt}
+export type ORDER_BY_ID_QUERYResult = {
+  _id: string;
+  orderNumber: string | null;
+  clerkUserId: string | null;
+  email: string | null;
+  items: Array<{
+    _key: string;
+    quantity: number | null;
+    priceAtPurchase: number | null;
+    product: {
+      _id: string;
+      name: string | null;
+      slug: string | null;
+      image: {
+        asset: {
+          _id: string;
+          url: string | null;
+        } | null;
+      } | null;
+    } | null;
+  }> | null;
+  total: number | null;
+  status: "cancelled" | "delivered" | "paid" | "shipped" | null;
+  address: {
+    name: string | null;
+    line1: string | null;
+    line2: string | null;
+    city: string | null;
+    postcode: string | null;
+    country: string | null;
+  } | null;
+  stripePaymentId: string | null;
+  createdAt: string | null;
+} | null;
+// Variable: RECENT_ORDERS_QUERY
+// Query: *[  _type == "order"] | order(createdAt desc) [0...$limit] {  _id,  orderNumber,  email,  total,  status,  createdAt}
+export type RECENT_ORDERS_QUERYResult = Array<{
+  _id: string;
+  orderNumber: string | null;
+  email: string | null;
+  total: number | null;
+  status: "cancelled" | "delivered" | "paid" | "shipped" | null;
+  createdAt: string | null;
+}>;
+// Variable: ORDER_BY_STRIPE_PAYMENT_ID_QUERY
+// Query: *[  _type == "order"  && stripePaymentId == $stripePaymentId][0]{ _id }
+export type ORDER_BY_STRIPE_PAYMENT_ID_QUERYResult = {
+  _id: string;
+} | null;
 
 // Source: ./sanity/queries/product.ts
 // Variable: PRODUCT_QUERY
@@ -265,7 +452,7 @@ export type PRODUCT_QUERYResult = Array<{
   } | null;
 }>;
 // Variable: PRODUCT_BY_SLUG_QUERY
-// Query: *[_type == "product" && slug.current == "$slug"] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors,    description,    details,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
+// Query: *[_type == "product" && slug.current == $slug] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors,    description,    details,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
 export type PRODUCT_BY_SLUG_QUERYResult = Array<{
   _id: string;
   name: string | null;
@@ -283,14 +470,57 @@ export type PRODUCT_BY_SLUG_QUERYResult = Array<{
     slug: string | null;
   } | null;
 }>;
+// Variable: PRODUCT_BY_IDS_QUERY
+// Query: *[_type == "product" && _id in $ids] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors,    description,    details,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
+export type PRODUCT_BY_IDS_QUERYResult = Array<{
+  _id: string;
+  name: string | null;
+  slug: string | null;
+  price: number | null;
+  colors: Array<string> | null;
+  description: string | null;
+  details: Array<string> | null;
+  images: Array<string | null> | null;
+  sizes: Array<string> | null;
+  stock: number | null;
+  category: {
+    _id: string;
+    name: string | null;
+    slug: string | null;
+  } | null;
+}>;
+
+// Source: ./sanity/queries/testimonial.ts
+// Variable: TESTIMONIAL_QUERY
+// Query: *[_type == "testimonial"] | order(date desc) {    _id,    "avatar": avatar.asset->url,    category -> { name },    date,    name,    rating,    review,    "workAssets": workAssets[].asset->url}
+export type TESTIMONIAL_QUERYResult = Array<{
+  _id: string;
+  avatar: string | null;
+  category: {
+    name: string | null;
+  } | null;
+  date: string | null;
+  name: string | null;
+  rating: number | null;
+  review: string | null;
+  workAssets: Array<string | null> | null;
+}>;
 
 // Query TypeMap
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
     '\n    *[_type == "category"] | order(_createdAt desc) {\n        _id,\n        name,\n        "slug": slug.current\n    }\n': CATEGORIES_QUERYResult;
+    '*[\n  _type == "customer"\n  && email == $email\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_EMAIL_QUERYResult;
+    '*[\n  _type == "customer"\n  && stripeCustomerId == $stripeCustomerId\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_STRIPE_ID_QUERYResult;
     '\n    *[_type == "gallery"] | order(_createdAt desc) {\n    _id,\n    title,\n    year,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n    "image": image.asset->url,\n    }\n': GALLERY_QUERYResult;
+    '*[\n  _type == "order"\n  && clerkUserId == $clerkUserId\n] | order(createdAt desc) {\n  _id,\n  orderNumber,\n  total,\n  status,\n  createdAt,\n  "itemCount": count(items),\n  "itemNames": items[].product->name,\n  "itemImages": items[].product->images[0].asset->url\n}': ORDERS_BY_USER_QUERYResult;
+    '*[\n  _type == "order"\n  && _id == $id\n][0] {\n  _id,\n  orderNumber,\n  clerkUserId,\n  email,\n  items[]{\n    _key,\n    quantity,\n    priceAtPurchase,\n    product->{\n      _id,\n      name,\n      "slug": slug.current,\n      "image": images[0]{\n        asset->{\n          _id,\n          url\n        }\n      }\n    }\n  },\n  total,\n  status,\n  address{\n    name,\n    line1,\n    line2,\n    city,\n    postcode,\n    country\n  },\n  stripePaymentId,\n  createdAt\n}': ORDER_BY_ID_QUERYResult;
+    '*[\n  _type == "order"\n] | order(createdAt desc) [0...$limit] {\n  _id,\n  orderNumber,\n  email,\n  total,\n  status,\n  createdAt\n}': RECENT_ORDERS_QUERYResult;
+    '*[\n  _type == "order"\n  && stripePaymentId == $stripePaymentId\n][0]{ _id }': ORDER_BY_STRIPE_PAYMENT_ID_QUERYResult;
     '\n*[_type == "product"] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors,\n    description,\n    details,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_QUERYResult;
-    '\n*[_type == "product" && slug.current == "$slug"] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors,\n    description,\n    details,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_SLUG_QUERYResult;
+    '\n*[_type == "product" && slug.current == $slug] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors,\n    description,\n    details,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_SLUG_QUERYResult;
+    '\n*[_type == "product" && _id in $ids] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors,\n    description,\n    details,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_IDS_QUERYResult;
+    '\n*[_type == "testimonial"] | order(date desc) {\n    _id,\n    "avatar": avatar.asset->url,\n    category -> { name },\n    date,\n    name,\n    rating,\n    review,\n    "workAssets": workAssets[].asset->url\n}\n': TESTIMONIAL_QUERYResult;
   }
 }

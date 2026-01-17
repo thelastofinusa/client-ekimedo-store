@@ -5,9 +5,9 @@ import { Container } from "@/shared/container";
 
 export default function NotFound() {
   return (
-    <main className="bg-foreground text-background flex min-h-screen flex-col">
-      <div className="py-24 lg:py-32 h-dvh">
-        <Container className="flex flex-col justify-center h-full">
+    <main className="bg-foreground text-background flex min-h-dvh flex-col">
+      <div className="h-dvh py-24 lg:py-32">
+        <Container className="flex h-full flex-col justify-center">
           <div className="flex grow flex-col items-center justify-center pt-16 text-center">
             <span className="mb-4 block text-[10px] tracking-[0.5em] uppercase opacity-40">
               Error 404

@@ -1,9 +1,3 @@
-export const YEARS = [
-  "All",
-  ...Array.from({ length: 2025 - 2020 + 1 }, (_, i) => (2025 - i).toString()),
-];
-export const CATEGORIES = ["All", "Bridal", "Prom", "Special Events"];
-
 export const GALLERY_ITEMS = [
   {
     id: "g1",

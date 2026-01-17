@@ -2,6 +2,7 @@
 import { Route } from "next";
 import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 
 import {
   Sheet,
@@ -15,37 +16,14 @@ import { Button } from "@/ui/button";
 import { Checkbox } from "@/ui/checkbox";
 import { useIsMobile } from "@/hooks/mobile";
 import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
+import { client } from "@/sanity/lib/client";
 
-const productsFilter: Array<{
-  name: string;
-  id: string;
-  type: "multiple" | "single";
-  options: {
-    name: string;
-    slug: string;
-  }[];
-}> = [
-  {
-    name: "Categories",
-    id: "category",
-    type: "multiple",
-    options: [
-      { name: "Bridal", slug: "bridal" },
-      { name: "Prom", slug: "prom" },
-      { name: "Special Event", slug: "special-event" },
-    ],
-  },
-  {
-    name: "Price Range",
-    id: "price",
-    type: "single",
-    options: [
-      { name: "Under $1,000", slug: "0-1000" },
-      { name: "$1,000 - $3,000", slug: "1000-3000" },
-      { name: "$3,000 - $5,000", slug: "3000-5000" },
-      { name: "Above $5,000", slug: "5000-10000" },
-    ],
-  },
+const priceRangeFilters = [
+  { name: "Under $500", slug: "0-500" },
+  { name: "$500 - $1,000", slug: "500-1000" },
+  { name: "$1,000 - $3,000", slug: "1000-3000" },
+  { name: "$3,000 - $5,000", slug: "3000-5000" },
+  { name: "Above $5,000", slug: "5000-999999" },
 ];
 
 export const Filters = () => {
@@ -53,58 +31,104 @@ export const Filters = () => {
   const pathname = usePathname();
   const { isMobile } = useIsMobile();
   const searchParams = useSearchParams();
+  const [categories, setCategories] = React.useState<
+    Array<{ _id: string; name: string; slug: string }>
+  >([]);
+
+  // Fetch categories from Sanity
+  React.useEffect(() => {
+    const fetchCategories = async () => {
+      const result = await client.fetch(CATEGORIES_QUERY);
+      setCategories(result as typeof categories);
+    };
+    fetchCategories();
+  }, []);
 
   const clearFilters = () => {
     router.push(pathname as Route, { scroll: false });
   };
 
-  const renderFilterContent = (filter: (typeof productsFilter)[0]) => {
-    if (filter.type === "multiple") {
-      const selectedValues = searchParams.getAll(filter.id);
+  const handleFilterChange = (
+    filterId: string,
+    value: string,
+    isMultiple: boolean,
+  ) => {
+    const params = new URLSearchParams(searchParams.toString());
 
-      return (
-        <div className="flex flex-col gap-3">
-          {filter.options.map((option) => {
-            const isChecked = selectedValues.includes(option.slug);
-            return (
-              <div key={option.slug} className="flex items-center gap-2.5">
-                <Checkbox
-                  checked={isChecked}
-                  id={`${filter.id}-${option.slug}`}
-                />
-                <Label
-                  htmlFor={`${filter.id}-${option.slug}`}
-                  className="cursor-pointer text-sm"
-                >
-                  {option.name}
-                </Label>
-              </div>
-            );
-          })}
-        </div>
-      );
+    if (isMultiple) {
+      // For multiple selections, toggle the value
+      const values = params.getAll(filterId);
+      if (values.includes(value)) {
+        params.delete(filterId);
+        values
+          .filter((v) => v !== value)
+          .forEach((v) => params.append(filterId, v));
+      } else {
+        params.append(filterId, value);
+      }
     } else {
-      const selectedValue = searchParams.get(filter.id);
+      // For single selection, replace the value
+      if (params.get(filterId) === value) {
+        params.delete(filterId);
+      } else {
+        params.set(filterId, value);
+      }
+    }
 
-      return (
-        <RadioGroup value={selectedValue || ""} className="flex flex-col gap-3">
-          {filter.options.map((option) => (
-            <div key={option.slug} className="flex items-center gap-2.5">
-              <RadioGroupItem
-                value={option.slug}
-                id={`${filter.id}-${option.slug}`}
+    router.push(`${pathname}?${params.toString()}` as Route, { scroll: false });
+  };
+
+  const renderCategoryFilters = () => {
+    const selectedValues = searchParams.getAll("category");
+
+    return (
+      <div className="flex flex-col gap-3">
+        {categories.map((category) => {
+          const isChecked = selectedValues.includes(category.slug);
+          return (
+            <div key={category.slug} className="flex items-center gap-2.5">
+              <Checkbox
+                checked={isChecked}
+                onCheckedChange={() =>
+                  handleFilterChange("category", category.slug, true)
+                }
+                id={`category-${category.slug}`}
               />
               <Label
-                htmlFor={`${filter.id}-${option.slug}`}
+                htmlFor={`category-${category.slug}`}
                 className="cursor-pointer text-sm"
               >
-                {option.name}
+                {category.name}
               </Label>
             </div>
-          ))}
-        </RadioGroup>
-      );
-    }
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderPriceFilters = () => {
+    const selectedValue = searchParams.get("price");
+
+    return (
+      <RadioGroup
+        value={selectedValue || ""}
+        onValueChange={(value) => handleFilterChange("price", value, false)}
+        className="flex flex-col gap-3"
+      >
+        {priceRangeFilters.map((option) => (
+          <div key={option.slug} className="flex items-center gap-2.5">
+            <RadioGroupItem value={option.slug} id={`price-${option.slug}`} />
+            <Label
+              htmlFor={`price-${option.slug}`}
+              className="cursor-pointer text-sm"
+            >
+              {option.name}
+            </Label>
+          </div>
+        ))}
+      </RadioGroup>
+    );
   };
 
   const content = () => (
@@ -119,14 +143,23 @@ export const Filters = () => {
       </div>
 
       <div className="flex flex-col gap-8">
-        {productsFilter.map((filter) => (
-          <div key={filter.id} className="flex flex-col gap-4">
+        {/* Categories Filter */}
+        {categories.length > 0 && (
+          <div className="flex flex-col gap-4">
             <p className="text-muted-foreground font-serif text-sm italic">
-              {filter.name}
+              Categories
             </p>
-            {renderFilterContent(filter)}
+            {renderCategoryFilters()}
           </div>
-        ))}
+        )}
+
+        {/* Price Range Filter */}
+        <div className="flex flex-col gap-4">
+          <p className="text-muted-foreground font-serif text-sm italic">
+            Price Range
+          </p>
+          {renderPriceFilters()}
+        </div>
       </div>
     </div>
   );

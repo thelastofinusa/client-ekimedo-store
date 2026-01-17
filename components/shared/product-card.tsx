@@ -26,11 +26,13 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
       className="group"
     >
       <Link href={`/products/${product.slug}`} className="block">
-        <div className="bg-bone relative mb-4 aspect-3/4 overflow-hidden shadow-sm">
+        <div className="bg-secondary relative mb-4 aspect-3/4 overflow-hidden border shadow-sm">
           <Image
             src={product.images?.[0]!}
             alt={product.name ?? ""}
             fill
+            priority
+            quality={100}
             className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
           {/* Subtle Hover Reveal */}
