@@ -178,7 +178,7 @@ Status: Paid
     // Email to admin/contact
     try {
       await resend.emails.send({
-        from: "noreply@ekimedo.com",
+        from: "onboarding@resend.dev",
         to: contactEmail,
         subject: `New Order: ${orderNumber}`,
         html: `
@@ -272,7 +272,7 @@ ${address.country}`
     if (customerEmail) {
       try {
         await resend.emails.send({
-          from: "noreply@ekimedo.com",
+          from: "onboarding@resend.dev",
           to: customerEmail,
           subject: `Order Confirmation: ${orderNumber}`,
           html: `

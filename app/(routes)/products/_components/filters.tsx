@@ -17,6 +17,7 @@ import { Checkbox } from "@/ui/checkbox";
 import { useIsMobile } from "@/hooks/mobile";
 import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
 import { client } from "@/sanity/lib/client";
+import { CATEGORIES_QUERYResult } from "@/sanity.types";
 
 const priceRangeFilters = [
   { name: "Under $500", slug: "0-500" },
@@ -26,23 +27,15 @@ const priceRangeFilters = [
   { name: "Above $5,000", slug: "5000-999999" },
 ];
 
-export const Filters = () => {
+interface Props {
+  categories: CATEGORIES_QUERYResult;
+}
+
+export const Filters: React.FC<Props> = ({ categories }) => {
   const router = useRouter();
   const pathname = usePathname();
   const { isMobile } = useIsMobile();
   const searchParams = useSearchParams();
-  const [categories, setCategories] = React.useState<
-    Array<{ _id: string; name: string; slug: string }>
-  >([]);
-
-  // Fetch categories from Sanity
-  React.useEffect(() => {
-    const fetchCategories = async () => {
-      const result = await client.fetch(CATEGORIES_QUERY);
-      setCategories(result as typeof categories);
-    };
-    fetchCategories();
-  }, []);
 
   const clearFilters = () => {
     router.push(pathname as Route, { scroll: false });
@@ -81,16 +74,18 @@ export const Filters = () => {
   const renderCategoryFilters = () => {
     const selectedValues = searchParams.getAll("category");
 
+    if (!categories.length) return null;
+
     return (
       <div className="flex flex-col gap-3">
         {categories.map((category) => {
-          const isChecked = selectedValues.includes(category.slug);
+          const isChecked = selectedValues.includes(category.slug!);
           return (
             <div key={category.slug} className="flex items-center gap-2.5">
               <Checkbox
                 checked={isChecked}
                 onCheckedChange={() =>
-                  handleFilterChange("category", category.slug, true)
+                  handleFilterChange("category", category.slug!, true)
                 }
                 id={`category-${category.slug}`}
               />
