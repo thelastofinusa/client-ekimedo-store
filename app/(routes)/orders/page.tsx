@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
-import { Package, ArrowRight, ShoppingBag } from "lucide-react";
+import { ArrowRight, ShoppingBag } from "lucide-react";
 import { Badge } from "@/ui/badge";
 import {
   Empty,
@@ -30,6 +30,8 @@ export default async function OrdersPage() {
     query: ORDERS_BY_USER_QUERY,
     params: { clerkUserId: userId ?? "" },
   });
+
+  console.log({ orders });
 
   if (orders.length === 0) {
     return (

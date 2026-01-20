@@ -8,6 +8,8 @@ import { StockBadge } from "./stock-badge";
 import { Badge } from "@/ui/badge";
 import { useCartActions } from "../providers/cart.provider";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Notify } from "./notify";
 
 interface Props {
   product: PRODUCT_QUERYResult[number];
@@ -34,6 +36,13 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
       },
       1,
     );
+    toast.custom(() => (
+      <Notify
+        type="success"
+        title={`${product.name} added`}
+        description={`Size: ${product.sizes?.[0] ?? ""}${product.colors?.[0]?.name ? `, Color: ${product.colors?.[0]?.name}` : "."}`}
+      />
+    ));
   };
 
   return (

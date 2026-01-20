@@ -59,7 +59,11 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
         1,
       );
       toast.custom(() => (
-        <Notify type="success" title={`${product.name} added successfully.`} />
+        <Notify
+          type="success"
+          title={`${product.name} added`}
+          description={`Size: ${selectedSize}${selectedColor ? `, Color: ${selectedColor}` : "."}`}
+        />
       ));
     }
   };

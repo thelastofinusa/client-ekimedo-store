@@ -22,7 +22,7 @@ if (!process.env.NEXT_PUBLIC_RESENT_CONTACT_EMAIL) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-11-17.clover" as any,
+  apiVersion: "2025-12-15.clover",
 });
 
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -71,8 +71,14 @@ export async function POST(req: Request) {
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
   const stripePaymentId = session.payment_intent as string;
 
+  if (!stripePaymentId) {
+    console.error("Missing payment_intent in session");
+    return;
+  }
+
   try {
     // Idempotency check: prevent duplicate processing on webhook retries
+    // This also handles backward compatibility for orders created with random IDs
     const existingOrder = await client.fetch(ORDER_BY_STRIPE_PAYMENT_ID_QUERY, {
       stripePaymentId,
     });
@@ -101,21 +107,26 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     const productIds = productIdsString.split(",");
     const quantities = quantitiesString.split(",").map(Number);
 
-    // Get line items from Stripe
+    // Get line items from Stripe to verify actual paid amount
     const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
 
-    // Build order items array
-    const orderItems = productIds.map((productId, index) => ({
-      _key: `item-${index}`,
-      product: {
-        _type: "reference" as const,
-        _ref: productId,
-      },
-      quantity: quantities[index],
-      priceAtPurchase: lineItems.data[index]?.amount_total
-        ? lineItems.data[index].amount_total / 100
-        : 0,
-    }));
+    // Build order items array - using line items for price accuracy
+    const orderItems = productIds.map((productId, index) => {
+      // We match by index here, assuming 1:1 mapping between metadata arrays and line items is maintained
+      // However, better to rely on what was paid in Stripe
+      const lineItem = lineItems.data[index];
+      return {
+        _key: `item-${index}`,
+        product: {
+          _type: "reference" as const,
+          _ref: productId,
+        },
+        quantity: quantities[index],
+        priceAtPurchase: lineItem?.amount_total
+          ? lineItem.amount_total / 100 / quantities[index] // Calculate unit price from total
+          : 0,
+      };
+    });
 
     // Generate order number
     const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
@@ -134,37 +145,58 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       : undefined;
 
     // Create order in Sanity with customer reference
-    const order = await writeClient.create({
-      _type: "order",
-      orderNumber,
-      ...(sanityCustomerId && {
-        customer: {
-          _type: "reference",
-          _ref: sanityCustomerId,
-        },
-      }),
-      clerkUserId,
-      email: userEmail ?? session.customer_details?.email ?? "",
-      items: orderItems,
-      total: (session.amount_total ?? 0) / 100,
-      status: "paid",
-      stripePaymentId,
-      address,
-      createdAt: new Date().toISOString(),
-    });
+    // Use stripePaymentId as the document _id to ensure idempotency and prevent duplicates
+    let order;
+    try {
+      order = await writeClient.create({
+        _id: stripePaymentId,
+        _type: "order",
+        orderNumber,
+        ...(sanityCustomerId && {
+          customer: {
+            _type: "reference",
+            _ref: sanityCustomerId,
+          },
+        }),
+        clerkUserId,
+        email: userEmail ?? session.customer_details?.email ?? "",
+        items: orderItems,
+        total: (session.amount_total ?? 0) / 100,
+        status: "paid",
+        stripePaymentId,
+        address,
+        createdAt: new Date().toISOString(),
+      });
 
-    console.log(`Order created: ${order._id} (${orderNumber})`);
+      console.log(`Order created: ${order._id} (${orderNumber})`);
+    } catch (err: unknown) {
+      const error = err as { statusCode?: number; message?: string };
+      if (
+        error.statusCode === 409 ||
+        error.message?.includes("already exists")
+      ) {
+        console.log(
+          `Order for payment ${stripePaymentId} already exists, skipping creation and side effects`,
+        );
+        return;
+      }
+      throw err;
+    }
 
     // Decrease stock for all products in a single transaction
-    await productIds
-      .reduce(
-        (tx, productId, i) =>
-          tx.patch(productId, (p) => p.dec({ stock: quantities[i] })),
-        writeClient.transaction(),
-      )
-      .commit();
+    // Use an object to aggregate quantities per product ID to avoid duplicate patches in a single transaction
+    const stockUpdates = new Map<string, number>();
+    productIds.forEach((id, idx) => {
+      stockUpdates.set(id, (stockUpdates.get(id) || 0) + quantities[idx]);
+    });
 
-    console.log(`Stock updated for ${productIds.length} products`);
+    const stockTransaction = writeClient.transaction();
+    for (const [productId, quantity] of stockUpdates.entries()) {
+      stockTransaction.patch(productId, (p) => p.dec({ stock: quantity }));
+    }
+    await stockTransaction.commit();
+
+    console.log(`Stock updated for ${stockUpdates.size} unique products`);
 
     // Send emails
     const customerEmail = userEmail ?? session.customer_details?.email;
@@ -196,9 +228,9 @@ Status: Paid
                 </div>
 
                 <!-- Content -->
-                <div style="padding: 40px 30px;">
+                <div style="padding: 20px 0;">
                   <p style="margin: 0 0 24px 0; color: #333333; font-size: 16px; line-height: 1.6;">
-                    A new order has been placed on Ekie Fashion.
+                    A new order has been placed on Ekimedo.
                   </p>
 
                   <!-- Order Details Card -->
@@ -248,14 +280,14 @@ ${address.country}`
 
                   <!-- CTA Button -->
                   <div style="text-align: center; margin: 32px 0;">
-                    <a href="${process.env.NEXT_PUBLIC_SITE_URL}/studio/orders/${order._id}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 12px 32px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">View Order in Studio</a>
+                    <a href="${process.env.NEXT_PUBLIC_SITE_URL}/studio/structure/order;${order._id}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 12px 32px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">View Order in Studio</a>
                   </div>
                 </div>
 
                 <!-- Footer -->
                 <div style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #e0e0e0;">
                   <p style="margin: 0; color: #999999; font-size: 12px;">
-                    Ekie Fashion • Order Management System
+                    Ekimedo • Order Management System
                   </p>
                 </div>
               </div>
@@ -291,7 +323,7 @@ ${address.country}`
                   </div>
 
                   <!-- Content -->
-                  <div style="padding: 40px 30px;">
+                  <div style="padding: 20px 0;">
                     <p style="margin: 0 0 24px 0; color: #333333; font-size: 16px; line-height: 1.6;">
                       Thank you for your purchase! Your order has been received and payment has been confirmed.
                     </p>
@@ -341,7 +373,7 @@ ${address.country}`
 
                   <!-- Footer -->
                   <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
-                    <p style="margin: 0 0 12px 0; color: #333333; font-size: 14px; font-weight: 600;">Ekie Fashion</p>
+                    <p style="margin: 0 0 12px 0; color: #333333; font-size: 14px; font-weight: 600;">Ekimedo</p>
                     <p style="margin: 0; color: #999999; font-size: 12px; line-height: 1.6;">
                       Discover our latest collections and exclusive designs.<br>
                       <a href="${process.env.NEXT_PUBLIC_SITE_URL}" style="color: #667eea; text-decoration: none;">Visit our website</a>

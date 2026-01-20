@@ -66,7 +66,7 @@ export const Notify: React.FC<CompProps> = (props) => {
             <p className="text-sm leading-none font-medium">{props.title}</p>
           )}
           {props.description && (
-            <p className="text-xs opacity-70">{props.description}</p>
+            <p className="text-[13px] opacity-80">{props.description}</p>
           )}
         </div>
       </div>
