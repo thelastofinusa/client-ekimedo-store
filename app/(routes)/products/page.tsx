@@ -4,7 +4,6 @@ import { Filters } from "./_components/filters";
 import { ProductGrid } from "./_components/product-grid";
 import { sanityFetch } from "@/sanity/lib/live";
 import { PRODUCT_QUERY } from "@/sanity/queries/product";
-import { PRODUCT_QUERYResult } from "@/sanity.types";
 import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 import { Skeleton } from "@/ui/skeleton";
 

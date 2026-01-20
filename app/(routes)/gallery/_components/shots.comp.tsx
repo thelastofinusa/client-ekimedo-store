@@ -42,7 +42,7 @@ export const ShotsComp: React.FC<Props> = ({ shots }) => {
     <section className="py-16 md:py-24 lg:px-8">
       <Container size="lg">
         {shots.length > 0 ? (
-          <div className="columns-2 gap-5 space-y-4 md:columns-3 lg:columns-4">
+          <div className="columns-2 gap-4 space-y-4 md:columns-3 md:gap-5 lg:columns-4">
             <AnimatePresence mode="popLayout">
               {shots.map((item, index) => (
                 <motion.div

@@ -59,7 +59,7 @@ export const ProductGrid: React.FC<Props> = ({ products }) => {
       {filteredProducts.length > 0 ? (
         <motion.div
           layout
-          className="grid gap-x-6 gap-y-12 grid-cols-2 lg:grid-cols-3"
+          className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3 lg:gap-y-12"
         >
           <AnimatePresence mode="popLayout">
             {filteredProducts.map((product, idx) => (
