@@ -42,7 +42,7 @@ export const ShotsComp: React.FC<Props> = ({ shots }) => {
     <section className="py-16 md:py-24 lg:px-8">
       <Container size="lg">
         {shots.length > 0 ? (
-          <div className="columns-1 gap-5 space-y-4 sm:columns-2 md:columns-3 lg:columns-4">
+          <div className="columns-2 gap-5 space-y-4 md:columns-3 lg:columns-4">
             <AnimatePresence mode="popLayout">
               {shots.map((item, index) => (
                 <motion.div
@@ -67,9 +67,11 @@ export const ShotsComp: React.FC<Props> = ({ shots }) => {
                       {formatSanityDate(item.year!)} —{" "}
                       {item.category?.name?.replace("-", " ")}
                     </span>
-                    <h3 className="font-serif text-xl md:text-2xl">
-                      {item.title}
-                    </h3>
+                    {item.title && (
+                      <h3 className="font-serif text-xl md:text-2xl">
+                        {item.title}
+                      </h3>
+                    )}
                   </div>
                 </motion.div>
               ))}

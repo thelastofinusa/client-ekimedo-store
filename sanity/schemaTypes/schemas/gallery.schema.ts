@@ -11,7 +11,6 @@ export const galleryType = defineType({
       name: "title",
       title: "Title",
       type: "string",
-      validation: (rule) => rule.required(),
     }),
     defineField({
       name: "year",

@@ -91,7 +91,8 @@ export const GallerySection: React.FC<Props> = ({ gallery, category }) => {
           item.category?.slug ===
             activeCategory.toLowerCase().replace(" ", "-");
 
-        const yearMatch = !activeYear || item.year === activeYear;
+        const yearMatch =
+          !activeYear || (item.year && item.year.slice(0, 4) === activeYear);
 
         return categoryMatch && yearMatch;
       }),
