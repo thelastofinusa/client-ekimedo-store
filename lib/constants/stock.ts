@@ -1,8 +1,4 @@
-/**
- * Stock threshold for "low stock" warnings
- * Products at or below this level will show low stock indicators
- */
-export const LOW_STOCK_THRESHOLD = 5;
+import { LOW_STOCK_THRESHOLD } from "./keys";
 
 /**
  * Check if a product is considered low stock
@@ -25,7 +21,7 @@ export const isOutOfStock = (stock: number): boolean => stock <= 0;
  * @returns Stock status: "out_of_stock", "low_stock", or "in_stock"
  */
 export const getStockStatus = (
-  stock: number | null | undefined
+  stock: number | null | undefined,
 ): "out_of_stock" | "low_stock" | "in_stock" | "unknown" => {
   if (stock === null || stock === undefined) return "unknown";
   if (stock <= 0) return "out_of_stock";

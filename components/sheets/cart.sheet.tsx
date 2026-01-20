@@ -136,28 +136,12 @@ export const CartSheet: React.FC<Props> = ({
                       </div>
 
                       <div className="flex flex-1 flex-col justify-between">
-                        <div className="flex flex-col">
-                          <p className="font-serif text-base">{item.name}</p>
-                          <p className="text-muted-foreground mt-1 text-sm font-medium">
-                            {formatPrice(item.price)}
-                          </p>
-                        </div>
-
-                        <div className="flex items-end justify-between">
-                          <div className="flex items-center gap-4">
-                            <StockBadge
-                              productId={item.productId}
-                              stock={currentStock}
-                            />
-                            <div className="w-36">
-                              <AddToCartButton
-                                productId={item.productId}
-                                name={item.name}
-                                price={item.price}
-                                image={item.image}
-                                stock={currentStock}
-                              />
-                            </div>
+                        <div className="flex items-start justify-between gap-4">
+                          <div className="flex flex-col">
+                            <p className="font-serif text-base">{item.name}</p>
+                            <p className="text-muted-foreground mt-1 text-sm font-medium">
+                              {formatPrice(item.price)}
+                            </p>
                           </div>
 
                           <Button
@@ -169,6 +153,21 @@ export const CartSheet: React.FC<Props> = ({
                             <Icons.Cancel01Icon className="size-3" />
                             <span className="sr-only">Remove {item.name}</span>
                           </Button>
+                        </div>
+
+                        <div className="flex items-end justify-between">
+                          <AddToCartButton
+                            productId={item.productId}
+                            name={item.name}
+                            price={item.price}
+                            image={item.image}
+                            stock={currentStock}
+                          />
+
+                          <StockBadge
+                            productId={item.productId}
+                            stock={currentStock}
+                          />
                         </div>
                       </div>
                     </div>

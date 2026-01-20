@@ -39,7 +39,7 @@ export const StockBadge: React.FC<Props> = ({
         variant="secondary"
         className={cn("w-fit bg-amber-100 text-amber-800", className)}
       >
-        Only {stock} left in stock
+        Only {stock} left
       </Badge>
     );
   }

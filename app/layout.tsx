@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     template: `%s - ${siteConfig.title}`,
   },
   description: siteConfig.description,
-  metadataBase: siteConfig.url,
+  metadataBase: new URL(siteConfig.url),
   authors: [{ name: siteConfig.title }],
   openGraph: {
     type: "website",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
     description: siteConfig.description,
     images: [
       {
-        url: `${siteConfig.url}/og.png`,
+        url: "/og.png",
         width: 1200,
         height: 630,
         alt: `${siteConfig.title} - ${siteConfig.tagline}`,
@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${siteConfig.title} - ${siteConfig.tagline}`,
     description: siteConfig.description,
-    images: [`${siteConfig.url}/twitter-image.png`],
+    images: ["/twitter-image.png"],
   },
   icons: [
     {

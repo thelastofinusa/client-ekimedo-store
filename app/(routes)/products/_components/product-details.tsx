@@ -2,32 +2,25 @@
 import Link from "next/link";
 import { Route } from "next";
 import * as React from "react";
+import { toast } from "sonner";
 import Image from "next/image";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/ui/accordion";
-import { ButtonGroup } from "@/ui/button-group";
-import { Button, buttonVariants } from "@/ui/button";
+import { Badge } from "@/ui/badge";
 import {
   useCartActions,
   useCartItem,
 } from "@/components/providers/cart.provider";
+import { Notify } from "@/components/shared/notify";
+import { Button, buttonVariants } from "@/ui/button";
 import { PRODUCT_QUERYResult } from "@/sanity.types";
 import { StockBadge } from "@/components/shared/stock-badge";
-import { toast } from "sonner";
-import { Notify } from "@/components/shared/notify";
-import { Badge } from "@/ui/badge";
 
 interface Props {
   product: PRODUCT_QUERYResult[number];
 }
 
 export const ProductDetails: React.FC<Props> = ({ product }) => {
-  const { addItem, updateQuantity } = useCartActions();
+  const { addItem } = useCartActions();
   const cartItem = useCartItem(product._id);
 
   const [selectedSize, setSelectedSize] = React.useState<string>("");
@@ -45,7 +38,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
           productId: product._id,
           name: product.name!,
           price: product.price!,
-          image: product.images?.[0]!,
+          image: product.images?.[0] ?? "",
         },
         1,
       );
@@ -60,7 +53,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
       <div className="flex h-max flex-1 gap-4 md:w-1/2 lg:w-max">
         <div className="flex flex-1 flex-col gap-4">
           <Image
-            src={product.images?.[0]!}
+            src={product.images?.[0] ?? ""}
             alt={product.name ?? ""}
             width={600}
             height={800}
@@ -89,9 +82,9 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
 
       {/* Info */}
       <div className="top-28 h-max w-full space-y-8 md:sticky md:w-1/2 lg:max-w-lg">
-        <div className="space-y-4">
-          <h2 className="font-serif text-3xl md:text-4xl">{product.name}</h2>
-          <p className="flex items-center gap-3 text-lg font-medium md:text-xl">
+        <div className="flex flex-col gap-2">
+          <h2 className="font-serif text-2xl md:text-3xl">{product.name}</h2>
+          <p className="flex items-center gap-3 text-base font-medium md:text-lg">
             <span>Price: ${product?.price?.toLocaleString()}</span>
             {isOutOfStock ? (
               <Badge variant="destructive">Out of Stock</Badge>
@@ -101,10 +94,10 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
           </p>
         </div>
 
-        <div className="space-y-8">
-          <p className="text-muted-foreground text-base leading-relaxed">
+        <div className="flex flex-col gap-8">
+          <pre className="text-muted-foreground font-sans text-base leading-relaxed whitespace-pre-wrap">
             {product.description}
-          </p>
+          </pre>
 
           {/* Colors */}
           {product?.colors && product?.colors?.length > 0 && (
@@ -147,79 +140,40 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
             </div>
           </div>
 
-          <ButtonGroup
-            orientation="horizontal"
-            aria-label="Media controls"
-            className="h-fit w-full gap-1"
+          <Button
+            size="xl"
+            className="w-full"
+            onClick={handleAdd}
+            disabled={
+              isAtMax ||
+              !selectedSize ||
+              ((product?.colors?.length ?? 0) > 0 && !selectedColor)
+            }
           >
-            <Button
-              size="lg"
-              className="flex-1"
-              onClick={handleAdd}
-              disabled={
-                isAtMax ||
-                !selectedSize ||
-                ((product?.colors?.length ?? 0) > 0 && !selectedColor)
-              }
-            >
-              <span>{isOutOfStock ? "Out of stock" : "Add to Cart"}</span>
-            </Button>
-          </ButtonGroup>
+            <span>{isOutOfStock ? "Out of stock" : "Add to Cart"}</span>
+          </Button>
         </div>
 
         <div className="border-t pt-6">
-          <Accordion
-            type="single"
-            collapsible
-            className="w-full"
-            defaultValue="details"
-          >
-            <AccordionItem value="details">
-              <AccordionTrigger className="text-sm tracking-wider uppercase">
-                Product Details
-              </AccordionTrigger>
-              <AccordionContent>
-                <ul className="text-muted-foreground list-inside list-disc space-y-1 pt-2">
-                  {product.details?.map((detail, idx) => (
-                    <li key={idx}>{detail}</li>
-                  ))}
-                </ul>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="shipping">
-              <AccordionTrigger className="text-sm tracking-wider uppercase">
-                Shipping & Returns
-              </AccordionTrigger>
-              <AccordionContent>
-                <p className="text-muted-foreground pt-2">
-                  We offer worldwide shipping. Please allow 3-5 business days
-                  for processing. Returns are accepted within 14 days of
-                  delivery for unworn items with tags attached.
-                </p>
-              </AccordionContent>
-            </AccordionItem>
-            <AccordionItem value="consultation">
-              <AccordionTrigger className="text-sm tracking-wider uppercase">
-                Consultation
-              </AccordionTrigger>
-              <AccordionContent>
-                <p className="text-muted-foreground pt-2">
-                  Looking for custom modifications? Start a consultation with
-                  our artisans to refine this design.
-                </p>
-                <Link
-                  href={"/consultation" as Route}
-                  className={buttonVariants({
-                    size: "lg",
-                    variant: "outline",
-                    className: "mt-3 w-full",
-                  })}
-                >
-                  Start Consultation
-                </Link>
-              </AccordionContent>
-            </AccordionItem>
-          </Accordion>
+          <div className="flex flex-col gap-2">
+            <p className="font-serif text-sm tracking-wider uppercase">
+              Consultation
+            </p>
+            <p className="text-muted-foreground pt-2">
+              Looking for custom modifications? Start a consultation with our
+              artisans to refine this design.
+            </p>
+            <Link
+              href={"/consultation" as Route}
+              className={buttonVariants({
+                size: "lg",
+                variant: "outline",
+                className: "mt-3 w-full",
+              })}
+            >
+              Start Consultation
+            </Link>
+          </div>
         </div>
       </div>
     </div>

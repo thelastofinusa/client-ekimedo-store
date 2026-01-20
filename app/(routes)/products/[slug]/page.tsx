@@ -14,13 +14,9 @@ import {
   PRODUCT_QUERYResult,
 } from "@/sanity.types";
 
-interface PageProps {
-  params: Promise<{ slug: string }>;
-}
-
 export const generateMetadata = async ({
   params,
-}: PageProps): Promise<Metadata> => {
+}: PageProps<"/products/[slug]">): Promise<Metadata> => {
   const { slug } = await params;
   const result = await sanityFetch({
     query: PRODUCT_BY_SLUG_QUERY,
@@ -43,7 +39,7 @@ export const generateMetadata = async ({
       description: product.description!,
       images: [
         {
-          url: product.images?.[0]!,
+          url: product.images?.[0] ?? "",
           width: 1200,
           height: 630,
           alt: product.name!,
@@ -59,7 +55,9 @@ export const generateMetadata = async ({
   };
 };
 
-export default async function ProductsDetailPage({ params }: PageProps) {
+export default async function ProductsDetailPage({
+  params,
+}: PageProps<"/products/[slug]">) {
   const { slug } = await params;
 
   // Fetch the product by slug

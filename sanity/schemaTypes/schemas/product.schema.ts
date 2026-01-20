@@ -46,7 +46,7 @@ export const productType = defineType({
       name: "description",
       title: "Description",
       type: "text",
-      rows: 4,
+      rows: 8,
       group: "details",
       validation: (rule) => rule.required().error("Description is required"),
     }),
@@ -81,7 +81,6 @@ export const productType = defineType({
       group: "details",
       of: [{ type: "string" }],
       options: {
-        layout: "tags",
         list: [
           { title: "XS", value: "XS" },
           { title: "S", value: "S" },
@@ -89,7 +88,6 @@ export const productType = defineType({
           { title: "L", value: "L" },
           { title: "XL", value: "XL" },
           { title: "XXL", value: "XXL" },
-          { title: "Custom", value: "Custom" },
         ],
       },
     }),
@@ -100,7 +98,6 @@ export const productType = defineType({
       type: "array",
       group: "details",
       of: [{ type: "string" }],
-      options: { layout: "tags" },
     }),
 
     defineField({
@@ -111,14 +108,6 @@ export const productType = defineType({
       initialValue: 0,
       validation: (rule) =>
         rule.integer().min(0).error("Stock must be 0 or higher"),
-    }),
-
-    defineField({
-      name: "details",
-      title: "Extra Details",
-      type: "array",
-      group: "details",
-      of: [{ type: "string" }],
     }),
   ],
   preview: {
