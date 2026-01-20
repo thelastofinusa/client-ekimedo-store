@@ -69,7 +69,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
   };
 
   return (
-    <div className="flex flex-col-reverse gap-8 md:flex-row lg:gap-12">
+    <div className="flex flex-col gap-8 md:flex-row lg:gap-12">
       <div className="flex h-max flex-1 gap-4 md:w-1/2 lg:w-max">
         <div className="flex flex-1 flex-col gap-4">
           {displayImage ? (
@@ -90,7 +90,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
 
           {/* Thumbnails */}
           {images.length > 1 && (
-            <div className="grid flex-1 grid-cols-2 gap-4 md:grid-cols-4">
+            <div className="grid flex-1 grid-cols-3 gap-4 md:grid-cols-4">
               {images.map((img, idx) => (
                 <button
                   key={idx}
