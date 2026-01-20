@@ -5,11 +5,14 @@ import { CART_STORAGE_KEY } from "@/lib/constants/keys";
 
 // Types
 export interface CartItem {
+  itemId: string;
   productId: string;
   name: string;
   price: number;
   quantity: number;
   image?: string;
+  selectedSize?: string;
+  selectedColor?: string;
 }
 
 export interface CartState {
@@ -17,9 +20,12 @@ export interface CartState {
 }
 
 export interface CartActions {
-  addItem: (item: Omit<CartItem, "quantity">, quantity?: number) => void;
-  removeItem: (productId: string) => void;
-  updateQuantity: (productId: string, quantity: number) => void;
+  addItem: (
+    item: Omit<CartItem, "quantity" | "itemId"> & { itemId?: string },
+    quantity?: number
+  ) => void;
+  removeItem: (itemId: string) => void;
+  updateQuantity: (itemId: string, quantity: number) => void;
   clearCart: () => void;
 }
 
@@ -43,36 +49,42 @@ export const createCartStore = (initState: CartState = defaultInitState) => {
 
         addItem: (item, quantity = 1) =>
           set((state) => {
-            const existing = state.items.find(
-              (i) => i.productId === item.productId
-            );
+            const itemId =
+              item.itemId ||
+              `${item.productId}-${item.selectedSize || ""}-${
+                item.selectedColor || ""
+              }`;
+
+            const existing = state.items.find((i) => i.itemId === itemId);
             if (existing) {
               return {
                 items: state.items.map((i) =>
-                  i.productId === item.productId
+                  i.itemId === itemId
                     ? { ...i, quantity: i.quantity + quantity }
                     : i
                 ),
               };
             }
-            return { items: [...state.items, { ...item, quantity }] };
+            return {
+              items: [...state.items, { ...item, itemId, quantity }],
+            };
           }),
 
-        removeItem: (productId) =>
+        removeItem: (itemId) =>
           set((state) => ({
-            items: state.items.filter((i) => i.productId !== productId),
+            items: state.items.filter((i) => i.itemId !== itemId),
           })),
 
-        updateQuantity: (productId, quantity) =>
+        updateQuantity: (itemId, quantity) =>
           set((state) => {
             if (quantity <= 0) {
               return {
-                items: state.items.filter((i) => i.productId !== productId),
+                items: state.items.filter((i) => i.itemId !== itemId),
               };
             }
             return {
               items: state.items.map((i) =>
-                i.productId === productId ? { ...i, quantity } : i
+                i.itemId === itemId ? { ...i, quantity } : i
               ),
             };
           }),

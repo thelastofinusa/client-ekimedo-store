@@ -5,6 +5,7 @@ import { productType } from "./schemas/product.schema";
 import { customerType } from "./schemas/customer.schema";
 import { orderType } from "./schemas/order.schema";
 import { testimonialType } from "./schemas/testimonial.schema";
+import { colorType } from "./schemas/color.schema";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -14,5 +15,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     customerType,
     orderType,
     testimonialType,
+    colorType,
   ],
 };

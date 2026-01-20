@@ -94,11 +94,19 @@ export const useTotalPrice = () =>
   );
 
 /**
- * Find a specific item in cart
+ * Find a specific item in cart by itemId
  */
-export const useCartItem = (productId: string) =>
+export const useCartItem = (itemId: string) =>
+  useCartStore((state) => state.items.find((item) => item.itemId === itemId));
+
+/**
+ * Get total quantity of a product (all variants)
+ */
+export const useProductTotalQuantity = (productId: string) =>
   useCartStore((state) =>
-    state.items.find((item) => item.productId === productId)
+    state.items
+      .filter((item) => item.productId === productId)
+      .reduce((sum, item) => sum + item.quantity, 0)
   );
 
 /**

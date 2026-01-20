@@ -8,12 +8,14 @@ import Image from "next/image";
 import { Badge } from "@/ui/badge";
 import {
   useCartActions,
-  useCartItem,
+  useProductTotalQuantity,
 } from "@/components/providers/cart.provider";
 import { Notify } from "@/components/shared/notify";
 import { Button, buttonVariants } from "@/ui/button";
 import { PRODUCT_QUERYResult } from "@/sanity.types";
 import { StockBadge } from "@/components/shared/stock-badge";
+import { Icons } from "hugeicons-proxy";
+import { cn } from "@/lib/utils";
 
 interface Props {
   product: PRODUCT_QUERYResult[number];
@@ -21,15 +23,27 @@ interface Props {
 
 export const ProductDetails: React.FC<Props> = ({ product }) => {
   const { addItem } = useCartActions();
-  const cartItem = useCartItem(product._id);
+  const quantityInCart = useProductTotalQuantity(product._id);
 
   const [selectedSize, setSelectedSize] = React.useState<string>("");
   const [selectedColor, setSelectedColor] = React.useState<string>("");
 
   const stock = product.stock ?? 0;
   const isOutOfStock = stock <= 0;
-  const quantityInCart = cartItem?.quantity ?? 0;
   const isAtMax = quantityInCart >= stock;
+
+  const images = (product.images ?? []).filter(Boolean) as string[];
+
+  const [selectedImage, setSelectedImage] = React.useState<string | null>(null);
+
+  React.useEffect(() => {
+    if (images.length > 0 && !selectedImage) {
+      setSelectedImage(images[0]);
+    }
+  }, [images, selectedImage]);
+
+  // Fallback image in case no images are available
+  const displayImage = selectedImage || images[0] || "/placeholder-image.jpg";
 
   const handleAdd = () => {
     if (quantityInCart < stock) {
@@ -38,7 +52,9 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
           productId: product._id,
           name: product.name!,
           price: product.price!,
-          image: product.images?.[0] ?? "",
+          image: selectedImage ?? images[0] ?? "",
+          selectedSize,
+          selectedColor,
         },
         1,
       );
@@ -52,36 +68,66 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
     <div className="flex flex-col-reverse gap-8 md:flex-row lg:gap-12">
       <div className="flex h-max flex-1 gap-4 md:w-1/2 lg:w-max">
         <div className="flex flex-1 flex-col gap-4">
-          <Image
-            src={product.images?.[0] ?? ""}
-            alt={product.name ?? ""}
-            width={600}
-            height={800}
-            quality={100}
-            className="h-auto w-full object-contain"
-            priority
-          />
+          {displayImage ? (
+            <Image
+              src={displayImage}
+              alt={product.name ?? "Product image"}
+              width={600}
+              height={800}
+              quality={100}
+              className="h-auto w-full object-contain"
+              priority
+            />
+          ) : (
+            <div className="flex aspect-3/4 h-full w-full items-center justify-center overflow-hidden bg-gray-100">
+              <span className="text-gray-400">No image available</span>
+            </div>
+          )}
 
-          <div className="grid flex-1 grid-cols-2 gap-4">
-            {product?.images?.slice(1).map((img, idx) => (
-              <div
-                key={idx}
-                className="relative aspect-3/4 flex-1 overflow-hidden"
-              >
-                <Image
-                  src={img || ""}
-                  alt={`${product.name} ${idx + 2}`}
-                  fill
-                  className="object-cover"
-                />
-              </div>
-            ))}
-          </div>
+          {/* Thumbnails */}
+          {images.length > 1 && (
+            <div className="grid flex-1 grid-cols-2 gap-4 md:grid-cols-4">
+              {images.map((img, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  onClick={() => setSelectedImage(img)}
+                  className={`relative aspect-3/4 cursor-pointer overflow-hidden border transition-all ${
+                    selectedImage === img ? "border-2" : "border"
+                  }`}
+                >
+                  <Image
+                    src={img}
+                    alt={`${product.name} ${idx + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 25vw, 10vw"
+                  />
+                  {selectedImage === img && (
+                    <div className="absolute inset-0 border-2 border-black" />
+                  )}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {/* Info */}
       <div className="top-28 h-max w-full space-y-8 md:sticky md:w-1/2 lg:max-w-lg">
+        <nav className="mb-8 hidden items-center text-sm text-neutral-500 md:flex">
+          <Link
+            href="/products"
+            className="transition-colors hover:text-neutral-900"
+          >
+            Products
+          </Link>
+          <Icons.ArrowRight01Icon className="mx-1 size-4" />
+          <span className="truncate font-medium text-neutral-900">
+            {product.name}
+          </span>
+        </nav>
+
         <div className="flex flex-col gap-2">
           <h2 className="font-serif text-2xl md:text-3xl">{product.name}</h2>
           <p className="flex items-center gap-3 text-base font-medium md:text-lg">
@@ -106,16 +152,24 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
                 Color: {selectedColor || "Select"}
               </span>
               <div className="flex flex-wrap gap-2">
-                {product.colors.map((color) => (
-                  <Button
-                    key={color}
-                    onClick={() => setSelectedColor(color)}
-                    size="sm"
-                    variant={selectedColor === color ? "default" : "outline"}
-                  >
-                    {color}
-                  </Button>
-                ))}
+                {product.colors.map((color) => {
+                  if (!color || !color.name || !color.value) return null;
+                  return (
+                    <button
+                      key={color.name}
+                      onClick={() => setSelectedColor(color.name || "")}
+                      className={cn(
+                        "ring-border size-7 rounded-full ring-1 transition-all hover:scale-110 focus:outline-none",
+                        selectedColor === color.name
+                          ? "ring-2 ring-black ring-offset-2"
+                          : "",
+                      )}
+                      style={{ backgroundColor: color.value }}
+                      title={color.name}
+                      type="button"
+                    />
+                  );
+                })}
               </div>
             </div>
           )}
@@ -123,7 +177,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
           {/* Sizes */}
           <div className="flex flex-col gap-2">
             <span className="text-xs tracking-wider uppercase">
-              Size: {selectedSize || "Select"}
+              Size: {selectedSize ?? "Select"}
             </span>
             <div className="flex flex-wrap gap-2">
               {product?.sizes?.map((size) => (

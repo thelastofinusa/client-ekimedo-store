@@ -1,6 +1,4 @@
-import Link from "next/link";
 import { Metadata } from "next";
-import { Icons } from "hugeicons-proxy";
 import { notFound } from "next/navigation";
 
 import { siteConfig } from "@/site.config";
@@ -81,21 +79,8 @@ export default async function ProductsDetailPage({
   const otherProducts = allProducts.filter((p) => p.slug !== slug);
 
   return (
-    <div className="py-28 lg:py-36">
+    <div className="py-28">
       <Container>
-        <nav className="mb-8 hidden items-center text-sm text-neutral-500 md:flex">
-          <Link
-            href="/products"
-            className="transition-colors hover:text-neutral-900"
-          >
-            Products
-          </Link>
-          <Icons.ArrowRight01Icon className="mx-1 size-4" />
-          <span className="truncate font-medium text-neutral-900">
-            {product.name}
-          </span>
-        </nav>
-
         <ProductDetails product={product} />
 
         {otherProducts.length > 0 && (

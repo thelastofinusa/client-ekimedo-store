@@ -145,7 +145,7 @@ export const CheckoutItems = () => {
 
               return (
                 <div
-                  key={item.productId}
+                  key={item.itemId}
                   className={cn("flex gap-4 p-6", hasIssue && "bg-red-50")}
                 >
                   {/* Image */}
@@ -171,6 +171,19 @@ export const CheckoutItems = () => {
                       <p className="font-medium text-zinc-900 dark:text-zinc-100">
                         {item.name}
                       </p>
+                      {(item.selectedSize || item.selectedColor) && (
+                        <p className="text-muted-foreground text-xs">
+                          {item.selectedSize && (
+                            <span>Size: {item.selectedSize}</span>
+                          )}
+                          {item.selectedSize && item.selectedColor && (
+                            <span className="mx-1">|</span>
+                          )}
+                          {item.selectedColor && (
+                            <span>Color: {item.selectedColor}</span>
+                          )}
+                        </p>
+                      )}
                       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                         Qty: {item.quantity}
                       </p>

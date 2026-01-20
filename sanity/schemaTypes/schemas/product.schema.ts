@@ -97,7 +97,7 @@ export const productType = defineType({
       title: "Colors",
       type: "array",
       group: "details",
-      of: [{ type: "string" }],
+      of: [{ type: "reference", to: [{ type: "color" }] }],
     }),
 
     defineField({
@@ -113,7 +113,7 @@ export const productType = defineType({
   preview: {
     select: {
       title: "name",
-      category: "category->title",
+      category: "category->name",
       media: "images.0",
       price: "price",
     },

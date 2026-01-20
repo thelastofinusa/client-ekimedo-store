@@ -107,7 +107,14 @@ export const GallerySection: React.FC<Props> = ({ gallery, category }) => {
       activeYear,
       setActiveYear,
     }),
-    [activeCategory, activeYear, setActiveCategory, setActiveYear],
+    [
+      activeCategory,
+      activeYear,
+      categories,
+      setActiveCategory,
+      setActiveYear,
+      years,
+    ],
   );
 
   return (

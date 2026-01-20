@@ -26,9 +26,11 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
     addItem(
       {
         productId: product._id,
-        name: product.name ?? "",
-        price: product.price ?? 0,
+        name: product.name!,
+        price: product.price!,
         image: product.images?.[0] ?? "",
+        selectedSize: product.sizes?.[0] ?? "",
+        selectedColor: product.colors?.[0]?.name ?? "",
       },
       1,
     );

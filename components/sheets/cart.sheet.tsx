@@ -17,6 +17,7 @@ import {
   useCartActions,
   useCartItem,
   useCartItems,
+  useProductTotalQuantity,
   useTotalItems,
   useTotalPrice,
 } from "@/providers/cart.provider";
@@ -139,6 +140,19 @@ export const CartSheet: React.FC<Props> = ({
                         <div className="flex items-start justify-between gap-4">
                           <div className="flex flex-col">
                             <p className="font-serif text-base">{item.name}</p>
+                            {(item.selectedSize || item.selectedColor) && (
+                              <p className="text-muted-foreground text-xs">
+                                {item.selectedSize && (
+                                  <span>Size: {item.selectedSize}</span>
+                                )}
+                                {item.selectedSize && item.selectedColor && (
+                                  <span className="mx-1">|</span>
+                                )}
+                                {item.selectedColor && (
+                                  <span>Color: {item.selectedColor}</span>
+                                )}
+                              </p>
+                            )}
                             <p className="text-muted-foreground mt-1 text-sm font-medium">
                               {formatPrice(item.price)}
                             </p>
@@ -148,15 +162,16 @@ export const CartSheet: React.FC<Props> = ({
                             variant="outline"
                             size="icon-xs"
                             aria-label="Remove item"
-                            onClick={() => removeItem(item.productId)}
+                            onClick={() => removeItem(item.itemId)}
                           >
                             <Icons.Cancel01Icon className="size-3" />
                             <span className="sr-only">Remove {item.name}</span>
                           </Button>
                         </div>
 
-                        <div className="flex items-end justify-between">
+                        <div className="mt-4 flex items-end justify-between">
                           <AddToCartButton
+                            itemId={item.itemId}
                             productId={item.productId}
                             name={item.name}
                             price={item.price}
@@ -216,6 +231,7 @@ export const CartSheet: React.FC<Props> = ({
 };
 
 interface AddToCartButtonProps {
+  itemId?: string;
   productId: string;
   name: string;
   price: number;
@@ -225,6 +241,7 @@ interface AddToCartButtonProps {
 }
 
 const AddToCartButton: React.FC<AddToCartButtonProps> = ({
+  itemId,
   productId,
   name,
   price,
@@ -233,22 +250,27 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
   className,
 }) => {
   const { addItem, updateQuantity } = useCartActions();
-  const cartItem = useCartItem(productId);
+  const cartItem = useCartItem(itemId || "");
+  const productTotalQuantity = useProductTotalQuantity(productId);
 
   const quantityInCart = cartItem?.quantity ?? 0;
   const isOutOfStock = stock <= 0;
-  const isAtMax = quantityInCart >= stock;
+  const isAtMax = productTotalQuantity >= stock;
 
   const handleAdd = () => {
-    if (quantityInCart < stock) {
-      addItem({ productId, name, price, image }, 1);
+    if (productTotalQuantity < stock) {
+      if (itemId) {
+        updateQuantity(itemId, quantityInCart + 1);
+      } else {
+        addItem({ productId, name, price, image }, 1);
+      }
       toast.custom(() => <Notify type="success" title={`Added ${name}`} />);
     }
   };
 
   const handleDecrement = () => {
-    if (quantityInCart > 0) {
-      updateQuantity(productId, quantityInCart - 1);
+    if (quantityInCart > 0 && itemId) {
+      updateQuantity(itemId, quantityInCart - 1);
     }
   };
 

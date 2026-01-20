@@ -12,7 +12,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-11-17.clover" as any,
+  apiVersion: "2025-12-15.clover",
 });
 
 // Types
@@ -22,6 +22,8 @@ interface CartItem {
   price: number;
   quantity: number;
   image?: string;
+  selectedSize?: string;
+  selectedColor?: string;
 }
 
 interface CheckoutResult {
@@ -57,20 +59,25 @@ export async function createCheckoutSession(
       ids: productIds,
     });
 
-    // 4. Validate each item
-    const validationErrors: string[] = [];
-    const validatedItems: {
-      product: (typeof products)[number];
-      quantity: number;
-    }[] = [];
-
+    // 4. Validate stock limits (aggregated by product)
+    const productQuantities = new Map<string, number>();
     for (const item of items) {
+      const current = productQuantities.get(item.productId) || 0;
+      productQuantities.set(item.productId, current + item.quantity);
+    }
+
+    const validationErrors: string[] = [];
+    const uniqueProductIds = Array.from(productQuantities.keys());
+
+    for (const productId of uniqueProductIds) {
       const product = products.find(
-        (p: { _id: string }) => p._id === item.productId,
+        (p: { _id: string }) => p._id === productId,
       );
+      const totalQuantity = productQuantities.get(productId) || 0;
 
       if (!product) {
-        validationErrors.push(`Product "${item.name}" is no longer available`);
+        const item = items.find((i) => i.productId === productId);
+        validationErrors.push(`Product "${item?.name}" is no longer available`);
         continue;
       }
 
@@ -79,14 +86,11 @@ export async function createCheckoutSession(
         continue;
       }
 
-      if (item.quantity > (product.stock ?? 0)) {
+      if (totalQuantity > (product.stock ?? 0)) {
         validationErrors.push(
-          `Only ${product.stock} of "${product.name}" available`,
+          `Only ${product.stock} of "${product.name}" available (you have ${totalQuantity})`,
         );
-        continue;
       }
-
-      validatedItems.push({ product, quantity: item.quantity });
     }
 
     if (validationErrors.length > 0) {
@@ -94,23 +98,42 @@ export async function createCheckoutSession(
     }
 
     // 5. Create Stripe line items with validated prices
-    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] =
-      validatedItems.map(({ product, quantity }) => ({
+    const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [];
+
+    for (const item of items) {
+      const product = products.find(
+        (p: { _id: string }) => p._id === item.productId,
+      );
+      if (!product) continue;
+
+      let name = product.name ?? "Product";
+      const variantInfo = [];
+      if (item.selectedSize) variantInfo.push(`Size: ${item.selectedSize}`);
+      if (item.selectedColor) variantInfo.push(`Color: ${item.selectedColor}`);
+
+      if (variantInfo.length > 0) {
+        name += ` (${variantInfo.join(", ")})`;
+      }
+
+      lineItems.push({
         price_data: {
           currency: "gbp",
           product_data: {
-            name: product.name ?? "Product",
+            name: name,
             images: product.images
               ? product.images.filter((img): img is string => img !== null)
               : [],
             metadata: {
               productId: product._id,
+              selectedSize: item.selectedSize || null,
+              selectedColor: item.selectedColor || null,
             },
           },
           unit_amount: Math.round((product.price ?? 0) * 100), // Convert to pence
         },
-        quantity,
-      }));
+        quantity: item.quantity,
+      });
+    }
 
     // 6. Get or create Stripe customer
     const userEmail = user.emailAddresses[0]?.emailAddress ?? "";
@@ -125,8 +148,8 @@ export async function createCheckoutSession(
       clerkUserId: userId,
       userEmail,
       sanityCustomerId,
-      productIds: validatedItems.map((i) => i.product._id).join(","),
-      quantities: validatedItems.map((i) => i.quantity).join(","),
+      productIds: items.map((i) => i.productId).join(","),
+      quantities: items.map((i) => i.quantity).join(","),
     };
 
     // 8. Create Stripe Checkout Session

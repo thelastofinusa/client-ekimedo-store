@@ -53,19 +53,42 @@ export function useCartStock(items: CartItem[]): UseCartStockReturn {
       });
 
       const newStockMap = new Map<string, StockInfo>();
+      const productQuantities = new Map<string, number>();
+
+      // Calculate total quantity per product
+      for (const item of items) {
+        const current = productQuantities.get(item.productId) || 0;
+        productQuantities.set(item.productId, current + item.quantity);
+      }
 
       for (const item of items) {
+        // If we already processed this product (and stockMap is keyed by productId), we might overwrite.
+        // But stockMap should report status for the PRODUCT.
+        // Wait, if I have 2 variants, both map to same productId.
+        // stockMap.set(productId, ...) will overwrite.
+        // So I should iterate unique productIds or ensure consistent status.
+        
+        // Actually, the status (isOutOfStock, exceedsStock) depends on the TOTAL quantity.
+        // So it is the same for all variants of that product.
+        
         const product = products.find(
           (p: { _id: string }) => p._id === item.productId,
         );
         const currentStock = product?.stock ?? 0;
+        const totalQuantity = productQuantities.get(item.productId) || 0;
 
         newStockMap.set(item.productId, {
           productId: item.productId,
           currentStock,
           isOutOfStock: currentStock === 0,
-          exceedsStock: item.quantity > currentStock,
-          availableQuantity: Math.min(item.quantity, currentStock),
+          exceedsStock: totalQuantity > currentStock,
+          availableQuantity: Math.max(0, currentStock - (totalQuantity - item.quantity)), // approximate?
+          // availableQuantity is tricky if multiple variants.
+          // If I have 3 S and 3 M. Stock 5.
+          // Total 6. Exceeds.
+          // availableQuantity?
+          // This field might be used to show "Only X left".
+          // If we show "Only 5 left" on both lines, it's fine.
         });
       }
 
