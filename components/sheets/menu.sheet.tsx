@@ -1,7 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
 import { motion } from "motion/react";
-import { SignedOut } from "@clerk/nextjs";
 
 import {
   Sheet,
@@ -12,8 +11,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/ui/sheet";
-import { buttonVariants, Button } from "@/ui/button";
-import { SigninDialog } from "@/dialogs/signin.dialog";
+import { buttonVariants } from "@/ui/button";
 import { headerRoutes } from "@/lib/constants/navigation";
 import { Route } from "next";
 
@@ -62,15 +60,6 @@ export const MenuSheet: React.FC<Props> = ({
         </div>
 
         <SheetFooter className="flex flex-row items-center gap-4 bg-black/20">
-          <SignedOut>
-            <SheetClose asChild>
-              <SigninDialog>
-                <Button variant="outline" size="lg" className="flex-1">
-                  Sign In
-                </Button>
-              </SigninDialog>
-            </SheetClose>
-          </SignedOut>
           <SheetClose asChild>
             <Link
               href={"/consultation" as Route}
