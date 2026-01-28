@@ -16,15 +16,15 @@ export const HeroComp = () => {
             className="max-w-3xl pt-16"
           >
             <span className="mb-3 block font-sans text-[11px] tracking-[0.3em] uppercase opacity-30">
-              Client Voices
+              Our Services
             </span>
-            <h1 className="mb-8 max-w-4xl font-serif text-5xl leading-[1.2] sm:text-6xl md:text-8xl md:leading-[0.95]">
-              Stories of <br /> Transformation
+            <h1 className="mb-8 max-w-4xl font-serif text-5xl leading-[1.2] sm:text-6xl md:text-8xl md:leading-[0.98]">
+              Curated <br /> Consultations
             </h1>
             <p className="max-w-xl text-base leading-relaxed font-light opacity-70 md:text-lg">
-              &quot;Real experiences from individuals who trusted EKIMEDO with
-              their most cherished moments. Discover the elegance and
-              craftsmanship that defines our Maison.&quot;
+              The Consultation fee goes toward dress production if you wish to
+              move forward with the process, otherwise The Consultation fee is
+              nonrefundable.
             </p>
           </motion.div>
         </header>

@@ -13,6 +13,67 @@
  */
 
 // Source: schema.json
+export type Service = {
+  _id: string;
+  _type: "service";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title?: string;
+  slug?: Slug;
+  description?: string;
+  price?: number;
+  duration?: string;
+  includes?: Array<string>;
+  image?: {
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+  };
+  snapshots?: Array<{
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+    _key: string;
+  }>;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
+export type Slug = {
+  _type: "slug";
+  current?: string;
+  source?: string;
+};
+
 export type Color = {
   _id: string;
   _type: "color";
@@ -65,22 +126,6 @@ export type Testimonial = {
     _type: "asset";
     _key: string;
   }>;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type Order = {
@@ -174,12 +219,6 @@ export type Product = {
     [internalGroqTypeReferenceTo]?: "color";
   }>;
   stock?: number;
-};
-
-export type Slug = {
-  _type: "slug";
-  current?: string;
-  source?: string;
 };
 
 export type Gallery = {
@@ -317,14 +356,15 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | Color
-  | Testimonial
+  | Service
   | SanityImageCrop
   | SanityImageHotspot
+  | Slug
+  | Color
+  | Testimonial
   | Order
   | Customer
   | Product
-  | Slug
   | Gallery
   | Category
   | SanityImagePaletteSwatch
@@ -512,6 +552,34 @@ export type PRODUCT_BY_IDS_QUERYResult = Array<{
   } | null;
 }>;
 
+// Source: ./sanity/queries/service.ts
+// Variable: SERVICE_QUERY
+// Query: *[_type == "service"] | order(_createdAt asc) {  _id,  title,  description,  price,  duration,  "slug": slug.current,  includes,  "image": image.asset->url,  "snapshots": snapshots[].asset->url}
+export type SERVICE_QUERYResult = Array<{
+  _id: string;
+  title: string | null;
+  description: string | null;
+  price: number | null;
+  duration: string | null;
+  slug: string | null;
+  includes: Array<string> | null;
+  image: string | null;
+  snapshots: Array<string | null> | null;
+}>;
+// Variable: SERVICE_BY_ID_QUERY
+// Query: *[_type == "service" && slug.current == $slug] | order(_createdAt asc) {  _id,  title,  description,  price,  duration,  "slug": slug.current,  includes,  "image": image.asset->url,  "snapshots": snapshots[].asset->url}
+export type SERVICE_BY_ID_QUERYResult = Array<{
+  _id: string;
+  title: string | null;
+  description: string | null;
+  price: number | null;
+  duration: string | null;
+  slug: string | null;
+  includes: Array<string> | null;
+  image: string | null;
+  snapshots: Array<string | null> | null;
+}>;
+
 // Source: ./sanity/queries/testimonial.ts
 // Variable: TESTIMONIAL_QUERY
 // Query: *[_type == "testimonial"] | order(date desc) {    _id,    "avatar": avatar.asset->url,    category -> { name },    date,    name,    rating,    review,    "workAssets": workAssets[].asset->url}
@@ -543,6 +611,8 @@ declare module "@sanity/client" {
     '\n*[_type == "product"] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, value},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_QUERYResult;
     '\n*[_type == "product" && slug.current == $slug] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, value},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_SLUG_QUERYResult;
     '\n*[_type == "product" && _id in $ids] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, value},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_IDS_QUERYResult;
+    '\n*[_type == "service"] | order(_createdAt asc) {\n  _id,\n  title,\n  description,\n  price,\n  duration,\n  "slug": slug.current,\n  includes,\n  "image": image.asset->url,\n  "snapshots": snapshots[].asset->url\n}\n': SERVICE_QUERYResult;
+    '\n*[_type == "service" && slug.current == $slug] | order(_createdAt asc) {\n  _id,\n  title,\n  description,\n  price,\n  duration,\n  "slug": slug.current,\n  includes,\n  "image": image.asset->url,\n  "snapshots": snapshots[].asset->url\n}\n': SERVICE_BY_ID_QUERYResult;
     '\n*[_type == "testimonial"] | order(date desc) {\n    _id,\n    "avatar": avatar.asset->url,\n    category -> { name },\n    date,\n    name,\n    rating,\n    review,\n    "workAssets": workAssets[].asset->url\n}\n': TESTIMONIAL_QUERYResult;
   }
 }

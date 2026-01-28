@@ -1,122 +1,206 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 import { Icons } from "hugeicons-proxy";
-import { PiQuotesFill } from "react-icons/pi";
 
-import { cn, formatSanityDate } from "@/lib/utils";
+import { cn, formatSanityDate, getInitials } from "@/lib/utils";
 import { Container } from "@/components/shared/container";
+import { Button } from "@/ui/button";
 import { TESTIMONIAL_QUERYResult } from "@/sanity.types";
+import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 
 interface Props {
   testimonials: TESTIMONIAL_QUERYResult;
 }
 
 export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
+  const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
+
+  const allImages = React.useMemo(() => {
+    return testimonials.flatMap((t) =>
+      (t.workAssets || []).map((asset) => ({
+        url: asset,
+        title: t.name,
+      })),
+    );
+  }, [testimonials]);
+
+  const offsets = React.useMemo(() => {
+    const result: number[] = [];
+    let count = 0;
+    for (const t of testimonials) {
+      result.push(count);
+      count += t.workAssets?.length || 0;
+    }
+    return result;
+  }, [testimonials]);
+
+  const handlePrevious = React.useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (selectedIndex === null) return;
+      setSelectedIndex(
+        selectedIndex === 0 ? allImages.length - 1 : selectedIndex - 1,
+      );
+    },
+    [selectedIndex, allImages.length],
+  );
+
+  const handleNext = React.useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (selectedIndex === null) return;
+      setSelectedIndex(
+        selectedIndex === allImages.length - 1 ? 0 : selectedIndex + 1,
+      );
+    },
+    [selectedIndex, allImages.length],
+  );
+
   return (
-    <div className="bg-foreground text-background py-24 lg:py-32">
-      <Container>
-        <div className="flex flex-col gap-24 lg:gap-32">
+    <div className="py-24 lg:py-32">
+      <Container size="sm">
+        <div className="grid grid-cols-1 gap-16 lg:grid-cols-2">
           {testimonials.map((testimonial, index) => (
-            <div
-              key={index}
-              className={`flex flex-col items-start gap-10 md:gap-16 lg:flex-row lg:gap-20 ${index % 2 !== 0 ? "lg:flex-row-reverse" : ""}`}
+            <motion.div
+              key={testimonial._id}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ delay: index * 0.1, duration: 0.8 }}
+              className="flex flex-col gap-6"
             >
-              <motion.div
-                initial={{ opacity: 0, x: index % 2 === 0 ? -30 : 30 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                className="flex flex-col gap-12 lg:w-1/2"
-              >
-                <div className="flex items-center gap-6">
-                  <div className="border-primary/10 ring-primary/5 ring-offset-charcoal relative h-16 w-16 overflow-hidden rounded-full border ring-1 ring-offset-4 grayscale">
-                    <Image
+              {/* Testimonial Quote */}
+              <blockquote>
+                <p className="text-charcoal/90 text-base leading-[1.7] font-light italic md:text-lg">
+                  &quot;{testimonial.review}&quot;
+                </p>
+              </blockquote>
+
+              {/* Author Profile */}
+              <div className="border-border/50 flex flex-wrap items-end justify-between gap-6 border-b pb-6">
+                <div className="flex items-center gap-4">
+                  <Avatar className="size-10">
+                    <AvatarImage
                       src={testimonial.avatar || "/placeholder.svg"}
                       alt={testimonial.name!}
-                      fill
-                      quality={100}
-                      priority
                       className="object-cover"
                     />
-                  </div>
-                  <div className="flex flex-col">
-                    <h4 className="font-serif text-2xl tracking-tight">
-                      {testimonial.name}
-                    </h4>
-                    <p className="text-muted-foreground font-sans text-[9px] tracking-[0.3em] uppercase">
+                    <AvatarFallback>
+                      {getInitials(testimonial.name!)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <p className="text-sm font-medium">{testimonial.name}</p>
+                    <p className="text-muted-foreground mt-0.5 text-[10px] tracking-widest uppercase">
                       {testimonial.category?.name}{" "}
                       {testimonial.date &&
                         `— ${formatSanityDate(testimonial.date)}`}
                     </p>
-                    <div className="mt-2 flex gap-0.5">
-                      {[...Array(5)].map((_, i) => (
-                        <Icons.StarIcon
-                          key={i}
-                          fill={
-                            i < testimonial.rating! ? "currentColor" : "none"
-                          }
-                          className={cn("text-muted-foreground size-4", {
-                            "text-background": i < testimonial.rating!,
-                          })}
-                        />
-                      ))}
-                    </div>
                   </div>
                 </div>
-
-                <div className="relative">
-                  <PiQuotesFill
-                    className="text-ivory absolute -top-10 -left-6 fill-current opacity-5"
-                    size={120}
-                    strokeWidth={0.5}
-                  />
-                  <h3 className="relative z-10 font-serif text-xl leading-[1.3] text-balance opacity-95 sm:text-2xl sm:leading-[1.2] md:text-4xl">
-                    &quot;{testimonial.review}&quot;
-                  </h3>
+                <div className="flex gap-px">
+                  {[...Array(5)].map((_, i) => (
+                    <Icons.StarIcon
+                      key={i}
+                      fill={i < testimonial.rating! ? "currentColor" : "none"}
+                      className={cn("text-muted-foreground size-4", {
+                        "text-foreground": i < testimonial.rating!,
+                      })}
+                    />
+                  ))}
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                className="w-full lg:w-1/2"
-              >
-                <div className="flex flex-col gap-6">
-                  <div className="grid aspect-[1.1] grid-cols-6 gap-3 md:aspect-[1.3] md:gap-4 lg:h-[600px]">
-                    {/* Placeholder logic for workAssets as they are not yet in basic schema, but we can keep structure */}
-                    <div className="group border-border/30 bg-secondary/20 relative col-span-4 row-span-2 overflow-hidden border shadow-md transition-all duration-700">
-                      <Image
-                        src={testimonial.workAssets?.[0] ?? ""}
-                        alt="Primary Work Asset"
-                        fill
-                        className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
-                      />
-                    </div>
-                    <div className="group border-border/30 bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden border shadow-md transition-all duration-700">
-                      <Image
-                        src={testimonial.workAssets?.[1] ?? ""}
-                        alt="Secondary Work Asset"
-                        fill
-                        className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
-                      />
-                    </div>
-                    <div className="group border-border/30 bg-secondary/20 relative col-span-2 row-span-1 overflow-hidden border shadow-md transition-all duration-700">
-                      <Image
-                        src={testimonial.workAssets?.[2] ?? ""}
-                        alt="Tertiary Work Asset"
-                        fill
-                        className="scale-110 object-cover transition-transform duration-1000 group-hover:scale-100"
-                      />
-                    </div>
+              {/* Work Assets Grid */}
+              <div className="grid grid-cols-4 gap-2">
+                {testimonial.workAssets?.slice(0, 4).map((asset, i) => (
+                  <div
+                    key={i}
+                    className="bg-secondary group relative aspect-[0.8] w-full cursor-pointer overflow-hidden"
+                    onClick={() => setSelectedIndex(offsets[index] + i)}
+                  >
+                    <Image
+                      src={asset || "/placeholder.svg"}
+                      alt={`Work ${i + 1}`}
+                      fill
+                      className="origin-top object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                    />
                   </div>
-                </div>
-              </motion.div>
-            </div>
+                ))}
+              </div>
+            </motion.div>
           ))}
         </div>
       </Container>
+
+      <AnimatePresence>
+        {selectedIndex !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="bg-foreground/95 fixed inset-0 z-100 flex items-center justify-center p-4 backdrop-blur-sm md:p-12"
+            onClick={() => setSelectedIndex(null)}
+          >
+            <Button
+              size="icon-sm"
+              variant="secondary"
+              onClick={() => setSelectedIndex(null)}
+              className="absolute top-6 right-5 z-50 md:top-8 md:right-8"
+            >
+              <Icons.Cancel01Icon className="size-4.5" />
+            </Button>
+
+            <Button
+              size={"icon"}
+              variant={"outline"}
+              className="hover:bg-background/80 absolute left-4 z-50 md:left-8"
+              onClick={handlePrevious}
+            >
+              <Icons.ArrowLeft01Icon className="size-4" />
+            </Button>
+
+            <Button
+              size={"icon"}
+              variant={"outline"}
+              className="hover:bg-background/80 absolute right-4 z-50 md:right-8"
+              onClick={handleNext}
+            >
+              <Icons.ArrowRight01Icon className="size-4" />
+            </Button>
+
+            <motion.div
+              key={selectedIndex}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative flex h-[80vh] w-full max-w-6xl items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative h-full w-full">
+                <Image
+                  src={allImages[selectedIndex]?.url || "/placeholder.svg"}
+                  alt={allImages[selectedIndex]?.title ?? ""}
+                  fill
+                  className="object-contain"
+                  priority
+                  quality={100}
+                />
+              </div>
+
+              <div className="absolute right-0 -bottom-16 left-0 text-center">
+                <h2 className="text-background font-serif text-xl md:text-3xl">
+                  {allImages[selectedIndex]?.title}
+                </h2>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

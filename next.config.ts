@@ -5,6 +5,9 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   experimental: {
     typedEnv: true,
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
   },
   images: {
     remotePatterns: [

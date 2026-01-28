@@ -58,7 +58,7 @@ export const testimonialType = defineType({
       name: "workAssets",
       title: "Work Assets",
       type: "array",
-      description: "Up to 3 images related to the work",
+      description: "Up to 4 images related to the work",
       of: [
         defineField({
           name: "asset",
@@ -76,7 +76,7 @@ export const testimonialType = defineType({
         }),
       ],
       validation: (rule) =>
-        rule.max(3).error("Maximum of 3 work assets allowed"),
+        rule.max(4).error("Maximum of 4 work assets allowed"),
     }),
   ],
 });

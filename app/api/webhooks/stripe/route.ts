@@ -76,6 +76,113 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     return;
   }
 
+  const metadata = session.metadata ?? {};
+
+  // Handle Consultation Booking
+  if (metadata.type === "consultation_booking") {
+    const {
+      bookingId,
+      serviceTitle,
+      customerName,
+      customerEmail,
+      customerPhone,
+      dateTime,
+      endTime,
+      location,
+      groupSize,
+    } = metadata;
+
+    if (!bookingId) {
+      console.error("Missing bookingId in metadata");
+      return;
+    }
+
+    try {
+      // Update booking status to confirmed
+      await writeClient
+        .patch(bookingId)
+        .set({ status: "confirmed" })
+        .commit();
+
+      console.log(`Booking ${bookingId} confirmed`);
+
+      // Send email notification
+      await resend.emails.send({
+        from: "onboarding@resend.dev",
+        to: contactEmail,
+        subject: `New Booking: ${serviceTitle}`,
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            </head>
+            <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
+              <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+                <!-- Header -->
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">New Booking Received</h1>
+                </div>
+
+                <!-- Content -->
+                <div style="padding: 20px 0;">
+                  <p style="margin: 0 0 24px 0; color: #333333; font-size: 16px; line-height: 1.6; padding: 0 20px;">
+                    A new consultation has been booked on Ekimedo.
+                  </p>
+
+                  <!-- Booking Details Card -->
+                  <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 24px 20px; border-radius: 4px;">
+                    <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Booking Details</h3>
+                    <table style="width: 100%; font-size: 14px; color: #555555;">
+                      <tr>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Service:</strong></td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600;">${serviceTitle}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Date:</strong></td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleDateString()}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Time:</strong></td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                      </tr>
+                       <tr>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Location:</strong></td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; text-transform: capitalize;">${location}</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 8px 0;"><strong>Group Size:</strong></td>
+                        <td style="padding: 8px 0; text-align: right;">${groupSize}</td>
+                      </tr>
+                    </table>
+                  </div>
+
+                  <!-- Customer Details -->
+                  <div style="margin: 24px 20px;">
+                    <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Customer Information</h3>
+                    <p style="margin: 0 0 8px 0; color: #555555; font-size: 14px;"><strong>Name:</strong> ${customerName}</p>
+                    <p style="margin: 0 0 8px 0; color: #555555; font-size: 14px;"><strong>Email:</strong> ${customerEmail}</p>
+                    <p style="margin: 0; color: #555555; font-size: 14px;"><strong>Phone:</strong> ${customerPhone}</p>
+                  </div>
+
+                  <!-- CTA Button -->
+                  <div style="text-align: center; margin: 32px 0;">
+                    <a href="${process.env.NEXT_PUBLIC_SITE_URL}/studio/structure/booking;${bookingId}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 12px 32px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">View Booking in Studio</a>
+                  </div>
+                </div>
+              </div>
+            </body>
+          </html>
+        `,
+      });
+      console.log(`Booking notification email sent to ${contactEmail}`);
+    } catch (error) {
+      console.error("Error processing booking webhook:", error);
+    }
+    return;
+  }
+
   try {
     // Idempotency check: prevent duplicate processing on webhook retries
     // This also handles backward compatibility for orders created with random IDs

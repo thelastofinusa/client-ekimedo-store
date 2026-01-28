@@ -1,0 +1,86 @@
+import React from "react";
+import Image from "next/image";
+import { notFound } from "next/navigation";
+
+import { sanityFetch } from "@/sanity/lib/live";
+import { Container } from "@/components/shared/container";
+import { SERVICE_BY_ID_QUERY } from "@/sanity/queries/service";
+import { SnapshotsGrid } from "../_components/snapshots-grid";
+import { BookingForm } from "../_components/booking-form";
+
+export default async function ServicePage(
+  props: PageProps<"/consultation/[slug]">,
+) {
+  const { slug } = await props.params;
+  const { data: services } = await sanityFetch({
+    query: SERVICE_BY_ID_QUERY,
+    params: { slug },
+  });
+  const service = services[0];
+
+  if (!service) {
+    return notFound();
+  }
+
+  return (
+    <div className="flex-1 overflow-x-clip">
+      {/* Category Hero */}
+      <section className="bg-foreground text-background relative flex h-[60vh] items-center justify-center overflow-hidden">
+        <Container size="sm" className="relative text-center">
+          <span className="mb-6 block font-mono text-[10px] tracking-[0.5em] uppercase">
+            Service
+          </span>
+          <h1 className="mx-auto max-w-4xl font-serif text-4xl tracking-widest uppercase md:text-5xl lg:text-7xl">
+            {service.title}
+          </h1>
+        </Container>
+      </section>
+
+      <div className="py-24 lg:py-32">
+        <Container>
+          {service.snapshots && service.snapshots.length > 0 ? (
+            <>
+              <div className="mx-auto mb-12 max-w-3xl text-center">
+                <span className="text-foreground/50 font-mono text-[10px] tracking-[0.5em] uppercase">
+                  Step 1
+                </span>
+                <h2 className="mt-2 font-serif text-3xl md:text-4xl">
+                  Inspiration & Process
+                </h2>
+                <p className="text-muted-foreground mt-2">
+                  Explore the phases of your consultation journey.
+                </p>
+              </div>
+              <SnapshotsGrid
+                snapshots={
+                  (service.snapshots || []).filter(Boolean) as string[]
+                }
+                title={service.title}
+              />
+            </>
+          ) : (
+            <p className="text-center opacity-50">Process steps coming soon.</p>
+          )}
+
+          {/* Booking Section */}
+          <div className="mt-24 md:mt-32" id="booking-form">
+            <div className="mx-auto max-w-4xl">
+              <div className="mb-8 text-center">
+                <span className="text-foreground/50 font-mono text-[10px] tracking-[0.5em] uppercase">
+                  Step 2
+                </span>
+                <h2 className="mt-2 font-serif text-3xl md:text-4xl">
+                  Schedule Your Consultation
+                </h2>
+                <p className="text-muted-foreground mt-2">
+                  Pick a date and share your details.
+                </p>
+              </div>
+              <BookingForm service={service} />
+            </div>
+          </div>
+        </Container>
+      </div>
+    </div>
+  );
+}
