@@ -39,8 +39,10 @@ export const serviceType = defineType({
     }),
     defineField({
       name: "duration",
-      title: "Duration",
-      type: "string",
+      title: "Duration (minutes)",
+      type: "number",
+      description: "Duration of the service in minutes (e.g., 60 for 1 hour)",
+      validation: (rule) => rule.required().min(1),
     }),
     defineField({
       name: "includes",

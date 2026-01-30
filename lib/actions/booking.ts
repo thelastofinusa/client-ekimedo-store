@@ -2,17 +2,9 @@
 
 import { client, writeClient } from "@/sanity/lib/client";
 import { SERVICE_BY_ID_QUERY } from "@/sanity/queries/service";
-import Stripe from "stripe";
-import { headers } from "next/headers";
 import { randomUUID } from "crypto";
-
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not defined");
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-12-15.clover",
-});
+import { stripe } from "@/lib/stripe";
+import { env } from "@/lib/env";
 
 export async function createBooking(formData: FormData) {
   try {
@@ -92,11 +84,9 @@ export async function createBooking(formData: FormData) {
 
     const createdBooking = await writeClient.create(bookingDoc);
 
-    // Determine success/cancel URLs
-    const headersList = await headers();
-    const origin =
-      headersList.get("origin") ||
-      process.env.NEXT_PUBLIC_APP_URL ||
+    const baseUrl =
+      env.NEXT_PUBLIC_SITE_URL ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
       "http://localhost:3000";
 
     // Create Stripe Session
@@ -115,8 +105,8 @@ export async function createBooking(formData: FormData) {
         },
       ],
       mode: "payment",
-      success_url: `${origin}/consultation?success=true`,
-      cancel_url: `${origin}/consultation?canceled=true`,
+      success_url: `${baseUrl}/consultation?success=true`,
+      cancel_url: `${baseUrl}/consultation?canceled=true`,
       metadata: {
         type: "consultation_booking",
         serviceSlug,

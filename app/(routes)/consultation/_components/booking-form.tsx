@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   Form,
   FormControl,
+  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -32,33 +33,66 @@ import {
   InputGroupInput,
 } from "@/ui/input-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
-import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
+import { cn, formatPrice } from "@/lib/utils";
 import { Calendar } from "@/ui/calendar";
 import { Checkbox } from "@/ui/checkbox";
 import { getBookedDates } from "@/lib/actions/calendar";
 import { createBooking } from "@/lib/actions/booking";
+import { File as FileIcon, Trash } from "lucide-react";
+import { ScrollArea } from "@/ui/scroll-area";
 
 interface Service {
   slug: string | null;
   title: string | null;
   price: number | null;
+  duration: number | null;
 }
 
 interface Props {
   service: Service;
 }
 
+function isValidDate(date: Date | undefined) {
+  if (!date) {
+    return false;
+  }
+
+  return !isNaN(date.getTime());
+}
+
+function formatDate(date: Date | undefined) {
+  if (!date) {
+    return "";
+  }
+
+  return date.toLocaleDateString("en-US", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 const bookingFormSchema = z.object({
   customerName: z.string().min(2, "Name must be at least 2 characters"),
   customerEmail: z.email("Invalid email address"),
   customerPhone: z.string().min(10, "Phone number must be at least 10 digits"),
-  groupSize: z.number("This field is required").min(1, "Must be at least 1"),
-  date: z.date(),
+  groupSize: z
+    .number("Group size is required")
+    .min(1, "Must be at least 1")
+    .max(10, "Must be at most 10"),
+  date: z.date("Date is required"),
   startTime: z.string().min(1, "Start time is required"),
-  endTime: z.string().min(1, "End time is required"),
-  location: z.enum(["virtual", "in-person"]),
-  styleInspiration: z.any(),
+  location: z.enum(["virtual", "in-person"], {
+    message: "Please select a location",
+  }),
+  styleInspiration: z
+    .array(z.custom<File>((val) => val instanceof File, "Please upload a file"))
+    .min(1, "At least one style inspiration file is required")
+    .max(5, "You can upload a maximum of 5 files")
+    .refine(
+      (files) => files.every((file) => file.size <= 5 * 1024 * 1024),
+      "Each file must be 5MB or less",
+    ),
   socialMediaHandles: z.array(
     z.object({
       value: z.union([
@@ -74,80 +108,14 @@ const bookingFormSchema = z.object({
 
 type BookingFormSchemaType = z.infer<typeof bookingFormSchema>;
 
-interface FileUploaderProps {
-  value: File[];
-  onChange: (files: File[]) => void;
-}
-
-const FileUploader = ({ value = [], onChange }: FileUploaderProps) => {
-  const onDrop = React.useCallback(
-    (acceptedFiles: File[]) => {
-      onChange([...value, ...acceptedFiles]);
-    },
-    [value, onChange],
-  );
-
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
-    accept: { "image/*": [] },
-    multiple: true,
-  });
-
-  const removeFile = (index: number) => {
-    const newFiles = [...value];
-    newFiles.splice(index, 1);
-    onChange(newFiles);
-  };
-
-  return (
-    <div className="space-y-4">
-      <div
-        {...getRootProps()}
-        className={cn(
-          "flex aspect-[2.3] cursor-pointer flex-col items-center justify-center rounded-md border border-dashed p-6 shadow-xs transition-colors",
-          isDragActive && "border-primary bg-primary/10",
-        )}
-      >
-        <input {...getInputProps()} />
-        <Icons.CloudUploadIcon className="text-muted-foreground mb-2 size-10" />
-        <p className="text-muted-foreground text-center text-sm">
-          {isDragActive
-            ? "Drop images here"
-            : "Drag & drop images here, or click to select"}
-        </p>
-      </div>
-      {value.length > 0 && (
-        <div className="grid grid-cols-5 gap-2 md:gap-4">
-          {value.map((file, index) => (
-            <div key={index} className="group relative">
-              <div className="relative aspect-square overflow-hidden rounded-md border">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt="preview"
-                  className="h-full w-full object-cover"
-                />
-              </div>
-              <Button
-                size="icon-xs"
-                variant="destructive"
-                type="button"
-                onClick={() => removeFile(index)}
-                className="absolute -top-2 -right-2 opacity-0 transition-opacity group-hover:opacity-100"
-              >
-                <Icons.Cancel01Icon />
-              </Button>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
 export const BookingForm: React.FC<Props> = ({ service }) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [bookedDates, setBookedDates] = React.useState<Date[]>([]);
+
+  const [open, setOpen] = React.useState<boolean>(false);
+  const [date, setDate] = React.useState<Date | undefined>();
+  const [month, setMonth] = React.useState<Date | undefined>(date);
+  const [value, setValue] = React.useState(formatDate(date));
 
   React.useEffect(() => {
     const fetchDates = async () => {
@@ -167,12 +135,12 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
       customerName: "",
       customerEmail: "",
       customerPhone: "",
-      groupSize: undefined,
+      groupSize: 1,
       location: "virtual",
       socialMediaHandles: [{ value: "" }],
       agreedToCancellation: false,
-      startTime: "10:00",
-      endTime: "11:00",
+      startTime: "",
+      styleInspiration: [],
     },
   });
 
@@ -214,10 +182,17 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
       const dateStr = format(values.date, "yyyy-MM-dd");
       const dateTime = `${dateStr}T${values.startTime}`;
       formData.append("dateTime", dateTime);
-      formData.append("endTime", `${dateStr}T${values.endTime}`);
+
+      // Calculate end time
+      const [hours, minutes] = values.startTime.split(":").map(Number);
+      const startDate = new Date(values.date);
+      startDate.setHours(hours, minutes, 0, 0);
+      const durationMinutes = service.duration || 60; // Default to 60 minutes if not set
+      const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
+      formData.append("endTime", endDate.toISOString());
 
       // Handle files
-      if (values.styleInspiration && values.styleInspiration.length > 0) {
+      if (values.styleInspiration && Array.isArray(values.styleInspiration)) {
         (values.styleInspiration as unknown as File[]).forEach((file) => {
           formData.append("styleInspiration", file);
         });
@@ -235,6 +210,51 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
       setIsLoading(false);
     }
   }
+
+  const [files, setFiles] = React.useState<File[]>([]);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop: (acceptedFiles) => {
+      setFiles(acceptedFiles);
+      form.setValue("styleInspiration", acceptedFiles as unknown as File[], {
+        shouldValidate: true,
+      });
+    },
+  });
+
+  const filesList = files.map((file) => (
+    <li
+      key={file.name}
+      className="relative flex items-center justify-between border p-4 shadow-xs"
+    >
+      <div className="flex items-center space-x-3 p-0">
+        <span className="bg-secondary/50 flex h-10 w-10 shrink-0 items-center justify-center rounded-md">
+          <Icons.File02Icon
+            className="text-foreground h-5 w-5"
+            aria-hidden={true}
+          />
+        </span>
+        <div>
+          <p className="text-foreground text-sm font-medium">{file.name}</p>
+          <p className="text-muted-foreground mt-0.5 text-xs tracking-wide uppercase">
+            {file.size} bytes
+          </p>
+        </div>
+      </div>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        aria-label="Remove file"
+        onClick={() => {
+          const newFiles = files.filter((f) => f.name !== file.name);
+          setFiles(newFiles);
+          form.setValue("styleInspiration", newFiles, { shouldValidate: true });
+        }}
+      >
+        <Trash className="h-5 w-5" aria-hidden={true} />
+      </Button>
+    </li>
+  ));
 
   return (
     <div className="bg-card rounded-md border p-6 shadow-xs md:p-8">
@@ -259,7 +279,11 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
                 <FormItem className="w-full">
                   <FormLabel>Full Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Jane Doe" {...field} />
+                    <Input
+                      placeholder="Jane Doe"
+                      disabled={isLoading}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -272,7 +296,11 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
                 <FormItem className="w-full">
                   <FormLabel>Email Address</FormLabel>
                   <FormControl>
-                    <Input placeholder="jane@example.com" {...field} />
+                    <Input
+                      placeholder="jane@example.com"
+                      disabled={isLoading}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -290,6 +318,7 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
                     <PhoneInput
                       defaultCountry="US"
                       placeholder="+1 (555) 000-0000"
+                      disabled={isLoading}
                       {...field}
                     />
                   </FormControl>
@@ -307,10 +336,10 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
                   </FormLabel>
                   <FormControl>
                     <Input
-                      min="1"
                       type="number"
                       {...field}
                       placeholder="2 People"
+                      disabled={isLoading}
                       onChange={(e) => field.onChange(e.target.valueAsNumber)}
                     />
                   </FormControl>
@@ -329,9 +358,10 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
                   <Select
                     onValueChange={field.onChange}
                     defaultValue={field.value}
+                    disabled={isLoading}
                   >
                     <FormControl>
-                      <SelectTrigger className="w-full">
+                      <SelectTrigger className="w-full" disabled={isLoading}>
                         <SelectValue placeholder="Select location" />
                       </SelectTrigger>
                     </FormControl>
@@ -358,28 +388,30 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
               </FormLabel>
               {fields.map((field, index) => (
                 <FormField
-                  key={index}
+                  key={field.id}
                   control={form.control}
                   name={`socialMediaHandles.${index}.value`}
-                  render={() => (
+                  render={({ field: controlField }) => (
                     <FormItem className="mb-1 w-full last-of-type:mb-0">
                       <FormControl>
-                        <div className="flex w-full items-center gap-2">
-                          <InputGroup className="h-12 w-full">
-                            <InputGroupInput
-                              type="url"
-                              placeholder="https://example.com/yourhandle"
-                              {...field}
-                            />
-                            {fields.length > 1 && (
-                              <InputGroupAddon align="inline-end">
-                                <InputGroupButton onClick={() => remove(index)}>
-                                  <Icons.Cancel01Icon className="h-4 w-4 text-red-500" />
-                                </InputGroupButton>
-                              </InputGroupAddon>
-                            )}
-                          </InputGroup>
-                        </div>
+                        <InputGroup className="h-12 w-full">
+                          <InputGroupInput
+                            type="url"
+                            placeholder="https://example.com/yourhandle"
+                            {...controlField}
+                            disabled={isLoading}
+                          />
+                          {fields.length > 1 && (
+                            <InputGroupAddon align="inline-end">
+                              <InputGroupButton
+                                size="icon-sm"
+                                onClick={() => remove(index)}
+                              >
+                                <Icons.Cancel01Icon className="h-4 w-4 text-red-500" />
+                              </InputGroupButton>
+                            </InputGroupAddon>
+                          )}
+                        </InputGroup>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -389,84 +421,104 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
             </div>
           </div>
           <div className="flex w-full flex-col gap-4 md:flex-row md:gap-6">
-            <div className="flex w-full flex-col gap-1">
-              <FormLabel>Preferred Date & Time</FormLabel>
-              <FormField
-                control={form.control}
-                name="date"
-                render={({ field }) => (
-                  <FormItem className="flex flex-col">
-                    <Popover>
+            <FormField
+              control={form.control}
+              name="date"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Preferred Date & Time</FormLabel>
+                  <InputGroup className="h-12 w-full">
+                    <FormControl>
+                      <InputGroupInput
+                        placeholder="January 01, 2025"
+                        disabled={isLoading}
+                        value={value}
+                        onChange={(e) => {
+                          const inputValue = e.target.value;
+                          setValue(inputValue);
+                          const date = new Date(inputValue);
+                          if (isValidDate(date)) {
+                            setDate(date);
+                            setMonth(date);
+                            field.onChange(date);
+                          }
+                        }}
+                        onBlur={field.onBlur}
+                        onKeyDown={(e) => {
+                          if (e.key === "ArrowDown") {
+                            e.preventDefault();
+                            setOpen(true);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <Popover open={open} onOpenChange={setOpen}>
                       <PopoverTrigger asChild>
-                        <FormControl>
-                          <Button
-                            variant={"outline"}
-                            size="lg"
-                            className={cn(
-                              "bg-card border-input/40 w-full pl-3 text-left font-sans text-base font-normal tracking-normal capitalize active:shadow-xs md:text-sm",
-                              !field.value && "text-muted-foreground",
-                            )}
-                          >
-                            {field.value ? (
-                              format(field.value, "PPP")
-                            ) : (
-                              <span>Pick a date</span>
-                            )}
-                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                          </Button>
-                        </FormControl>
+                        <InputGroupAddon align="inline-end">
+                          <InputGroupButton size="icon-sm" disabled={isLoading}>
+                            <Icons.Calendar03Icon />
+                            <span className="sr-only">Pick a date</span>
+                          </InputGroupButton>
+                        </InputGroupAddon>
                       </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0" align="start">
+                      <PopoverContent
+                        className="w-auto overflow-hidden p-0"
+                        align="end"
+                        alignOffset={-8}
+                        sideOffset={10}
+                      >
                         <Calendar
                           mode="single"
                           selected={field.value}
-                          onSelect={field.onChange}
+                          month={month}
+                          onMonthChange={setMonth}
                           disabled={[
                             ...bookedDates,
                             (date) =>
                               date < new Date() ||
                               date < new Date("1900-01-01"),
+                            isLoading,
                           ]}
                           modifiers={{
                             booked: bookedDates,
                           }}
-                          modifiersClassNames={{
-                            booked: "[&>button]:line-through opacity-100",
+                          onSelect={(date) => {
+                            if (date) {
+                              setDate(date);
+                              setValue(formatDate(date));
+                              field.onChange(date);
+                              setOpen(false);
+                            }
                           }}
                           autoFocus
                         />
                       </PopoverContent>
                     </Popover>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex w-full gap-4 md:gap-6">
-              <FormField
-                control={form.control}
-                name="startTime"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>Start Time</FormLabel>
-                    <Input type="time" className="appearance-none" {...field} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="endTime"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormLabel>End Time</FormLabel>
-                    <Input type="time" className="appearance-none" {...field} />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
+                  </InputGroup>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="startTime"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel>Start Time</FormLabel>
+                  <Input
+                    type="time"
+                    step="1"
+                    disabled={isLoading}
+                    className="peer appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
+                    {...field}
+                  />
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
+
           <FormField
             control={form.control}
             name="styleInspiration"
@@ -474,12 +526,59 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
               <FormItem className="w-full">
                 <FormLabel>Style Inspiration</FormLabel>
                 <FormControl>
-                  <FileUploader value={field.value} onChange={field.onChange} />
+                  <div
+                    {...getRootProps()}
+                    className={cn(
+                      isDragActive
+                        ? "border-primary bg-primary/10 ring-primary/20 ring-2"
+                        : "border-border",
+                      isLoading ? "pointer-events-none opacity-50" : "",
+                      "flex justify-center rounded-md border border-dashed px-6 py-20 transition-colors duration-200",
+                    )}
+                  >
+                    <div>
+                      <Icons.File01Icon
+                        className="text-muted-foreground/80 mx-auto h-12 w-12"
+                        aria-hidden={true}
+                      />
+                      <div className="text-muted-foreground mt-4 flex text-sm">
+                        <p>Drag and drop or</p>
+                        <label
+                          htmlFor="file"
+                          className="text-primary hover:text-primary/80 relative cursor-pointer rounded-sm pl-1 font-medium hover:underline hover:underline-offset-4"
+                        >
+                          <span>choose file(s)</span>
+                          <input
+                            {...getInputProps()}
+                            type="file"
+                            className="sr-only"
+                            disabled={isLoading}
+                          />
+                        </label>
+                        <p className="pl-1">to upload</p>
+                      </div>
+                    </div>
+                  </div>
                 </FormControl>
-                <p className="text-muted-foreground text-[0.8rem]">
-                  Upload images of styles you like.
-                </p>
+                <FormDescription className="sm:flex sm:items-center sm:justify-between">
+                  <span>Allowed files are PNG, JPEG, JPG.</span>
+                  <span className="pl-1 sm:pl-0">
+                    Max 5. size per file: 5MB
+                  </span>
+                </FormDescription>
                 <FormMessage />
+                {filesList.length > 0 && (
+                  <div className="flex flex-col gap-2">
+                    <p className="text-foreground mt-6 text-sm font-medium">
+                      File(s) to upload
+                    </p>
+                    <ScrollArea className="border-border/50 max-h-[200px] border p-4 shadow-xs">
+                      <ul role="list" className="flex flex-col gap-4">
+                        {filesList}
+                      </ul>
+                    </ScrollArea>
+                  </div>
+                )}
               </FormItem>
             )}
           />
@@ -492,10 +591,14 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    disabled={isLoading}
                   />
                 </FormControl>
 
-                <FormLabel className="text-muted-foreground -mt-0.5 font-sans text-sm font-normal tracking-normal normal-case">
+                <FormLabel
+                  aria-invalid={!!form.formState.errors.agreedToCancellation}
+                  className="text-muted-foreground aria-invalid:text-destructive -mt-0.5 font-sans text-sm font-normal tracking-normal normal-case"
+                >
                   I understand that cancellations must be made at least 24 hours
                   in advance to receive a full refund. Late cancellations or
                   no-shows may be subject to a fee.
@@ -505,15 +608,12 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
           />
           <Button
             type="submit"
-            disabled={isLoading}
             size="xl"
             className="w-full"
+            isLoading={isLoading}
+            loadingText="Processing..."
           >
-            {isLoading ? (
-              <>Processing...</>
-            ) : (
-              <>Proceed to Payment • ${service.price?.toFixed(2)}</>
-            )}
+            Proceed to Payment • ${service.price?.toFixed(2)}
           </Button>
           <p className="text-muted-foreground text-center text-xs">
             Secure payment processed by Stripe

@@ -1,5 +1,15 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Environment variables
+
+Create a `.env.local` file with at least:
+
+- `NEXT_PUBLIC_SITE_URL` – public site URL (e.g. `https://yourdomain.com` or `http://localhost:3000`)
+- `NEXT_PUBLIC_RESEND_CONTACT_EMAIL` – email address for booking/order notifications (Resend)
+- `STRIPE_WEBHOOK_SECRET` – Stripe webhook signing secret for `/api/webhooks/stripe`
+
+See the codebase and [@t3-oss/env-nextjs](https://github.com/t3-oss/env-nextjs) for the full required schema.
+
 ## Getting Started
 
 First, run the development server:

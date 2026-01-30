@@ -24,7 +24,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/select";
-import { sleep } from "@/lib/utils";
 import { Textarea } from "@/ui/textarea";
 import { PhoneInput } from "@/ui/phone-input";
 import { Notify } from "@/components/shared/notify";
@@ -33,6 +32,7 @@ import {
   FormType,
   inquiryTypes,
 } from "@/lib/validators/contact-form";
+import { sendContactMessage } from "@/lib/actions/contact";
 
 export const ContactFormComp = () => {
   const form = useForm<FormType>({
@@ -48,17 +48,32 @@ export const ContactFormComp = () => {
   });
 
   async function onSubmit(values: FormType) {
-    await sleep();
-    toast.custom(() => {
-      return (
+    const result = await sendContactMessage({
+      fName: values.fName,
+      lName: values.lName,
+      email: values.email,
+      inquiryType: values.inquiryType,
+      phone: values.phone,
+      message: values.message,
+    });
+
+    if (result.success) {
+      toast.custom(() => (
         <Notify
           type="success"
-          title={`Messages has been sent, ${values.fName}`}
+          title={`Message has been sent, ${values.fName}`}
         />
-      );
-    });
-    console.log(values);
-    form.reset();
+      ));
+      form.reset();
+    } else {
+      toast.custom(() => (
+        <Notify
+          type="error"
+          title="Something went wrong"
+          description={result.error}
+        />
+      ));
+    }
   }
 
   return (

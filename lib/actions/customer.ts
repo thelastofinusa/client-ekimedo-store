@@ -1,16 +1,8 @@
 "use server";
 
-import Stripe from "stripe";
 import { client, writeClient } from "@/sanity/lib/client";
 import { CUSTOMER_BY_EMAIL_QUERY } from "@/sanity/queries/customer";
-
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not defined");
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-11-17.clover" as any,
-});
+import { stripe } from "@/lib/stripe";
 
 /**
  * Gets or creates a Stripe customer by email

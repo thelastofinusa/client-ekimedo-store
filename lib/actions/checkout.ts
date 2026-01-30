@@ -6,14 +6,7 @@ import { client } from "@/sanity/lib/client";
 import { PRODUCT_BY_IDS_QUERY } from "@/sanity/queries/product";
 import { getOrCreateStripeCustomer } from "@/lib/actions/customer";
 import { env } from "../env";
-
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not defined");
-}
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-12-15.clover",
-});
+import { stripe } from "@/lib/stripe";
 
 // Types
 interface CartItem {
@@ -117,7 +110,7 @@ export async function createCheckoutSession(
 
       lineItems.push({
         price_data: {
-          currency: "gbp",
+          currency: "usd",
           product_data: {
             name: name,
             images: product.images

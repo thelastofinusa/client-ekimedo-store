@@ -4,10 +4,7 @@ import { headers } from "next/headers";
 import { NextResponse } from "next/server";
 import { client, writeClient } from "@/sanity/lib/client";
 import { ORDER_BY_STRIPE_PAYMENT_ID_QUERY } from "@/sanity/queries/orders";
-
-if (!process.env.STRIPE_SECRET_KEY) {
-  throw new Error("STRIPE_SECRET_KEY is not defined");
-}
+import { stripe } from "@/lib/stripe";
 
 if (!process.env.STRIPE_WEBHOOK_SECRET) {
   throw new Error("STRIPE_WEBHOOK_SECRET is not defined");
@@ -17,17 +14,13 @@ if (!process.env.RESEND_API_KEY) {
   throw new Error("RESEND_API_KEY is not defined");
 }
 
-if (!process.env.NEXT_PUBLIC_RESENT_CONTACT_EMAIL) {
-  throw new Error("NEXT_PUBLIC_RESENT_CONTACT_EMAIL is not defined");
+if (!process.env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL) {
+  throw new Error("NEXT_PUBLIC_RESEND_CONTACT_EMAIL is not defined");
 }
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2025-12-15.clover",
-});
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-const contactEmail = process.env.NEXT_PUBLIC_RESENT_CONTACT_EMAIL;
+const contactEmail = process.env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -69,22 +62,28 @@ export async function POST(req: Request) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  const stripePaymentId = session.payment_intent as string;
-
-  if (!stripePaymentId) {
-    console.error("Missing payment_intent in session");
-    return;
-  }
+  const stripePaymentId =
+    typeof session.payment_intent === "string"
+      ? session.payment_intent
+      : ((session.payment_intent as Stripe.PaymentIntent)?.id ?? null);
 
   const metadata = session.metadata ?? {};
 
-  // Handle Consultation Booking
-  if (metadata.type === "consultation_booking") {
+  // Handle Consultation Booking (does not require stripePaymentId)
+  if (String(metadata.type ?? "").trim() === "consultation_booking") {
+    // We cannot reliably access event.type here because event is not passed to this function.
+    // However, we know this function is only called for checkout.session.completed
+    console.log("Processing consultation booking webhook:", {
+      eventType: "checkout.session.completed",
+      sessionId: session.id,
+      metadataType: metadata.type,
+    });
+
     const {
       bookingId,
       serviceTitle,
       customerName,
-      customerEmail,
+      customerEmail: metadataCustomerEmail,
       customerPhone,
       dateTime,
       endTime,
@@ -98,88 +97,125 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     try {
-      // Update booking status to confirmed
-      await writeClient
-        .patch(bookingId)
-        .set({ status: "confirmed" })
-        .commit();
+      await writeClient.patch(bookingId).set({ status: "confirmed" }).commit();
 
       console.log(`Booking ${bookingId} confirmed`);
 
-      // Send email notification
-      await resend.emails.send({
-        from: "onboarding@resend.dev",
-        to: contactEmail,
-        subject: `New Booking: ${serviceTitle}`,
-        html: `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            </head>
-            <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-              <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-                <!-- Header -->
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">New Booking Received</h1>
+      const adminHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+          <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">New Booking Received</h1>
+              </div>
+              <div style="padding: 20px 0;">
+                <p style="margin: 0 0 24px 0; color: #333333; font-size: 16px; line-height: 1.6; padding: 0 20px;">A new consultation has been booked on Ekimedo.</p>
+                <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 24px 20px; border-radius: 4px;">
+                  <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Booking Details</h3>
+                  <table style="width: 100%; font-size: 14px; color: #555555;">
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Service:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600;">${serviceTitle}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Date:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleDateString()}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Time:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Location:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; text-transform: capitalize;">${location}</td></tr>
+                    <tr><td style="padding: 8px 0;"><strong>Group Size:</strong></td><td style="padding: 8px 0; text-align: right;">${groupSize}</td></tr>
+                  </table>
                 </div>
-
-                <!-- Content -->
-                <div style="padding: 20px 0;">
-                  <p style="margin: 0 0 24px 0; color: #333333; font-size: 16px; line-height: 1.6; padding: 0 20px;">
-                    A new consultation has been booked on Ekimedo.
-                  </p>
-
-                  <!-- Booking Details Card -->
-                  <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 24px 20px; border-radius: 4px;">
-                    <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Booking Details</h3>
-                    <table style="width: 100%; font-size: 14px; color: #555555;">
-                      <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Service:</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600;">${serviceTitle}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Date:</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleDateString()}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Time:</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})} - ${new Date(endTime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
-                      </tr>
-                       <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Location:</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; text-transform: capitalize;">${location}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 8px 0;"><strong>Group Size:</strong></td>
-                        <td style="padding: 8px 0; text-align: right;">${groupSize}</td>
-                      </tr>
-                    </table>
-                  </div>
-
-                  <!-- Customer Details -->
-                  <div style="margin: 24px 20px;">
-                    <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Customer Information</h3>
-                    <p style="margin: 0 0 8px 0; color: #555555; font-size: 14px;"><strong>Name:</strong> ${customerName}</p>
-                    <p style="margin: 0 0 8px 0; color: #555555; font-size: 14px;"><strong>Email:</strong> ${customerEmail}</p>
-                    <p style="margin: 0; color: #555555; font-size: 14px;"><strong>Phone:</strong> ${customerPhone}</p>
-                  </div>
-
-                  <!-- CTA Button -->
-                  <div style="text-align: center; margin: 32px 0;">
-                    <a href="${process.env.NEXT_PUBLIC_SITE_URL}/studio/structure/booking;${bookingId}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 12px 32px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">View Booking in Studio</a>
-                  </div>
+                <div style="margin: 24px 20px;">
+                  <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Customer Information</h3>
+                  <p style="margin: 0 0 8px 0; color: #555555; font-size: 14px;"><strong>Name:</strong> ${customerName}</p>
+                  <p style="margin: 0 0 8px 0; color: #555555; font-size: 14px;"><strong>Email:</strong> ${metadataCustomerEmail}</p>
+                  <p style="margin: 0; color: #555555; font-size: 14px;"><strong>Phone:</strong> ${customerPhone}</p>
+                </div>
+                <div style="text-align: center; margin: 32px 0;">
+                  <a href="${process.env.NEXT_PUBLIC_SITE_URL}/studio/structure/booking;${bookingId}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 12px 32px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">View Booking in Studio</a>
                 </div>
               </div>
-            </body>
-          </html>
-        `,
-      });
-      console.log(`Booking notification email sent to ${contactEmail}`);
+            </div>
+          </body>
+        </html>
+      `;
+
+      const adminTo = (
+        process.env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL ?? ""
+      ).trim();
+
+      if (!adminTo) {
+        console.error(
+          "Consultation webhook: NEXT_PUBLIC_RESEND_CONTACT_EMAIL is empty, skipping admin email",
+        );
+      } else {
+        const { error: adminError } = await resend.emails.send({
+          from: "onboarding@resend.dev",
+          to: adminTo,
+          subject: `New Booking: ${serviceTitle}`,
+          html: adminHtml,
+        });
+        if (adminError) {
+          console.error("Resend admin booking email failed:", adminError);
+        } else {
+          console.log(`Booking notification email sent to ${adminTo}`);
+        }
+      }
+
+      const customerHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
+          <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
+            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
+                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Consultation Confirmed</h1>
+              </div>
+              <div style="padding: 20px 0;">
+                <p style="margin: 0 0 24px 0; color: #333333; font-size: 16px; line-height: 1.6; padding: 0 20px;">Hi ${customerName}, your consultation has been confirmed. We look forward to seeing you.</p>
+                <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 24px 20px; border-radius: 4px;">
+                  <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Booking Details</h3>
+                  <table style="width: 100%; font-size: 14px; color: #555555;">
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Service:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600;">${serviceTitle}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Date:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleDateString()}</td></tr>
+                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Time:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</td></tr>
+                    <tr><td style="padding: 8px 0;"><strong>Location:</strong></td><td style="padding: 8px 0; text-align: right; text-transform: capitalize;">${location}</td></tr>
+                  </table>
+                </div>
+                <p style="margin: 0 24px 24px; color: #666; font-size: 14px;">If you have any questions, reply to this email or contact us.</p>
+              </div>
+            </div>
+          </body>
+        </html>
+      `;
+
+      const customerTo = String(metadataCustomerEmail ?? "").trim() || adminTo;
+
+      if (!customerTo) {
+        console.error(
+          "Consultation webhook: No valid customer or admin email found, skipping customer confirmation",
+        );
+      } else {
+        const { error: customerError } = await resend.emails.send({
+          from: "onboarding@resend.dev",
+          to: customerTo,
+          subject: `Your consultation is confirmed – ${serviceTitle}`,
+          html: customerHtml,
+        });
+        if (customerError) {
+          console.error(
+            "Resend customer booking confirmation failed:",
+            customerError,
+          );
+        } else {
+          console.log(`Booking confirmation email sent to ${customerTo}`);
+        }
+      }
     } catch (error) {
       console.error("Error processing booking webhook:", error);
     }
+    return;
+  }
+
+  if (!stripePaymentId) {
+    console.error("Missing payment_intent in session");
     return;
   }
 
@@ -198,42 +234,56 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     // Extract metadata
-    const {
-      clerkUserId,
-      userEmail,
-      sanityCustomerId,
-      productIds: productIdsString,
-      quantities: quantitiesString,
-    } = session.metadata ?? {};
+    const { clerkUserId, userEmail, sanityCustomerId } = session.metadata ?? {};
 
-    if (!clerkUserId || !productIdsString || !quantitiesString) {
-      console.error("Missing metadata in checkout session");
+    if (!clerkUserId) {
+      console.error("Missing clerkUserId in checkout session metadata");
       return;
     }
 
-    const productIds = productIdsString.split(",");
-    const quantities = quantitiesString.split(",").map(Number);
+    // Get line items from Stripe with product details expanded
+    const lineItems = await stripe.checkout.sessions.listLineItems(session.id, {
+      expand: ["data.price.product"],
+    });
 
-    // Get line items from Stripe to verify actual paid amount
-    const lineItems = await stripe.checkout.sessions.listLineItems(session.id);
+    const orderItems = [];
+    const stockUpdates = new Map<string, number>();
 
-    // Build order items array - using line items for price accuracy
-    const orderItems = productIds.map((productId, index) => {
-      // We match by index here, assuming 1:1 mapping between metadata arrays and line items is maintained
-      // However, better to rely on what was paid in Stripe
-      const lineItem = lineItems.data[index];
-      return {
-        _key: `item-${index}`,
+    for (const item of lineItems.data) {
+      const price = item.price;
+      const product = price?.product as Stripe.Product;
+      const quantity = item.quantity ?? 1;
+
+      // Try to get productId from metadata
+      const productId = product?.metadata?.productId;
+
+      if (!productId) {
+        console.error(`Missing productId metadata for line item ${item.id}`);
+        continue;
+      }
+
+      orderItems.push({
+        _key: item.id,
         product: {
           _type: "reference" as const,
           _ref: productId,
         },
-        quantity: quantities[index],
-        priceAtPurchase: lineItem?.amount_total
-          ? lineItem.amount_total / 100 / quantities[index] // Calculate unit price from total
+        quantity: quantity,
+        priceAtPurchase: item.amount_total
+          ? item.amount_total / 100 / quantity
           : 0,
-      };
-    });
+      });
+
+      stockUpdates.set(
+        productId,
+        (stockUpdates.get(productId) || 0) + quantity,
+      );
+    }
+
+    if (orderItems.length === 0) {
+      console.error("No valid order items found");
+      return;
+    }
 
     // Generate order number
     const orderNumber = `ORD-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 6).toUpperCase()}`;
@@ -291,12 +341,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     // Decrease stock for all products in a single transaction
-    // Use an object to aggregate quantities per product ID to avoid duplicate patches in a single transaction
-    const stockUpdates = new Map<string, number>();
-    productIds.forEach((id, idx) => {
-      stockUpdates.set(id, (stockUpdates.get(id) || 0) + quantities[idx]);
-    });
-
     const stockTransaction = writeClient.transaction();
     for (const [productId, quantity] of stockUpdates.entries()) {
       stockTransaction.patch(productId, (p) => p.dec({ stock: quantity }));
@@ -307,10 +351,15 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
     // Send emails
     const customerEmail = userEmail ?? session.customer_details?.email;
+    const totalItems = Array.from(stockUpdates.values()).reduce(
+      (a, b) => a + b,
+      0,
+    );
+
     const orderSummary = `
 Order Number: ${orderNumber}
 Total: £${((session.amount_total ?? 0) / 100).toFixed(2)}
-Items: ${quantities.reduce((a, b) => a + b, 0)} item(s)
+Items: ${totalItems} item(s)
 Status: Paid
     `.trim();
 
@@ -350,11 +399,11 @@ Status: Paid
                       </tr>
                       <tr>
                         <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Total:</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600; color: #667eea;">£${((session.amount_total ?? 0) / 100).toFixed(2)}</td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600; color: #667eea;">$${((session.amount_total ?? 0) / 100).toFixed(2)}</td>
                       </tr>
                       <tr>
                         <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Items:</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${quantities.reduce((a, b) => a + b, 0)} item(s)</td>
+                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${totalItems} item(s)</td>
                       </tr>
                       <tr>
                         <td style="padding: 8px 0;"><strong>Status:</strong></td>
@@ -445,11 +494,11 @@ ${address.country}`
                         </tr>
                         <tr>
                           <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Total Amount:</strong></td>
-                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600; color: #667eea; font-size: 16px;">£${((session.amount_total ?? 0) / 100).toFixed(2)}</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600; color: #667eea; font-size: 16px;">$${((session.amount_total ?? 0) / 100).toFixed(2)}</td>
                         </tr>
                         <tr>
                           <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Items:</strong></td>
-                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${quantities.reduce((a, b) => a + b, 0)} item(s)</td>
+                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${totalItems} item(s)</td>
                         </tr>
                         <tr>
                           <td style="padding: 8px 0;"><strong>Payment Status:</strong></td>

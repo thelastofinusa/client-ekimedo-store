@@ -13,6 +13,59 @@
  */
 
 // Source: schema.json
+export type Booking = {
+  _id: string;
+  _type: "booking";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  customerName?: string;
+  customerEmail?: string;
+  customerPhone?: string;
+  service?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "service";
+  };
+  bookingDate?: string;
+  endTime?: string;
+  status?: "pending" | "confirmed" | "cancelled" | "completed";
+  location?: "virtual" | "in-person";
+  groupSize?: number;
+  socialMediaHandles?: Array<string>;
+  styleInspiration?: Array<{
+    asset?: {
+      _ref: string;
+      _type: "reference";
+      _weak?: boolean;
+      [internalGroqTypeReferenceTo]?: "sanity.imageAsset";
+    };
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    _type: "image";
+    _key: string;
+  }>;
+  agreedToCancellation?: boolean;
+};
+
+export type SanityImageCrop = {
+  _type: "sanity.imageCrop";
+  top?: number;
+  bottom?: number;
+  left?: number;
+  right?: number;
+};
+
+export type SanityImageHotspot = {
+  _type: "sanity.imageHotspot";
+  x?: number;
+  y?: number;
+  height?: number;
+  width?: number;
+};
+
 export type Service = {
   _id: string;
   _type: "service";
@@ -23,7 +76,7 @@ export type Service = {
   slug?: Slug;
   description?: string;
   price?: number;
-  duration?: string;
+  duration?: number;
   includes?: Array<string>;
   image?: {
     asset?: {
@@ -50,22 +103,6 @@ export type Service = {
     _type: "image";
     _key: string;
   }>;
-};
-
-export type SanityImageCrop = {
-  _type: "sanity.imageCrop";
-  top?: number;
-  bottom?: number;
-  left?: number;
-  right?: number;
-};
-
-export type SanityImageHotspot = {
-  _type: "sanity.imageHotspot";
-  x?: number;
-  y?: number;
-  height?: number;
-  width?: number;
 };
 
 export type Slug = {
@@ -356,9 +393,10 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
-  | Service
+  | Booking
   | SanityImageCrop
   | SanityImageHotspot
+  | Service
   | Slug
   | Color
   | Testimonial
@@ -376,6 +414,11 @@ export type AllSanitySchemaTypes =
   | SanityImageAsset
   | Geopoint;
 export declare const internalGroqTypeReferenceTo: unique symbol;
+// Source: ./sanity/queries/booking.ts
+// Variable: BOOKED_DATES_QUERY
+// Query: *[_type == "booking" && bookingDate > now()] {    bookingDate  }
+export type BOOKED_DATES_QUERYResult = Array<never>;
+
 // Source: ./sanity/queries/category.ts
 // Variable: CATEGORIES_QUERY
 // Query: *[_type == "category"] | order(_createdAt desc) {        _id,        name,        "slug": slug.current    }
@@ -560,7 +603,7 @@ export type SERVICE_QUERYResult = Array<{
   title: string | null;
   description: string | null;
   price: number | null;
-  duration: string | null;
+  duration: number | null;
   slug: string | null;
   includes: Array<string> | null;
   image: string | null;
@@ -573,7 +616,7 @@ export type SERVICE_BY_ID_QUERYResult = Array<{
   title: string | null;
   description: string | null;
   price: number | null;
-  duration: string | null;
+  duration: number | null;
   slug: string | null;
   includes: Array<string> | null;
   image: string | null;
@@ -600,6 +643,7 @@ export type TESTIMONIAL_QUERYResult = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
+    '\n  *[_type == "booking" && bookingDate > now()] {\n    bookingDate\n  }\n': BOOKED_DATES_QUERYResult;
     '\n    *[_type == "category"] | order(_createdAt desc) {\n        _id,\n        name,\n        "slug": slug.current\n    }\n': CATEGORIES_QUERYResult;
     '*[\n  _type == "customer"\n  && email == $email\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_EMAIL_QUERYResult;
     '*[\n  _type == "customer"\n  && stripeCustomerId == $stripeCustomerId\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_STRIPE_ID_QUERYResult;
