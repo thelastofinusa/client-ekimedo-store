@@ -8,10 +8,38 @@ export const testimonialType = defineType({
   icon: PiChatsCircleDuotone,
   fields: [
     defineField({
+      name: "status",
+      title: "Status",
+      type: "string",
+      options: {
+        list: [
+          { title: "Pending", value: "pending" },
+          { title: "Approved", value: "approved" },
+          { title: "Denied", value: "denied" },
+        ],
+        layout: "radio",
+      },
+      initialValue: "pending",
+    }),
+
+    defineField({
       name: "name",
       title: "Client Name",
       type: "string",
       validation: (rule) => rule.required().error("Client name is required"),
+    }),
+
+    defineField({
+      name: "clerkUser",
+      title: "Clerk User",
+      type: "object",
+      readOnly: true,
+      fields: [
+        defineField({ name: "name", type: "string", title: "Name" }),
+        defineField({ name: "email", type: "string", title: "Email" }),
+        defineField({ name: "avatarUrl", type: "url", title: "Avatar URL" }),
+        defineField({ name: "clerkId", type: "string", title: "Clerk ID" }),
+      ],
     }),
 
     defineField({

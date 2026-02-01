@@ -2,7 +2,7 @@ import { defineField, defineType } from "sanity";
 import { IoColorPaletteOutline } from "react-icons/io5";
 
 export const colorType = defineType({
-  name: "color",
+  name: "productColor",
   title: "Color",
   type: "document",
   icon: IoColorPaletteOutline,
@@ -15,24 +15,23 @@ export const colorType = defineType({
     }),
     defineField({
       name: "value",
-      title: "Hex Value",
-      type: "string",
-      description: "e.g. #FF0000",
-      validation: (rule) =>
-        rule
-          .required()
-          .regex(/^#([0-9A-F]{3}){1,2}$/i, "Must be a valid hex color code"),
+      title: "Color",
+      type: "color",
+      options: {
+        disableAlpha: true,
+      },
+      validation: (rule) => rule.required(),
     }),
   ],
   preview: {
     select: {
       title: "name",
-      subtitle: "value",
+      subtitle: "value.hex",
     },
     prepare({ title, subtitle }) {
       return {
         title,
-        subtitle,
+        subtitle: subtitle || "No color selected",
         media: IoColorPaletteOutline,
       };
     },

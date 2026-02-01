@@ -14,6 +14,8 @@ import {
 import { buttonVariants } from "@/ui/button";
 import { headerRoutes } from "@/lib/constants/navigation";
 import { Route } from "next";
+import { useUser } from "@clerk/nextjs";
+import { env } from "@/lib/env";
 
 interface Props {
   children: React.ReactNode;
@@ -26,6 +28,11 @@ export const MenuSheet: React.FC<Props> = ({
   openMenu,
   setOpenMenu,
 }) => {
+  const { user } = useUser();
+  const isAdmin =
+    user?.primaryEmailAddress?.emailAddress ===
+    env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
+
   return (
     <Sheet open={openMenu} onOpenChange={setOpenMenu}>
       <SheetTrigger asChild>{children}</SheetTrigger>
@@ -35,7 +42,7 @@ export const MenuSheet: React.FC<Props> = ({
         </SheetHeader>
 
         <div className="flex flex-1 flex-col justify-center p-8 md:px-12">
-          <nav className="flex flex-col gap-4 md:gap-6">
+          <nav className="flex flex-col gap-4">
             {headerRoutes.map((item, index) => {
               return (
                 <motion.div
@@ -49,7 +56,7 @@ export const MenuSheet: React.FC<Props> = ({
                     href={{ pathname: item.path }}
                     className="group flex w-fit items-baseline gap-4"
                   >
-                    <span className="font-serif text-3xl transition-all duration-500 md:text-4xl">
+                    <span className="font-serif text-2xl transition-all duration-500 md:text-3xl">
                       {item.label}
                     </span>
                   </Link>
@@ -59,21 +66,24 @@ export const MenuSheet: React.FC<Props> = ({
           </nav>
         </div>
 
-        <SheetFooter className="flex flex-row items-center gap-4 bg-black/20">
-          <SheetClose asChild>
-            <Link
-              href={"/consultation" as Route}
-              onClick={() => setOpenMenu(false)}
-              className={buttonVariants({
-                variant: "secondary",
-                size: "lg",
-                className: "flex-1",
-              })}
-            >
-              Book an Appointment
-            </Link>
-          </SheetClose>
-        </SheetFooter>
+        {isAdmin && (
+          <SheetFooter className="flex flex-row items-center gap-4 bg-black/20">
+            <SheetClose asChild>
+              <Link
+                target="_blank"
+                href={"/studio" as Route}
+                onClick={() => setOpenMenu(false)}
+                className={buttonVariants({
+                  variant: "secondary",
+                  size: "lg",
+                  className: "flex-1",
+                })}
+              >
+                Admin Dashboard
+              </Link>
+            </SheetClose>
+          </SheetFooter>
+        )}
       </SheetContent>
     </Sheet>
   );

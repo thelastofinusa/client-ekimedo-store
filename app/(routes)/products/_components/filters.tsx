@@ -2,7 +2,6 @@
 import { Route } from "next";
 import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 
 import {
   Sheet,
@@ -16,8 +15,12 @@ import { Button } from "@/ui/button";
 import { Checkbox } from "@/ui/checkbox";
 import { useIsMobile } from "@/hooks/mobile";
 import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
-import { client } from "@/sanity/lib/client";
-import { CATEGORIES_QUERYResult } from "@/sanity.types";
+import { Icons } from "hugeicons-proxy";
+import {
+  CATEGORIES_QUERYResult,
+  PRODUCT_COLOR_QUERYResult,
+} from "@/sanity.types";
+import { ScrollArea } from "@/ui/scroll-area";
 
 const priceRangeFilters = [
   { name: "Under $500", slug: "0-500" },
@@ -29,13 +32,20 @@ const priceRangeFilters = [
 
 interface Props {
   categories: CATEGORIES_QUERYResult;
+  colors: PRODUCT_COLOR_QUERYResult;
 }
 
-export const Filters: React.FC<Props> = ({ categories }) => {
+export const Filters: React.FC<Props> = ({ categories, colors }) => {
   const router = useRouter();
   const pathname = usePathname();
   const { isMobile } = useIsMobile();
   const searchParams = useSearchParams();
+  const categoriesValue = searchParams.getAll("category");
+  const colorsValue = searchParams.getAll("color");
+  const priceValue = searchParams.get("price");
+
+  const hasActiveFilters =
+    !!priceValue || categoriesValue.length > 0 || colorsValue.length > 0;
 
   const clearFilters = () => {
     router.push(pathname as Route, { scroll: false });
@@ -72,14 +82,12 @@ export const Filters: React.FC<Props> = ({ categories }) => {
   };
 
   const renderCategoryFilters = () => {
-    const selectedValues = searchParams.getAll("category");
-
     if (!categories.length) return null;
 
     return (
-      <div className="flex flex-col gap-3">
+      <div className="flex flex-col gap-2">
         {categories.map((category) => {
-          const isChecked = selectedValues.includes(category.slug!);
+          const isChecked = categoriesValue.includes(category.slug!);
           return (
             <div key={category.slug} className="flex items-center gap-2.5">
               <Checkbox
@@ -102,14 +110,46 @@ export const Filters: React.FC<Props> = ({ categories }) => {
     );
   };
 
-  const renderPriceFilters = () => {
-    const selectedValue = searchParams.get("price");
+  const renderColorFilters = () => {
+    if (!colors.length) return null;
 
     return (
+      <div className="flex flex-col gap-2">
+        {colors.map((color) => {
+          const isChecked = colorsValue.includes(color.name as string);
+
+          return (
+            <div key={color.hex} className="flex items-center gap-2.5">
+              <Checkbox
+                checked={isChecked}
+                onCheckedChange={() =>
+                  handleFilterChange("color", color.name as string, true)
+                }
+                id={`color-${color.name}`}
+              />
+              <Label
+                htmlFor={`color-${color.name}`}
+                className="flex cursor-pointer items-center gap-1.5"
+              >
+                <span
+                  className="size-3 rounded-full border"
+                  style={{ backgroundColor: color.hex as string }}
+                />
+                <span className="text-sm">{color.name}</span>
+              </Label>
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
+
+  const renderPriceFilters = () => {
+    return (
       <RadioGroup
-        value={selectedValue || ""}
+        value={priceValue || ""}
         onValueChange={(value) => handleFilterChange("price", value, false)}
-        className="flex flex-col gap-3"
+        className="flex flex-col gap-2"
       >
         {priceRangeFilters.map((option) => (
           <div key={option.slug} className="flex items-center gap-2.5">
@@ -128,13 +168,14 @@ export const Filters: React.FC<Props> = ({ categories }) => {
 
   const content = () => (
     <div className="flex h-max w-full flex-col gap-8 md:sticky md:top-26 md:w-64 lg:top-32">
-      <div className="flex items-center justify-between">
-        <p className="hidden font-serif text-2xl font-medium md:flex">
-          Filters
-        </p>
-        <Button size="sm" variant="outline" onClick={clearFilters}>
-          Clear All
-        </Button>
+      <div className="flex items-center gap-3">
+        {hasActiveFilters && (
+          <Button size="icon-xs" variant="outline" onClick={clearFilters}>
+            <Icons.Cancel01Icon />
+            <span className="sr-only">Clear All</span>
+          </Button>
+        )}
+        <p className="font-serif text-2xl font-medium">Filters</p>
       </div>
 
       <div className="flex flex-col gap-8">
@@ -144,7 +185,21 @@ export const Filters: React.FC<Props> = ({ categories }) => {
             <p className="text-muted-foreground font-serif text-sm italic">
               Categories
             </p>
-            {renderCategoryFilters()}
+            <ScrollArea className="max-h-[320px] overflow-y-auto">
+              {renderCategoryFilters()}
+            </ScrollArea>
+          </div>
+        )}
+
+        {/* Colors Filter */}
+        {colors.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <p className="text-muted-foreground font-serif text-sm italic">
+              Colors
+            </p>
+            <ScrollArea className="max-h-[320px] overflow-y-auto">
+              {renderColorFilters()}
+            </ScrollArea>
           </div>
         )}
 
@@ -153,7 +208,9 @@ export const Filters: React.FC<Props> = ({ categories }) => {
           <p className="text-muted-foreground font-serif text-sm italic">
             Price Range
           </p>
-          {renderPriceFilters()}
+          <ScrollArea className="max-h-[320px] overflow-y-auto">
+            {renderPriceFilters()}
+          </ScrollArea>
         </div>
       </div>
     </div>
@@ -174,9 +231,7 @@ export const Filters: React.FC<Props> = ({ categories }) => {
           <SheetHeader className="mb-4">
             <SheetTitle>Filters</SheetTitle>
           </SheetHeader>
-          <div className="flex flex-1 flex-col p-8 py-4 md:px-12 md:py-6">
-            {content()}
-          </div>
+          <div className="flex flex-1 flex-col px-8">{content()}</div>
         </SheetContent>
       </Sheet>
     );

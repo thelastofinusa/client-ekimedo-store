@@ -13,6 +13,28 @@
  */
 
 // Source: schema.json
+export type BusinessHours = {
+  _id: string;
+  _type: "businessHours";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  hours?: Array<{
+    day?:
+      | "Monday"
+      | "Tuesday"
+      | "Wednesday"
+      | "Thursday"
+      | "Friday"
+      | "Saturday"
+      | "Sunday";
+    isOpen?: boolean;
+    startTime?: string;
+    endTime?: string;
+    _key: string;
+  }>;
+};
+
 export type Booking = {
   _id: string;
   _type: "booking";
@@ -111,14 +133,23 @@ export type Slug = {
   source?: string;
 };
 
-export type Color = {
+export type ProductColor = {
   _id: string;
-  _type: "color";
+  _type: "productColor";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
   name?: string;
-  value?: string;
+  value?: Color;
+};
+
+export type Color = {
+  _type: "color";
+  hex?: string;
+  alpha?: number;
+  hsl?: HslaColor;
+  hsv?: HsvaColor;
+  rgb?: RgbaColor;
 };
 
 export type Testimonial = {
@@ -127,7 +158,14 @@ export type Testimonial = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
+  status?: "pending" | "approved" | "denied";
   name?: string;
+  clerkUser?: {
+    name?: string;
+    email?: string;
+    avatarUrl?: string;
+    clerkId?: string;
+  };
   category?: {
     _ref: string;
     _type: "reference";
@@ -253,7 +291,7 @@ export type Product = {
     _type: "reference";
     _weak?: boolean;
     _key: string;
-    [internalGroqTypeReferenceTo]?: "color";
+    [internalGroqTypeReferenceTo]?: "productColor";
   }>;
   stock?: number;
 };
@@ -294,6 +332,30 @@ export type Category = {
   _rev: string;
   name?: string;
   slug?: Slug;
+};
+
+export type RgbaColor = {
+  _type: "rgbaColor";
+  r?: number;
+  g?: number;
+  b?: number;
+  a?: number;
+};
+
+export type HsvaColor = {
+  _type: "hsvaColor";
+  h?: number;
+  s?: number;
+  v?: number;
+  a?: number;
+};
+
+export type HslaColor = {
+  _type: "hslaColor";
+  h?: number;
+  s?: number;
+  l?: number;
+  a?: number;
 };
 
 export type SanityImagePaletteSwatch = {
@@ -393,11 +455,13 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | BusinessHours
   | Booking
   | SanityImageCrop
   | SanityImageHotspot
   | Service
   | Slug
+  | ProductColor
   | Color
   | Testimonial
   | Order
@@ -405,6 +469,9 @@ export type AllSanitySchemaTypes =
   | Product
   | Gallery
   | Category
+  | RgbaColor
+  | HsvaColor
+  | HslaColor
   | SanityImagePaletteSwatch
   | SanityImagePalette
   | SanityImageDimensions
@@ -416,7 +483,7 @@ export type AllSanitySchemaTypes =
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./sanity/queries/booking.ts
 // Variable: BOOKED_DATES_QUERY
-// Query: *[_type == "booking" && bookingDate > now()] {    bookingDate  }
+// Query: *[_type == "booking" && bookingDate > now() && status != "cancelled"] {    bookingDate  }
 export type BOOKED_DATES_QUERYResult = Array<never>;
 
 // Source: ./sanity/queries/category.ts
@@ -426,6 +493,14 @@ export type CATEGORIES_QUERYResult = Array<{
   _id: string;
   name: string | null;
   slug: string | null;
+}>;
+
+// Source: ./sanity/queries/color.ts
+// Variable: PRODUCT_COLOR_QUERY
+// Query: *[_type == "productColor"]{  name,  "hex": value.hex}
+export type PRODUCT_COLOR_QUERYResult = Array<{
+  name: string | null;
+  hex: string | null;
 }>;
 
 // Source: ./sanity/queries/customer.ts
@@ -464,6 +539,26 @@ export type GALLERY_QUERYResult = Array<{
   } | null;
   image: string | null;
 }>;
+
+// Source: ./sanity/queries/hours.ts
+// Variable: BUSINESS_HOUR_QUERY
+// Query: *[_type == "businessHours"]{  hours[]}[0]
+export type BUSINESS_HOUR_QUERYResult = {
+  hours: Array<{
+    day?:
+      | "Friday"
+      | "Monday"
+      | "Saturday"
+      | "Sunday"
+      | "Thursday"
+      | "Tuesday"
+      | "Wednesday";
+    isOpen?: boolean;
+    startTime?: string;
+    endTime?: string;
+    _key: string;
+  }> | null;
+} | null;
 
 // Source: ./sanity/queries/orders.ts
 // Variable: ORDERS_BY_USER_QUERY
@@ -532,7 +627,7 @@ export type ORDER_BY_STRIPE_PAYMENT_ID_QUERYResult = {
 
 // Source: ./sanity/queries/product.ts
 // Variable: PRODUCT_QUERY
-// Query: *[_type == "product"] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, value},    description,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
+// Query: *[_type == "product"] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, "value": value.hex},    description,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
 export type PRODUCT_QUERYResult = Array<{
   _id: string;
   name: string | null;
@@ -553,7 +648,7 @@ export type PRODUCT_QUERYResult = Array<{
   } | null;
 }>;
 // Variable: PRODUCT_BY_SLUG_QUERY
-// Query: *[_type == "product" && slug.current == $slug] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, value},    description,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
+// Query: *[_type == "product" && slug.current == $slug] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, "value": value.hex},    description,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
 export type PRODUCT_BY_SLUG_QUERYResult = Array<{
   _id: string;
   name: string | null;
@@ -574,7 +669,7 @@ export type PRODUCT_BY_SLUG_QUERYResult = Array<{
   } | null;
 }>;
 // Variable: PRODUCT_BY_IDS_QUERY
-// Query: *[_type == "product" && _id in $ids] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, value},    description,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
+// Query: *[_type == "product" && _id in $ids] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, "value": value.hex},    description,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
 export type PRODUCT_BY_IDS_QUERYResult = Array<{
   _id: string;
   name: string | null;
@@ -625,7 +720,7 @@ export type SERVICE_BY_ID_QUERYResult = Array<{
 
 // Source: ./sanity/queries/testimonial.ts
 // Variable: TESTIMONIAL_QUERY
-// Query: *[_type == "testimonial"] | order(date desc) {    _id,    "avatar": avatar.asset->url,    category -> { name },    date,    name,    rating,    review,    "workAssets": workAssets[].asset->url}
+// Query: *[_type == "testimonial" && status == "approved"] | order(date desc) {    _id,    "avatar": avatar.asset->url,    category -> { name },    date,    name,    rating,    review,    "workAssets": workAssets[].asset->url}
 export type TESTIMONIAL_QUERYResult = Array<{
   _id: string;
   avatar: string | null;
@@ -643,20 +738,22 @@ export type TESTIMONIAL_QUERYResult = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '\n  *[_type == "booking" && bookingDate > now()] {\n    bookingDate\n  }\n': BOOKED_DATES_QUERYResult;
+    '\n  *[_type == "booking" && bookingDate > now() && status != "cancelled"] {\n    bookingDate\n  }\n': BOOKED_DATES_QUERYResult;
     '\n    *[_type == "category"] | order(_createdAt desc) {\n        _id,\n        name,\n        "slug": slug.current\n    }\n': CATEGORIES_QUERYResult;
+    '\n*[_type == "productColor"]{\n  name,\n  "hex": value.hex\n}\n': PRODUCT_COLOR_QUERYResult;
     '*[\n  _type == "customer"\n  && email == $email\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_EMAIL_QUERYResult;
     '*[\n  _type == "customer"\n  && stripeCustomerId == $stripeCustomerId\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_STRIPE_ID_QUERYResult;
     '\n    *[_type == "gallery"] | order(_createdAt desc) {\n    _id,\n    title,\n    year,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n    "image": image.asset->url,\n    }\n': GALLERY_QUERYResult;
+    '\n    *[_type == "businessHours"]{\n  hours[]\n}[0]\n': BUSINESS_HOUR_QUERYResult;
     '*[\n  _type == "order"\n  && clerkUserId == $clerkUserId\n] | order(createdAt desc) {\n  _id,\n  orderNumber,\n  total,\n  status,\n  createdAt,\n  "itemCount": count(items),\n  "itemNames": items[].product->name,\n  "itemImages": items[].product->images[0].asset->url\n}': ORDERS_BY_USER_QUERYResult;
     '*[\n  _type == "order"\n  && _id == $id\n][0] {\n  _id,\n  orderNumber,\n  clerkUserId,\n  email,\n  items[]{\n    _key,\n    quantity,\n    priceAtPurchase,\n    product->{\n      _id,\n      name,\n      "slug": slug.current,\n      "image": images[0]{\n        asset->{\n          _id,\n          url\n        }\n      }\n    }\n  },\n  total,\n  status,\n  address{\n    name,\n    line1,\n    line2,\n    city,\n    postcode,\n    country\n  },\n  stripePaymentId,\n  createdAt\n}': ORDER_BY_ID_QUERYResult;
     '*[\n  _type == "order"\n] | order(createdAt desc) [0...$limit] {\n  _id,\n  orderNumber,\n  email,\n  total,\n  status,\n  createdAt\n}': RECENT_ORDERS_QUERYResult;
     '*[\n  _type == "order"\n  && stripePaymentId == $stripePaymentId\n][0]{ _id }': ORDER_BY_STRIPE_PAYMENT_ID_QUERYResult;
-    '\n*[_type == "product"] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, value},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_QUERYResult;
-    '\n*[_type == "product" && slug.current == $slug] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, value},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_SLUG_QUERYResult;
-    '\n*[_type == "product" && _id in $ids] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, value},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_IDS_QUERYResult;
+    '\n*[_type == "product"] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_QUERYResult;
+    '\n*[_type == "product" && slug.current == $slug] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_SLUG_QUERYResult;
+    '\n*[_type == "product" && _id in $ids] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_IDS_QUERYResult;
     '\n*[_type == "service"] | order(_createdAt asc) {\n  _id,\n  title,\n  description,\n  price,\n  duration,\n  "slug": slug.current,\n  includes,\n  "image": image.asset->url,\n  "snapshots": snapshots[].asset->url\n}\n': SERVICE_QUERYResult;
     '\n*[_type == "service" && slug.current == $slug] | order(_createdAt asc) {\n  _id,\n  title,\n  description,\n  price,\n  duration,\n  "slug": slug.current,\n  includes,\n  "image": image.asset->url,\n  "snapshots": snapshots[].asset->url\n}\n': SERVICE_BY_ID_QUERYResult;
-    '\n*[_type == "testimonial"] | order(date desc) {\n    _id,\n    "avatar": avatar.asset->url,\n    category -> { name },\n    date,\n    name,\n    rating,\n    review,\n    "workAssets": workAssets[].asset->url\n}\n': TESTIMONIAL_QUERYResult;
+    '\n*[_type == "testimonial" && status == "approved"] | order(date desc) {\n    _id,\n    "avatar": avatar.asset->url,\n    category -> { name },\n    date,\n    name,\n    rating,\n    review,\n    "workAssets": workAssets[].asset->url\n}\n': TESTIMONIAL_QUERYResult;
   }
 }

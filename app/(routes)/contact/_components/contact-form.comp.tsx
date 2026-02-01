@@ -27,21 +27,23 @@ import {
 import { Textarea } from "@/ui/textarea";
 import { PhoneInput } from "@/ui/phone-input";
 import { Notify } from "@/components/shared/notify";
-import {
-  formSchema,
-  FormType,
-  inquiryTypes,
-} from "@/lib/validators/contact-form";
+import { formSchema, FormType } from "@/lib/validators/contact-form";
 import { sendContactMessage } from "@/lib/actions/contact";
+import { CATEGORIES_QUERYResult } from "@/sanity.types";
 
-export const ContactFormComp = () => {
+interface Props {
+  categories: CATEGORIES_QUERYResult;
+}
+
+export const ContactFormComp = ({ categories }: Props) => {
   const form = useForm<FormType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fName: "",
       lName: "",
       email: "",
-      inquiryType: "" as (typeof inquiryTypes)[number],
+      inquiryType:
+        (categories[0]?.slug as FormType["inquiryType"]) || "General Inquiry",
       phone: "",
       message: "",
     },
@@ -85,8 +87,10 @@ export const ContactFormComp = () => {
               <span className="text-muted-foreground mb-4 text-[10px] tracking-[0.4em] uppercase md:mb-6">
                 Get in touch
               </span>
-              <h2 className="font-serif text-5xl md:text-7xl">Inquire</h2>
-              <p className="mt-6 max-w-md text-sm leading-relaxed opacity-60 md:mt-8">
+              <h2 className="font-serif text-5xl md:text-6xl">
+                Let&apos; Talk
+              </h2>
+              <p className="mt-6 max-w-md text-sm leading-relaxed opacity-60">
                 Whether you have a specific vision or are just beginning your
                 journey, our atelier is ready to assist you.
               </p>
@@ -95,9 +99,9 @@ export const ContactFormComp = () => {
             <Form {...form}>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
-                className="flex flex-col gap-4 md:gap-6"
+                className="flex flex-col gap-4"
               >
-                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 md:gap-6 lg:grid-cols-2">
+                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="fName"
@@ -154,17 +158,24 @@ export const ContactFormComp = () => {
                           >
                             <SelectValue />
                           </SelectTrigger>
-                          {!form.formState.isSubmitting && (
-                            <SelectContent>
-                              <SelectGroup>
-                                {inquiryTypes.map((type) => (
-                                  <SelectItem key={type} value={type}>
-                                    {type}
-                                  </SelectItem>
-                                ))}
-                              </SelectGroup>
-                            </SelectContent>
-                          )}
+                          {categories.length > 0 &&
+                            !form.formState.isSubmitting && (
+                              <SelectContent>
+                                <SelectGroup>
+                                  {categories.map(
+                                    (type: CATEGORIES_QUERYResult[number]) => (
+                                      <SelectItem
+                                        key={type._id}
+                                        value={type.slug!}
+                                      >
+                                        {type.name}
+                                      </SelectItem>
+                                    ),
+                                  )}
+                                  <SelectItem value="others">Others</SelectItem>
+                                </SelectGroup>
+                              </SelectContent>
+                            )}
                         </Select>
                       </FormControl>
                       <FormMessage />
@@ -172,7 +183,7 @@ export const ContactFormComp = () => {
                   )}
                 />
 
-                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 md:gap-6 lg:grid-cols-2">
+                <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
                   <FormField
                     control={form.control}
                     name="email"
@@ -232,7 +243,7 @@ export const ContactFormComp = () => {
                   loadingText="Please wait..."
                   isLoading={form.formState.isSubmitting}
                 >
-                  <span>Send Inquiry</span>
+                  <span>Continue</span>
                 </Button>
               </form>
             </Form>
@@ -257,31 +268,30 @@ export const ContactFormComp = () => {
                 <p className="text-[10px] tracking-[0.4em] uppercase">
                   Contact Info
                 </p>
-                <Link
-                  target="_blank"
-                  className="w-max font-serif text-lg hover:underline"
-                  href="tel:+12029074865"
-                >
-                  <p>(+1) 202-907-4865</p>
-                  <p>info.e22fashion@gmail.com</p>
-                </Link>
-              </div>
-              <div className="flex flex-col gap-3">
-                <p className="text-[10px] tracking-[0.4em] uppercase">
-                  Business Hours
-                </p>
-                <h4 className="w-max font-serif text-lg">
-                  <p>Tuesday to Saturday: 10:00 AM to 6:00 PM.</p>
-                  <p>Sunday and Monday: Closed.</p>
+                <h4 className="flex w-max flex-col text-lg">
+                  <Link
+                    target="_blank"
+                    className="hover:underline"
+                    href="tel:+12029074865"
+                  >
+                    (+1) 202-907-4865
+                  </Link>
+                  <Link
+                    target="_blank"
+                    className="hover:underline"
+                    href="mailto:ekimedoatelier1@gmail.com"
+                  >
+                    ekimedoatelier1@gmail.com
+                  </Link>
                 </h4>
               </div>
             </div>
 
             <div className="bg-secondary relative aspect-video overflow-hidden shadow-xs transition-all duration-300">
               <Image
-                src="https://images.unsplash.com/photo-1549488497-94b52bddac5d?q=80&w=2670&auto=format&fit=crop"
+                src="/contact-img.avif"
                 alt="Location"
-                className="absolute inset-0 h-auto w-full object-cover opacity-60"
+                className="absolute inset-0 h-auto w-full object-cover"
                 width={2670}
                 height={0}
                 priority

@@ -12,7 +12,7 @@ import {
 } from "@/ui/empty";
 import { ProductCard } from "@/components/shared/product-card";
 import { Icons } from "hugeicons-proxy";
-import { PRODUCT_QUERYResult } from "@/sanity.types";
+import { PRODUCT_COLOR_QUERYResult, PRODUCT_QUERYResult } from "@/sanity.types";
 
 interface Props {
   products: PRODUCT_QUERYResult;
@@ -32,6 +32,20 @@ export const ProductGrid: React.FC<Props> = ({ products }) => {
         // category is a single object with slug property
         const productCategory = product.category?.slug;
         return productCategory ? categories.includes(productCategory) : false;
+      });
+    }
+
+    // Filter by colors (MULTI SELECT)
+    const colors = searchParams.getAll("color");
+    if (colors.length > 0) {
+      filtered = filtered.filter((product) => {
+        const productColors = product.colors;
+
+        if (!productColors || productColors.length === 0) return false;
+
+        return productColors.some((color) =>
+          colors.includes(color.name as string),
+        );
       });
     }
 

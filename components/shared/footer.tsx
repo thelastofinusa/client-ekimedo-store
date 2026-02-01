@@ -10,17 +10,21 @@ import { client } from "@/sanity/lib/client";
 import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 import { FilteredResponseQueryOptions } from "@sanity/client/stega";
 import { Icons } from "hugeicons-proxy";
-
-const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
+import { BUSINESS_HOUR_QUERY } from "@/sanity/queries/hours";
 
 export const Footer = async () => {
+  const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
   const categories = await client.fetch(CATEGORIES_QUERY, {}, options);
+  const businessHours = await client.fetch(BUSINESS_HOUR_QUERY, {}, options);
 
   return (
-    <footer className="bg-foreground text-background border-border/10 border-t py-24">
-      <Container size="sm">
+    <footer className="bg-foreground text-background border-border/20 border-t">
+      <Container
+        size="sm"
+        className="divide-border/20 flex flex-col divide-y py-24"
+      >
         {/* Main Footer Grid */}
-        <div className="border-border/20 mb-16 grid grid-cols-1 gap-16 border-b pb-16 md:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-16 pb-16 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand Section */}
           <div className="space-y-6 lg:col-span-1">
             <Logo
@@ -88,7 +92,7 @@ export const Footer = async () => {
 
           {/* Collections */}
           <div className="space-y-6">
-            <h4 className="text-[11px] font-medium tracking-[0.3em] uppercase opacity-40">
+            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
               Collections
             </h4>
             <nav className="flex flex-col gap-4">
@@ -106,7 +110,7 @@ export const Footer = async () => {
 
           {/* Explore */}
           <div className="space-y-6">
-            <h4 className="text-[11px] font-medium tracking-[0.3em] uppercase opacity-40">
+            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
               Explore
             </h4>
             <nav className="flex flex-col gap-4">
@@ -139,7 +143,7 @@ export const Footer = async () => {
 
           {/* Connect */}
           <div className="space-y-6">
-            <h4 className="text-[11px] font-medium tracking-[0.3em] uppercase opacity-40">
+            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
               Services
             </h4>
             <nav className="flex flex-col gap-4">
@@ -151,10 +155,10 @@ export const Footer = async () => {
               </Link>
               <a
                 target="_blank"
-                href="mailto:info.e22fashion@gmail.com"
+                href="mailto:ekimedoatelier1@gmail.com"
                 className="flex items-center gap-2 text-sm opacity-70 transition-opacity hover:opacity-100"
               >
-                info.e22fashion@gmail.com
+                ekimedoatelier1@gmail.com
               </a>
               <a
                 target="_blank"
@@ -167,11 +171,43 @@ export const Footer = async () => {
           </div>
         </div>
 
+        {businessHours?.hours && businessHours.hours.length > 0 && (
+          <div className="space-y-6 py-16">
+            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
+              Business Hours
+            </h4>
+            <nav className="flex flex-col gap-4 sm:max-w-sm">
+              {businessHours.hours?.map((item) => (
+                <p
+                  key={item._key}
+                  className="flex items-center justify-between text-sm opacity-70 transition-opacity hover:opacity-100"
+                >
+                  <span className="font-medium">{item.day}</span>{" "}
+                  <span>
+                    {item.isOpen
+                      ? `${item.startTime} - ${item.endTime}`
+                      : "Closed"}
+                  </span>
+                </p>
+              ))}
+            </nav>
+          </div>
+        )}
+
         {/* Bottom Footer */}
-        <div className="flex flex-col items-start justify-between gap-8 text-xs tracking-widest uppercase md:flex-row md:items-center">
+        <div className="flex flex-col items-start justify-between gap-8 pt-16 text-xs tracking-widest md:flex-row md:items-center">
           <div className="space-y-2">
             <p className="opacity-60">© 2025 {siteConfig.title}</p>
-            <p>All Rights Reserved</p>
+            <p>
+              All Rights Reserved - Designed and Developed by{" "}
+              <a
+                target="_blank"
+                href="http://x.com/thelastofinusa"
+                className="font-medium underline"
+              >
+                Holiday
+              </a>
+            </p>
           </div>
 
           <div className="flex gap-4 md:text-right">
@@ -185,68 +221,3 @@ export const Footer = async () => {
     </footer>
   );
 };
-
-// <Container className="flex flex-col gap-32">
-//   <div className="flex flex-col items-start justify-between gap-20 md:flex-row">
-//     <div className="flex max-w-sm flex-col gap-4">
-//       <Logo
-//         href="/"
-//         srcDesktop="horizontal"
-//         srcMobile="horizontal"
-//         mobileSize={[110, 32]}
-//         color="bone"
-//         className="block font-serif text-xl tracking-[0.2em] uppercase"
-//       />
-//       <p className="text-[11px] leading-relaxed font-light tracking-[0.3em] uppercase opacity-40">
-//         {siteConfig.tagline}
-//       </p>
-
-//       <div className="mt-4 flex items-center gap-2">
-//         <Button variant={"outline"} size="xs" disabled>
-//           <FaStripe className="size-7" />
-//         </Button>
-//         <Button variant={"outline"} size="xs" disabled>
-//           <FaApplePay className="size-7" />
-//         </Button>
-//         <Button variant={"outline"} size="xs" disabled>
-//           <RiVisaLine className="size-6" />
-//         </Button>
-//         <Button variant={"outline"} size="xs" disabled>
-//           <FaGooglePay className="size-7" />
-//         </Button>
-//       </div>
-//     </div>
-
-//     <div className="grid w-full grid-cols-2 gap-8 lg:w-max lg:grid-cols-3 lg:gap-10">
-//       {footerRoutes.map((item, itemIdx) => (
-//         <div
-//           key={itemIdx}
-//           className="space-y-6 last-of-type:col-span-2 lg:last-of-type:col-span-1"
-//         >
-//           <span className="block text-[11px] tracking-widest uppercase opacity-20">
-//             {item.title}
-//           </span>
-//           <nav className="flex flex-col gap-3 text-[11px] tracking-widest uppercase">
-//             {item.routes.map((route, routeIdx) => (
-//               <Link
-//                 key={routeIdx}
-//                 href={{ pathname: route.path }}
-//                 className="opacity-60 transition-opacity hover:opacity-100"
-//               >
-//                 {route.label}
-//               </Link>
-//             ))}
-//           </nav>
-//         </div>
-//       ))}
-//     </div>
-//   </div>
-
-//   <div className="border-border/10 flex items-center justify-between border-t pt-12 text-[9px] tracking-[0.3em] uppercase">
-//     <div className="flex items-center gap-3">
-//       <Icons.InstagramIcon className="text-muted-foreground size-5" />
-//       <Icons.TiktokIcon className="text-muted-foreground size-5" />
-//     </div>
-//     <p>© 2025 {siteConfig.title}. All rights reserved.</p>
-//   </div>
-// </Container>

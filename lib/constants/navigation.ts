@@ -20,6 +20,10 @@ export const headerRoutes = [
     path: "/testimonials",
   },
   {
+    label: "Consultation",
+    path: "/consultation",
+  },
+  {
     label: "Let's Talk",
     path: "/contact",
   },
@@ -55,8 +59,8 @@ export const footerRoutes = [
     title: "Inquiries",
     routes: [
       {
-        label: "info.e22fashion@gmail.com",
-        path: "mailto:info.e22fashion@gmail.com",
+        label: "ekimedoatelier1@gmail.com",
+        path: "mailto:ekimedoatelier1@gmail.com",
         newTab: true,
       },
       {

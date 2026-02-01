@@ -15,7 +15,8 @@ import { Button, buttonVariants } from "@/ui/button";
 import { PRODUCT_QUERYResult } from "@/sanity.types";
 import { StockBadge } from "@/components/shared/stock-badge";
 import { Icons } from "hugeicons-proxy";
-import { cn } from "@/lib/utils";
+import { cn, formatPrice } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 interface Props {
   product: PRODUCT_QUERYResult[number];
@@ -135,20 +136,23 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
         <div className="flex flex-col gap-2">
           <h2 className="font-serif text-2xl md:text-3xl">{product.name}</h2>
           <p className="flex items-center gap-3 text-base font-medium md:text-lg">
-            <span>Price: ${product?.price?.toLocaleString()}</span>
+            <span>
+              Price:{" "}
+              <span className="font-mono">{formatPrice(product?.price)}</span>
+            </span>
             {isOutOfStock ? (
               <Badge variant="destructive">Out of Stock</Badge>
             ) : (
               <StockBadge productId={product._id} stock={stock} />
             )}
           </p>
-        </div>
 
-        <div className="flex flex-col gap-8">
           <pre className="text-muted-foreground font-sans text-base leading-relaxed whitespace-pre-wrap">
             {product.description}
           </pre>
+        </div>
 
+        <div className="flex flex-col gap-8">
           {/* Colors */}
           {product?.colors && product?.colors?.length > 0 && (
             <div className="flex flex-col gap-2">
@@ -159,19 +163,26 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
                 {product.colors.map((color) => {
                   if (!color || !color.name || !color.value) return null;
                   return (
-                    <button
-                      key={color.name}
-                      onClick={() => setSelectedColor(color.name || "")}
-                      className={cn(
-                        "ring-border size-7 rounded-full ring-1 transition-all hover:scale-110 focus:outline-none",
-                        selectedColor === color.name
-                          ? "ring-2 ring-black ring-offset-2"
-                          : "",
-                      )}
-                      style={{ backgroundColor: color.value }}
-                      title={color.name}
-                      type="button"
-                    />
+                    <Tooltip key={color.name}>
+                      <TooltipTrigger asChild>
+                        <button
+                          key={color.name}
+                          onClick={() => setSelectedColor(color.name || "")}
+                          className={cn(
+                            "ring-border size-7 rounded-full ring-1 transition-all hover:scale-110 focus:outline-none",
+                            selectedColor === color.name
+                              ? "ring-2 ring-black ring-offset-2"
+                              : "",
+                          )}
+                          style={{ backgroundColor: color.value }}
+                          title={color.name}
+                          type="button"
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{color.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
                   );
                 })}
               </div>

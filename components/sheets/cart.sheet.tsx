@@ -297,19 +297,19 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
     <ButtonGroup>
       <Button
         variant="outline"
-        size="icon-sm"
+        size="icon-xs"
         type="button"
         aria-label="Decrement"
         onClick={handleDecrement}
       >
         <Icons.MinusSignIcon className="size-3" />
       </Button>
-      <div className="flex size-8 items-center justify-center border px-2 text-xs font-medium shadow-xs">
+      <div className="flex size-6 items-center justify-center border px-2 text-[10px] font-medium shadow-xs">
         {quantityInCart}
       </div>
       <Button
         variant="outline"
-        size="icon-sm"
+        size="icon-xs"
         type="button"
         aria-label="Increment"
         onClick={handleAdd}

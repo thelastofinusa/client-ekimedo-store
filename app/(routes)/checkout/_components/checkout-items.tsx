@@ -29,6 +29,7 @@ import { createCheckoutSession } from "@/lib/actions/checkout";
 import { Route } from "next";
 import { toast } from "sonner";
 import { SigninDialog } from "@/components/dialogs/signin.dialog";
+import { Skeleton } from "@/ui/skeleton";
 
 export const CheckoutItems = () => {
   const router = useRouter();
@@ -110,8 +111,22 @@ export const CheckoutItems = () => {
               <span className="mb-px">[{totalItems} items]</span>
             </p>
 
-            <Button size="sm" variant="outline" onClick={clearCart}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={clearCart}
+              className="hidden md:inline-flex"
+            >
               Clear Items
+            </Button>
+            <Button
+              size="icon-xs"
+              variant="outline"
+              onClick={clearCart}
+              className="md:hidden"
+            >
+              <Icons.Cancel01Icon />
+              <span className="sr-only">Clear Items</span>
             </Button>
           </div>
 
@@ -126,94 +141,107 @@ export const CheckoutItems = () => {
             </Alert>
           )}
 
-          {/* Loading state */}
-          {isLoading && (
-            <div className="flex items-center justify-center py-6">
-              <Icons.Loading03Icon className="h-6 w-6 animate-spin text-zinc-400" />
-              <span className="ml-2 text-sm text-zinc-500">
-                Verifying stock...
-              </span>
-            </div>
-          )}
-
           {/* Items List */}
-          <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
-            {items.map((item) => {
-              const stockInfo = stockMap.get(item.productId);
-              const hasIssue =
-                stockInfo?.isOutOfStock || stockInfo?.exceedsStock;
+          <div className="divide-border/50 divide-y">
+            {isLoading
+              ? Array.from({ length: 2 }).map((_, idx) => (
+                  <div key={idx} className="flex gap-4 p-6">
+                    <Skeleton className="h-20 w-20 shrink-0" />
 
-              return (
-                <div
-                  key={item.itemId}
-                  className={cn("flex gap-4 p-6", hasIssue && "bg-red-50")}
-                >
-                  {/* Image */}
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800">
-                    {item.image ? (
-                      <Image
-                        src={item.image}
-                        alt={item.name}
-                        fill
-                        className="object-cover"
-                        sizes="80px"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-xs text-zinc-400">
-                        No image
+                    <div className="flex flex-1 flex-col justify-between pt-2">
+                      <div className="flex flex-col gap-1">
+                        <Skeleton className="h-4 w-36" />
+                        <Skeleton className="h-3 w-28" />
+                        <Skeleton className="mt-1 h-4 w-10" />
                       </div>
-                    )}
-                  </div>
+                    </div>
 
-                  {/* Details */}
-                  <div className="flex flex-1 flex-col justify-between">
-                    <div>
-                      <p className="font-medium text-zinc-900 dark:text-zinc-100">
-                        {item.name}
-                      </p>
-                      {(item.selectedSize || item.selectedColor) && (
-                        <p className="text-muted-foreground text-xs">
-                          {item.selectedSize && (
-                            <span>Size: {item.selectedSize}</span>
-                          )}
-                          {item.selectedSize && item.selectedColor && (
-                            <span className="mx-1">|</span>
-                          )}
-                          {item.selectedColor && (
-                            <span>Color: {item.selectedColor}</span>
-                          )}
-                        </p>
-                      )}
-                      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                        Qty: {item.quantity}
-                      </p>
-                      {stockInfo?.isOutOfStock && (
-                        <p className="mt-1 text-sm font-medium text-red-600">
-                          Out of stock
-                        </p>
-                      )}
-                      {stockInfo?.exceedsStock && !stockInfo.isOutOfStock && (
-                        <p className="mt-1 text-sm font-medium text-amber-600">
-                          Only {stockInfo.currentStock} available
-                        </p>
-                      )}
+                    <div className="flex flex-col items-end gap-1 text-right">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-3 w-28" />
                     </div>
                   </div>
+                ))
+              : items.map((item) => {
+                  const stockInfo = stockMap.get(item.productId);
+                  const hasIssue =
+                    stockInfo?.isOutOfStock || stockInfo?.exceedsStock;
 
-                  {/* Price */}
-                  <div className="text-right">
-                    <p className="font-medium text-zinc-900 dark:text-zinc-100">
-                      {formatPrice(item.price * item.quantity)}
-                    </p>
-                    {item.quantity > 1 && (
-                      <p className="text-sm text-zinc-500">
-                        {formatPrice(item.price)} each
-                      </p>
-                    )}
-                  </div>
-                </div>
-              );
-            })}
+                  return (
+                    <div
+                      key={item.itemId}
+                      className={cn("flex gap-4 p-6", hasIssue && "bg-red-50")}
+                    >
+                      {/* Image */}
+                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800">
+                        {item.image ? (
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                            sizes="80px"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs text-zinc-400">
+                            No image
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Details */}
+                      <div className="flex flex-1 flex-col justify-between">
+                        <div>
+                          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+                            {item.name}
+                          </p>
+                          {(item.selectedSize || item.selectedColor) && (
+                            <p className="text-muted-foreground text-xs">
+                              {item.selectedSize && (
+                                <span>Size: {item.selectedSize}</span>
+                              )}
+                              {item.selectedSize && item.selectedColor && (
+                                <span className="mx-1">|</span>
+                              )}
+                              {item.selectedColor && (
+                                <span>Color: {item.selectedColor}</span>
+                              )}
+                            </p>
+                          )}
+                          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                            Qty: {item.quantity}
+                          </p>
+                          {stockInfo?.isOutOfStock && (
+                            <p className="mt-1 text-sm font-medium text-red-600">
+                              Out of stock
+                            </p>
+                          )}
+                          {stockInfo?.exceedsStock &&
+                            !stockInfo.isOutOfStock && (
+                              <p className="mt-1 text-sm font-medium text-amber-600">
+                                Only {stockInfo.currentStock} available
+                              </p>
+                            )}
+                        </div>
+                      </div>
+
+                      {/* Price */}
+                      <div className="text-right">
+                        <p className="font-mono font-medium text-zinc-900 dark:text-zinc-100">
+                          {formatPrice(item.price * item.quantity)}
+                        </p>
+                        {item.quantity > 1 && (
+                          <p className="text-sm text-zinc-500">
+                            <span className="font-mono">
+                              {formatPrice(item.price)}
+                            </span>{" "}
+                            each
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
           </div>
         </div>
 
@@ -225,7 +253,7 @@ export const CheckoutItems = () => {
           <div className="mt-6 space-y-4">
             <div className="flex justify-between text-sm">
               <span className="text-zinc-500 dark:text-zinc-400">Subtotal</span>
-              <span className="text-zinc-900 dark:text-zinc-100">
+              <span className="font-mono text-zinc-900 dark:text-zinc-100">
                 {formatPrice(totalPrice)}
               </span>
             </div>
@@ -238,7 +266,7 @@ export const CheckoutItems = () => {
             <div className="border-t border-zinc-200 pt-4 dark:border-zinc-800">
               <div className="flex justify-between text-base font-semibold">
                 <span className="text-zinc-900 dark:text-zinc-100">Total</span>
-                <span className="text-zinc-900 dark:text-zinc-100">
+                <span className="font-mono text-zinc-900 dark:text-zinc-100">
                   {formatPrice(totalPrice)}
                 </span>
               </div>

@@ -80,7 +80,7 @@ export default async function ProductsDetailPage({
 
   return (
     <div className="py-28">
-      <Container>
+      <Container size="lg">
         <ProductDetails product={product} />
 
         {otherProducts.length > 0 && (

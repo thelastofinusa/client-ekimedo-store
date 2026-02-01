@@ -21,7 +21,7 @@ export default function RoutesLayout(
           {props.children}
           <Footer />
         </React.Fragment>
-        <Toaster position="top-center" />
+        <Toaster position="bottom-center" />
       </CartProvider>
       <Analytics />
       <SanityLive />

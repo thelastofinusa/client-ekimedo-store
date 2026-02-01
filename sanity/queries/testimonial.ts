@@ -1,7 +1,7 @@
 import { defineQuery } from "next-sanity";
 
 export const TESTIMONIAL_QUERY = defineQuery(`
-*[_type == "testimonial"] | order(date desc) {
+*[_type == "testimonial" && status == "approved"] | order(date desc) {
     _id,
     "avatar": avatar.asset->url,
     category -> { name },

@@ -1,5 +1,8 @@
 import { Metadata } from "next";
 import { ContactFormComp } from "./_components/contact-form.comp";
+import { FilteredResponseQueryOptions } from "@sanity/client/stega";
+import { CATEGORIES_QUERY } from "@/sanity/queries/category";
+import { client } from "@/sanity/lib/client";
 
 export const metadata: Metadata = {
   title: "Let's Talk",
@@ -7,10 +10,13 @@ export const metadata: Metadata = {
     "Get in touch with us for any inquiries, support, or feedback. We're here to help and would love to hear from you!",
 };
 
-export default function ContactPage() {
+export default async function ContactPage() {
+  const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
+  const categories = await client.fetch(CATEGORIES_QUERY, {}, options);
+
   return (
     <div className="flex-1 overflow-x-clip">
-      <ContactFormComp />
+      <ContactFormComp categories={categories} />
     </div>
   );
 }

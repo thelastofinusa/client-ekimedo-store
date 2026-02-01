@@ -2,7 +2,13 @@
 import * as React from "react";
 import { Package } from "lucide-react";
 import { Icons } from "hugeicons-proxy";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 
 import { Logo } from "./logo";
 import { Button } from "@/ui/button";
@@ -10,10 +16,17 @@ import { Container } from "./container";
 import { Separator } from "@/ui/separator";
 import { MenuSheet } from "@/sheets/menu.sheet";
 import { CartSheet } from "@/sheets/cart.sheet";
-import { SigninDialog } from "@/dialogs/signin.dialog";
 import { useTotalItems } from "@/providers/cart.provider";
+import { env } from "@/lib/env";
+import { PiPackageDuotone } from "react-icons/pi";
+import { RiAdminLine } from "react-icons/ri";
 
 export const Header = () => {
+  const { user } = useUser();
+  const isAdmin =
+    user?.primaryEmailAddress?.emailAddress ===
+    env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
+
   const totalItems = useTotalItems();
   const [openMenu, setOpenMenu] = React.useState(false);
   const [openCart, setOpenCart] = React.useState(false);
@@ -74,9 +87,18 @@ export const Header = () => {
                     <UserButton.MenuItems>
                       <UserButton.Link
                         label="My Orders"
-                        labelIcon={<Package className="mt-px size-3.5" />}
+                        labelIcon={
+                          <PiPackageDuotone className="mt-px size-4" />
+                        }
                         href="/orders"
                       />
+                      {isAdmin && (
+                        <UserButton.Link
+                          label="Admin Dashboard"
+                          labelIcon={<RiAdminLine className="mt-px size-4" />}
+                          href="/studio"
+                        />
+                      )}
                     </UserButton.MenuItems>
                   </UserButton>
                 </Button>

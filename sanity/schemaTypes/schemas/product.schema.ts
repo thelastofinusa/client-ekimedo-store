@@ -1,5 +1,6 @@
 import { defineField, defineType } from "sanity";
 import { PiDress } from "react-icons/pi";
+import { formatPrice } from "@/lib/utils";
 
 export const productType = defineType({
   name: "product",
@@ -97,7 +98,7 @@ export const productType = defineType({
       title: "Colors",
       type: "array",
       group: "details",
-      of: [{ type: "reference", to: [{ type: "color" }] }],
+      of: [{ type: "reference", to: [{ type: "productColor" }] }],
     }),
 
     defineField({
@@ -112,21 +113,14 @@ export const productType = defineType({
   ],
   preview: {
     select: {
-      title: "name",
-      category: "category->name",
-      media: "images.0",
+      name: "name",
       price: "price",
+      stock: "stock",
     },
-    prepare({ title, category, media, price }) {
+    prepare({ name, price, stock }) {
       return {
-        title,
-        subtitle: `${category ?? "Uncategorized"} • $${price?.toLocaleString(
-          "en-US",
-          {
-            minimumFractionDigits: 2,
-          },
-        )}`,
-        media,
+        title: name,
+        subtitle: `${formatPrice(price)} - ${stock} in stock`,
       };
     },
   },

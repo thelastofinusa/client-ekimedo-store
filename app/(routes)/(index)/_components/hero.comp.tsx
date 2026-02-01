@@ -16,7 +16,7 @@ export const HeroComp = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-          className="mdleading-[0.9] font-serif text-[12vw] leading-[1.1] tracking-tighter lg:text-[6vw]"
+          className="font-serif text-5xl leading-[1.1] tracking-tighter md:text-[8vw] lg:text-[6vw]"
         >
           {siteConfig.tagline}
         </motion.h1>
@@ -39,32 +39,26 @@ export const HeroComp = () => {
         >
           <Link
             href="/products"
-            className={buttonVariants({ variant: "outline", size: "lg" })}
+            className={buttonVariants({
+              size: "lg",
+              className: "w-full md:w-max",
+            })}
           >
             Explore Products
           </Link>
           <div className="bg-border hidden h-6 w-px md:block" />
           <Link
             href={"/consultation" as Route}
-            className={buttonVariants({ variant: "link", size: "lg" })}
+            className={buttonVariants({
+              variant: "outline",
+              size: "lg",
+              className: "w-full md:w-max",
+            })}
           >
-            Private Consultation
+            Book Consultation
           </Link>
         </motion.div>
       </div>
-
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 0.8 }}
-        transition={{ delay: 1.5, duration: 1 }}
-        className="absolute bottom-12 left-1/2 flex -translate-x-1/2 flex-col items-center gap-4"
-      >
-        <span className="vertical-rl text-[8px] tracking-widest uppercase">
-          Scroll
-        </span>
-        <div className="bg-border h-12 w-px" />
-      </motion.div>
     </section>
   );
 };

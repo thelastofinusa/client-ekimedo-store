@@ -37,6 +37,16 @@ export function formatSanityDate(dateString: string) {
   });
 }
 
+export function assertValue<T>(
+  v: T | undefined,
+  errorMessage?: string,
+): NonNullable<T> {
+  if (v === undefined || v === null) {
+    throw new Error(errorMessage ?? "Missing property");
+  }
+  return v;
+}
+
 type DateFormatOption = "short" | "long" | "datetime";
 
 const DATE_FORMAT_OPTIONS: Record<
