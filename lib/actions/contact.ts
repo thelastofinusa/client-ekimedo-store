@@ -30,44 +30,81 @@ export async function sendContactMessage(params: {
       replyTo: params.email,
       subject: `Inquiry: ${params.inquiryType} – ${fullName}`,
       html: `
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          </head>
-          <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
-            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 32px 20px; text-align: center;">
-                <h1 style="margin: 0; color: #ffffff; font-size: 22px; font-weight: 600;">New Contact Inquiry</h1>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>New Contact Inquiry</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; color: #000000; -webkit-font-smoothing: antialiased;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+
+              <!-- Header -->
+              <div style="border-bottom: 2px solid #000000; padding-bottom: 20px; margin-bottom: 40px;">
+                  <h1 style="margin: 0; font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
+                      Ekimedo
+                  </h1>
+                  <p style="margin: 5px 0 0 0; font-size: 12px; text-transform: uppercase; color: #666666;">
+                      Contact Inquiry Received
+                  </p>
               </div>
-              <div style="padding: 24px;">
-                <table style="width: 100%; font-size: 14px; color: #333;">
-                  <tr>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Name</strong></td>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">${escapeHtml(fullName)}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Email</strong></td>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;"><a href="mailto:${escapeHtml(params.email)}">${escapeHtml(params.email)}</a></td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Phone</strong></td>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">${escapeHtml(params.phone)}</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #eee;"><strong>Inquiry type</strong></td>
-                    <td style="padding: 8px 0; border-bottom: 1px solid #eee; text-align: right;">${escapeHtml(params.inquiryType)}</td>
-                  </tr>
-                </table>
-                <div style="margin-top: 24px;">
-                  <p style="margin: 0 0 8px 0; color: #666; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em;">Message</p>
-                  <p style="margin: 0; color: #333; font-size: 14px; line-height: 1.6; white-space: pre-wrap;">${escapeHtml(params.message)}</p>
-                </div>
+
+              <!-- Details Table -->
+              <div style="margin-bottom: 40px;">
+                  <h2 style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #eeeeee; padding-bottom: 10px; margin-bottom: 20px;">
+                      Sender Information
+                  </h2>
+                  <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666; border-bottom: 1px solid #eeeeee;">Name</td>
+                          <td style="padding: 12px 0; text-align: right; font-weight: 700; border-bottom: 1px solid #eeeeee;">${escapeHtml(fullName)}</td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666; border-bottom: 1px solid #eeeeee;">Email</td>
+                          <td style="padding: 12px 0; text-align: right; border-bottom: 1px solid #eeeeee;">
+                              <a href="mailto:${escapeHtml(params.email)}" style="color: #000000; text-decoration: underline;">${escapeHtml(params.email)}</a>
+                          </td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666; border-bottom: 1px solid #eeeeee;">Phone</td>
+                          <td style="padding: 12px 0; text-align: right; border-bottom: 1px solid #eeeeee;">${escapeHtml(params.phone)}</td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666;">Inquiry Type</td>
+                          <td style="padding: 12px 0; text-align: right; font-weight: 700;">${escapeHtml(params.inquiryType)}</td>
+                      </tr>
+                  </table>
               </div>
-            </div>
-          </body>
-        </html>
+
+              <!-- Message Content -->
+              <div style="margin-bottom: 40px;">
+                  <h2 style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #eeeeee; padding-bottom: 10px; margin-bottom: 15px;">
+                      Message
+                  </h2>
+                  <div style="font-size: 15px; line-height: 1.6; color: #333333; white-space: pre-wrap;">
+                      ${escapeHtml(params.message)}
+                  </div>
+              </div>
+
+              <!-- Action -->
+              <div style="margin-bottom: 60px; text-align: center;">
+                  <a href="mailto:${escapeHtml(params.email)}" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 15px 40px; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #000000;">
+                      Reply to Inquiry
+                  </a>
+              </div>
+
+              <!-- Footer -->
+              <div style="border-top: 1px solid #eeeeee; padding-top: 20px; text-align: center;">
+                  <p style="margin: 0 0 10px 0; color: #000000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Ekimedo Admin</p>
+                  <p style="margin: 0; color: #999999; font-size: 11px; letter-spacing: 0.5px;">
+                      Internal Notification • Contact Form Submission
+                  </p>
+              </div>
+
+          </div>
+      </body>
+      </html>
       `,
     });
 
