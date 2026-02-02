@@ -17,6 +17,7 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: siteConfig.url,
     title: `${siteConfig.title} - ${siteConfig.tagline}`,
+    siteName: siteConfig.title,
     description: siteConfig.description,
     images: [
       {
