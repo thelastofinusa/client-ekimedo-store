@@ -42,8 +42,7 @@ export const ContactFormComp = ({ categories }: Props) => {
       fName: "",
       lName: "",
       email: "",
-      inquiryType:
-        (categories[0]?.slug as FormType["inquiryType"]) || "General Inquiry",
+      inquiryType: categories[0]?.slug || "Others",
       phone: "",
       message: "",
     },
