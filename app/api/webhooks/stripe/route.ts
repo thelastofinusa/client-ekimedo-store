@@ -102,39 +102,90 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       console.log(`Booking ${bookingId} confirmed`);
 
       const adminHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-          <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
-            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">New Booking Received</h1>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>New Booking Received</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; color: #000000; -webkit-font-smoothing: antialiased;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+
+              <!-- Header -->
+              <div style="border-bottom: 2px solid #000000; padding-bottom: 20px; margin-bottom: 40px;">
+                  <h1 style="margin: 0; font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
+                      Ekimedo
+                  </h1>
+                  <p style="margin: 5px 0 0 0; font-size: 12px; text-transform: uppercase; color: #666666;">
+                      New Booking Notification
+                  </p>
               </div>
-              <div style="padding: 20px 0;">
-                <p style="margin: 0 0 24px 0; color: #333333; font-size: 16px; line-height: 1.6; padding: 0 20px;">A new consultation has been booked on Ekimedo.</p>
-                <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 24px 20px; border-radius: 4px;">
-                  <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Booking Details</h3>
-                  <table style="width: 100%; font-size: 14px; color: #555555;">
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Service:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600;">${serviceTitle}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Date:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleDateString()}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Time:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Location:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; text-transform: capitalize;">${location}</td></tr>
-                    <tr><td style="padding: 8px 0;"><strong>Group Size:</strong></td><td style="padding: 8px 0; text-align: right;">${groupSize}</td></tr>
+
+              <!-- Intro -->
+              <div style="margin-bottom: 40px;">
+                  <p style="font-size: 16px; line-height: 1.5; margin: 0; color: #333333;">
+                      A new consultation has been booked through the platform. Please review the details below.
+                  </p>
+              </div>
+
+              <!-- Booking Details -->
+              <div style="margin-bottom: 40px;">
+                  <h2 style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #eeeeee; padding-bottom: 10px; margin-bottom: 20px;">
+                      Booking Details
+                  </h2>
+                  <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666; border-bottom: 1px solid #eeeeee;">Service</td>
+                          <td style="padding: 12px 0; text-align: right; font-weight: 700; border-bottom: 1px solid #eeeeee;">${serviceTitle}</td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666; border-bottom: 1px solid #eeeeee;">Date</td>
+                          <td style="padding: 12px 0; text-align: right; border-bottom: 1px solid #eeeeee;">${new Date(dateTime).toLocaleDateString()}</td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666; border-bottom: 1px solid #eeeeee;">Time</td>
+                          <td style="padding: 12px 0; text-align: right; border-bottom: 1px solid #eeeeee;">${new Date(dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666; border-bottom: 1px solid #eeeeee;">Location</td>
+                          <td style="padding: 12px 0; text-align: right; text-transform: capitalize; border-bottom: 1px solid #eeeeee;">${location}</td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666;">Group Size</td>
+                          <td style="padding: 12px 0; text-align: right;">${groupSize} Participant</td>
+                      </tr>
                   </table>
-                </div>
-                <div style="margin: 24px 20px;">
-                  <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Customer Information</h3>
-                  <p style="margin: 0 0 8px 0; color: #555555; font-size: 14px;"><strong>Name:</strong> ${customerName}</p>
-                  <p style="margin: 0 0 8px 0; color: #555555; font-size: 14px;"><strong>Email:</strong> ${metadataCustomerEmail}</p>
-                  <p style="margin: 0; color: #555555; font-size: 14px;"><strong>Phone:</strong> ${customerPhone}</p>
-                </div>
-                <div style="text-align: center; margin: 32px 0;">
-                  <a href="${process.env.NEXT_PUBLIC_SITE_URL}/studio/structure/booking;${bookingId}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 12px 32px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">View Booking in Studio</a>
-                </div>
               </div>
-            </div>
-          </body>
-        </html>
+
+              <!-- Customer Information -->
+              <div style="margin-bottom: 40px; padding: 20px; border: 1px solid #eeeeee;">
+                  <h2 style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 0; margin-bottom: 15px;">
+                      Customer Information
+                  </h2>
+                  <p style="font-size: 14px; margin: 0 0 8px 0; color: #333333;"><strong>Name:</strong> ${customerName}</p>
+                  <p style="font-size: 14px; margin: 0 0 8px 0; color: #333333;"><strong>Email:</strong> ${metadataCustomerEmail}</p>
+                  <p style="font-size: 14px; margin: 0; color: #333333;"><strong>Phone:</strong> ${customerPhone}</p>
+              </div>
+
+              <!-- Action -->
+              <div style="margin-bottom: 60px; text-align: center;">
+                  <a target="_blank" rel="noopener noreferrer" href="${process.env.NEXT_PUBLIC_SITE_URL}/studio/structure/booking;${bookingId}" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 15px 40px; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #000000;">
+                      View Booking in Studio
+                  </a>
+              </div>
+
+              <!-- Footer -->
+              <div style="border-top: 1px solid #eeeeee; padding-top: 20px; text-align: center;">
+                  <p style="margin: 0 0 10px 0; color: #000000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Ekimedo Admin</p>
+                  <p style="margin: 0; color: #999999; font-size: 11px; letter-spacing: 0.5px;">
+                      Internal Notification • Order Management System
+                  </p>
+              </div>
+
+          </div>
+      </body>
+      </html>
       `;
 
       const adminTo = (
@@ -159,31 +210,96 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         }
       }
 
+      const start = new Date(dateTime).toISOString().replace(/-|:|\.\d+/g, "");
+      const end = new Date(endTime).toISOString().replace(/-|:|\.\d+/g, "");
+
+      const calendarUrl = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+        serviceTitle,
+      )}&dates=${start}/${end}&details=${encodeURIComponent(
+        `Consultation with ${customerName}`,
+      )}&location=${encodeURIComponent(location)}`;
+
       const customerHtml = `
-        <!DOCTYPE html>
-        <html>
-          <head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-          <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5;">
-            <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-              <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-                <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">Consultation Confirmed</h1>
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Consultation Confirmed</title>
+      </head>
+      <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; color: #000000; -webkit-font-smoothing: antialiased;">
+          <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+
+              <!-- Header -->
+              <div style="border-bottom: 2px solid #000000; padding-bottom: 20px; margin-bottom: 40px;">
+                  <h1 style="margin: 0; font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
+                      Ekimedo
+                  </h1>
+                  <p style="margin: 5px 0 0 0; font-size: 12px; text-transform: uppercase; color: #666666;">
+                      Consultation Confirmed
+                  </p>
               </div>
-              <div style="padding: 20px 0;">
-                <p style="margin: 0 0 24px 0; color: #333333; font-size: 16px; line-height: 1.6; padding: 0 20px;">Hi ${customerName}, your consultation has been confirmed. We look forward to seeing you.</p>
-                <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 24px 20px; border-radius: 4px;">
-                  <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Booking Details</h3>
-                  <table style="width: 100%; font-size: 14px; color: #555555;">
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Service:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600;">${serviceTitle}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Date:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleDateString()}</td></tr>
-                    <tr><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Time:</strong></td><td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${new Date(dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</td></tr>
-                    <tr><td style="padding: 8px 0;"><strong>Location:</strong></td><td style="padding: 8px 0; text-align: right; text-transform: capitalize;">${location}</td></tr>
+
+              <!-- Intro -->
+              <div style="margin-bottom: 40px;">
+                  <h2 style="font-size: 20px; font-weight: 700; margin: 0 0 10px 0;">Hello, ${customerName}</h2>
+                  <p style="font-size: 16px; line-height: 1.5; margin: 0; color: #333333;">
+                      Your consultation has been confirmed. We look forward to seeing you soon. Please find your booking details below.
+                  </p>
+              </div>
+
+              <!-- Booking Details -->
+              <div style="margin-bottom: 40px;">
+                  <h2 style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #eeeeee; padding-bottom: 10px; margin-bottom: 20px;">
+                      Booking Details
+                  </h2>
+                  <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666; border-bottom: 1px solid #eeeeee;">Service</td>
+                          <td style="padding: 12px 0; text-align: right; font-weight: 700; border-bottom: 1px solid #eeeeee;">${serviceTitle}</td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666; border-bottom: 1px solid #eeeeee;">Date</td>
+                          <td style="padding: 12px 0; text-align: right; border-bottom: 1px solid #eeeeee;">${new Date(dateTime).toLocaleDateString()}</td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666; border-bottom: 1px solid #eeeeee;">Time</td>
+                          <td style="padding: 12px 0; text-align: right; border-bottom: 1px solid #eeeeee;">${new Date(dateTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })} - ${new Date(endTime).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</td>
+                      </tr>
+                      <tr>
+                          <td style="padding: 12px 0; color: #666666;">Location</td>
+                          <td style="padding: 12px 0; text-align: right; text-transform: capitalize;">${location}</td>
+                      </tr>
                   </table>
-                </div>
-                <p style="margin: 0 24px 24px; color: #666; font-size: 14px;">If you have any questions, reply to this email or contact us.</p>
               </div>
-            </div>
-          </body>
-        </html>
+
+              <!-- Note Section -->
+              <div style="border: 1px solid #000000; padding: 20px; margin-bottom: 40px;">
+                  <p style="font-size: 14px; margin: 0; line-height: 1.5; color: #333333;">
+                      <strong>Questions?</strong><br>
+                      If you have any questions or need to reschedule, please reply to this email or contact our support team directly.
+                  </p>
+              </div>
+
+              <!-- Action -->
+              <div style="margin-bottom: 60px; text-align: center;">
+                  <a href="${calendarUrl}" target="_blank" rel="noopener noreferrer" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 15px 40px; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #000000;">
+                      Add to Calendar
+                  </a>
+              </div>
+
+              <!-- Footer -->
+              <div style="border-top: 1px solid #eeeeee; padding-top: 20px; text-align: center;">
+                  <p style="margin: 0 0 10px 0; color: #000000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Ekimedo</p>
+                  <p style="margin: 0; color: #999999; font-size: 11px; letter-spacing: 0.5px; line-height: 1.4;">
+                      Bespoke design solutions for modern brands.<br>
+                      &copy; 2024 EKIMEDO. ALL RIGHTS RESERVED.
+                  </p>
+              </div>
+
+          </div>
+      </body>
+      </html>
       `;
 
       const customerTo = String(metadataCustomerEmail ?? "").trim() || adminTo;
@@ -356,13 +472,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       0,
     );
 
-    const orderSummary = `
-Order Number: ${orderNumber}
-Total: £${((session.amount_total ?? 0) / 100).toFixed(2)}
-Items: ${totalItems} item(s)
-Status: Paid
-    `.trim();
-
     // Email to admin/contact
     try {
       await resend.emails.send({
@@ -370,85 +479,101 @@ Status: Paid
         to: contactEmail,
         subject: `New Order: ${orderNumber}`,
         html: `
-          <!DOCTYPE html>
-          <html>
-            <head>
-              <meta charset="UTF-8">
-              <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            </head>
-            <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-              <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Order Confirmation</title>
+        </head>
+        <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; color: #000000; -webkit-font-smoothing: antialiased;">
+            <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+
                 <!-- Header -->
-                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-                  <h1 style="margin: 0; color: #ffffff; font-size: 24px; font-weight: 600;">New Order Received</h1>
+                <div style="border-bottom: 2px solid #000000; padding-bottom: 20px; margin-bottom: 40px;">
+                    <h1 style="margin: 0; font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
+                        Ekimedo
+                    </h1>
+                    <p style="margin: 5px 0 0 0; font-size: 12px; text-transform: uppercase; color: #666666;">
+                        Order Receipt
+                    </p>
                 </div>
 
-                <!-- Content -->
-                <div style="padding: 20px 0;">
-                  <p style="margin: 0 0 24px 0; color: #333333; font-size: 16px; line-height: 1.6;">
-                    A new order has been placed on Ekimedo.
-                  </p>
-
-                  <!-- Order Details Card -->
-                  <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 24px 0; border-radius: 4px;">
-                    <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Order Details</h3>
-                    <table style="width: 100%; font-size: 14px; color: #555555;">
-                      <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Order Number:</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;"><code style="background-color: #e8e8e8; padding: 4px 8px; border-radius: 4px; font-weight: 600;">${orderNumber}</code></td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Total:</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600; color: #667eea;">$${((session.amount_total ?? 0) / 100).toFixed(2)}</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Items:</strong></td>
-                        <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${totalItems} item(s)</td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 8px 0;"><strong>Status:</strong></td>
-                        <td style="padding: 8px 0; text-align: right;"><span style="background-color: #d4edda; color: #155724; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 12px;">PAID</span></td>
-                      </tr>
-                    </table>
-                  </div>
-
-                  <!-- Customer Email -->
-                  <div style="margin: 24px 0;">
-                    <p style="margin: 0 0 8px 0; color: #999999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Customer Email</p>
-                    <p style="margin: 0; color: #333333; font-size: 14px;">${customerEmail}</p>
-                  </div>
-
-                  <!-- Shipping Address -->
-                  <div style="margin: 24px 0; padding: 20px; background-color: #f8f9fa; border-radius: 4px;">
-                    <p style="margin: 0 0 12px 0; color: #999999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Shipping Address</p>
-                    <p style="margin: 0; color: #333333; font-size: 14px; line-height: 1.6; white-space: pre-line;">
-${
-  address
-    ? `${address.name}
-${address.line1}
-${address.line2 ? address.line2 + "\n" : ""}${address.city}
-${address.postcode}
-${address.country}`
-    : "No address provided"
-}
+                <!-- Intro -->
+                <div style="margin-bottom: 40px;">
+                    <p style="font-size: 16px; line-height: 1.5; margin: 0;">
+                        A new order has been confirmed and is currently being processed.
                     </p>
-                  </div>
+                </div>
 
-                  <!-- CTA Button -->
-                  <div style="text-align: center; margin: 32px 0;">
-                    <a href="${process.env.NEXT_PUBLIC_SITE_URL}/studio/structure/order;${order._id}" style="display: inline-block; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; padding: 12px 32px; text-decoration: none; border-radius: 4px; font-weight: 600; font-size: 14px;">View Order in Studio</a>
-                  </div>
+                <!-- Order Summary -->
+                <div style="margin-bottom: 40px;">
+                    <h2 style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #eeeeee; padding-bottom: 10px; margin-bottom: 20px;">
+                        Order Summary
+                    </h2>
+                    <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                        <tr>
+                            <td style="padding: 10px 0; color: #666666;">Order Number</td>
+                            <td style="padding: 10px 0; text-align: right; font-weight: 700;">${orderNumber}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 0; color: #666666;">Items</td>
+                            <td style="padding: 10px 0; text-align: right;">${totalItems} item(s)</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 10px 0; color: #666666;">Status</td>
+                            <td style="padding: 10px 0; text-align: right; text-transform: uppercase; font-size: 11px; font-weight: 700;">PAID</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 20px 0 10px 0; font-size: 16px; font-weight: 700; border-top: 1px solid #000000;">Total Amount</td>
+                            <td style="padding: 20px 0 10px 0; text-align: right; font-size: 16px; font-weight: 700; border-top: 1px solid #000000;">$${((session.amount_total ?? 0) / 100).toFixed(2)}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <!-- Shipping & Contact -->
+                <div style="display: table; width: 100%; margin-bottom: 40px;">
+                    <!-- Customer -->
+                    <div style="display: table-cell; width: 50%; vertical-align: top; padding-right: 10px;">
+                        <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #666666; margin-bottom: 10px;">Customer</h3>
+                        <p style="font-size: 13px; margin: 0; line-height: 1.4;">
+                            ${customerEmail}
+                        </p>
+                    </div>
+                    <!-- Shipping -->
+                    <div style="display: table-cell; width: 50%; vertical-align: top; padding-left: 10px;">
+                        <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #666666; margin-bottom: 10px;">Shipping To</h3>
+                        <p style="font-size: 13px; margin: 0; line-height: 1.4;">
+                            ${
+                              address
+                                ? `${address.name}
+        ${address.line1}
+        ${address.line2 ? address.line2 + "\n" : ""}${address.city}
+        ${address.postcode}
+        ${address.country}`
+                                : "No address provided"
+                            }
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Action -->
+                <div style="margin-bottom: 60px; text-align: center;">
+                    <a target="_blank" rel="noopener noreferrer" href="${process.env.NEXT_PUBLIC_SITE_URL}/studio/structure/order;${order._id}" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 15px 40px; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #000000;">
+                        View Order Details
+                    </a>
                 </div>
 
                 <!-- Footer -->
-                <div style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #e0e0e0;">
-                  <p style="margin: 0; color: #999999; font-size: 12px;">
-                    Ekimedo • Order Management System
-                  </p>
+                <div style="border-top: 1px solid #eeeeee; padding-top: 20px; text-align: center;">
+                    <p style="margin: 0; color: #999999; font-size: 11px; letter-spacing: 0.5px;">
+                        &copy; 2024 EKIMEDO MANAGEMENT SYSTEM. ALL RIGHTS RESERVED.
+                    </p>
                 </div>
-              </div>
-            </body>
-          </html>
+
+            </div>
+        </body>
+        </html>
         `,
       });
       console.log(`Order notification email sent to ${contactEmail}`);
@@ -464,80 +589,94 @@ ${address.country}`
           to: customerEmail,
           subject: `Order Confirmation: ${orderNumber}`,
           html: `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-              </head>
-              <body style="margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f5f5f5;">
-                <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Order Confirmation</title>
+          </head>
+          <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #ffffff; color: #000000; -webkit-font-smoothing: antialiased;">
+              <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+
                   <!-- Header -->
-                  <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; text-align: center;">
-                    <h1 style="margin: 0; color: #ffffff; font-size: 28px; font-weight: 600;">Thank You!</h1>
-                    <p style="margin: 8px 0 0 0; color: rgba(255, 255, 255, 0.9); font-size: 16px;">Your order has been confirmed</p>
+                  <div style="border-bottom: 2px solid #000000; padding-bottom: 20px; margin-bottom: 40px;">
+                      <h1 style="margin: 0; font-size: 24px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
+                          Ekimedo
+                      </h1>
+                      <p style="margin: 5px 0 0 0; font-size: 12px; text-transform: uppercase; color: #666666;">
+                          Order Confirmed
+                      </p>
                   </div>
 
-                  <!-- Content -->
-                  <div style="padding: 20px 0;">
-                    <p style="margin: 0 0 24px 0; color: #333333; font-size: 16px; line-height: 1.6;">
-                      Thank you for your purchase! Your order has been received and payment has been confirmed.
-                    </p>
+                  <!-- Intro -->
+                  <div style="margin-bottom: 40px;">
+                      <h2 style="font-size: 20px; font-weight: 700; margin: 0 0 10px 0;">Thank You!</h2>
+                      <p style="font-size: 16px; line-height: 1.5; margin: 0; color: #333333;">
+                          Thank you for your purchase! Your order has been received and payment has been confirmed. We're currently preparing your items for delivery.
+                      </p>
+                  </div>
 
-                    <!-- Order Confirmation Card -->
-                    <div style="background-color: #f8f9fa; border-left: 4px solid #667eea; padding: 20px; margin: 24px 0; border-radius: 4px;">
-                      <h3 style="margin: 0 0 16px 0; color: #333333; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Order Confirmation</h3>
-                      <table style="width: 100%; font-size: 14px; color: #555555;">
-                        <tr>
-                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Order Number:</strong></td>
-                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;"><code style="background-color: #e8e8e8; padding: 4px 8px; border-radius: 4px; font-weight: 600;">${orderNumber}</code></td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Total Amount:</strong></td>
-                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right; font-weight: 600; color: #667eea; font-size: 16px;">$${((session.amount_total ?? 0) / 100).toFixed(2)}</td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0;"><strong>Items:</strong></td>
-                          <td style="padding: 8px 0; border-bottom: 1px solid #e0e0e0; text-align: right;">${totalItems} item(s)</td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 8px 0;"><strong>Payment Status:</strong></td>
-                          <td style="padding: 8px 0; text-align: right;"><span style="background-color: #d4edda; color: #155724; padding: 4px 12px; border-radius: 20px; font-weight: 600; font-size: 12px;">✓ CONFIRMED</span></td>
-                        </tr>
+                  <!-- Order Summary -->
+                  <div style="margin-bottom: 40px;">
+                      <h2 style="font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid #eeeeee; padding-bottom: 10px; margin-bottom: 20px;">
+                          Order Confirmation
+                      </h2>
+                      <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
+                          <tr>
+                              <td style="padding: 10px 0; color: #666666;">Order Number</td>
+                              <td style="padding: 10px 0; text-align: right; font-weight: 700;">${orderNumber}</td>
+                          </tr>
+                          <tr>
+                              <td style="padding: 10px 0; color: #666666;">Items</td>
+                              <td style="padding: 10px 0; text-align: right;">${totalItems} item(s)</td>
+                          </tr>
+                          <tr>
+                              <td style="padding: 10px 0; color: #666666;">Payment Status</td>
+                              <td style="padding: 10px 0; text-align: right; text-transform: uppercase; font-size: 11px; font-weight: 700;">✓ Confirmed</td>
+                          </tr>
+                          <tr>
+                              <td style="padding: 20px 0 10px 0; font-size: 16px; font-weight: 700; border-top: 1px solid #000000;">Total Amount</td>
+                              <td style="padding: 20px 0 10px 0; text-align: right; font-size: 16px; font-weight: 700; border-top: 1px solid #000000;">$${((session.amount_total ?? 0) / 100).toFixed(2)}</td>
+                          </tr>
                       </table>
-                    </div>
+                  </div>
 
-                    <!-- Info Box -->
-                    <div style="background-color: #e7f3ff; border-left: 4px solid #2196F3; padding: 16px; margin: 24px 0; border-radius: 4px;">
-                      <p style="margin: 0; color: #1565c0; font-size: 14px; line-height: 1.6;">
-                        <strong>What's next?</strong><br>
-                        We're preparing your order for shipment. You'll receive a tracking number via email as soon as your items ship.
+                  <!-- Next Steps / Info Box -->
+                  <div style="border: 1px solid #000000; padding: 20px; margin-bottom: 40px;">
+                      <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; margin-top: 0; margin-bottom: 10px;">What's next?</h3>
+                      <p style="font-size: 14px; margin: 0; line-height: 1.5; color: #333333;">
+                          Our team is now processing your order. You will receive a notification email as soon as your items have been dispatched.
                       </p>
-                    </div>
+                  </div>
 
-                    <!-- Divider -->
-                    <hr style="margin: 32px 0; border: none; border-top: 1px solid #e0e0e0;">
-
-                    <!-- Contact Section -->
-                    <div style="margin: 24px 0;">
-                      <p style="margin: 0 0 12px 0; color: #999999; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Questions?</p>
-                      <p style="margin: 0; color: #333333; font-size: 14px; line-height: 1.6;">
-                        If you have any questions about your order, please don't hesitate to reach out to our customer service team.
+                  <!-- Contact Section -->
+                  <div style="margin-bottom: 40px;">
+                      <h3 style="font-size: 11px; font-weight: 700; text-transform: uppercase; color: #666666; margin-bottom: 10px;">Questions?</h3>
+                      <p style="font-size: 13px; margin: 0; line-height: 1.5; color: #333333;">
+                          If you have any questions about your order, please don't hesitate to reach out to our customer service team.
                       </p>
-                    </div>
+                  </div>
+
+                  <!-- Action -->
+                  <div style="margin-bottom: 60px; text-align: center;">
+                      <a target="_blank" rel="noopener noreferrer" href="${process.env.NEXT_PUBLIC_SITE_URL}" style="display: inline-block; background-color: #000000; color: #ffffff; padding: 15px 40px; text-decoration: none; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border: 1px solid #000000;">
+                          Visit Our Website
+                      </a>
                   </div>
 
                   <!-- Footer -->
-                  <div style="background-color: #f8f9fa; padding: 30px; text-align: center; border-top: 1px solid #e0e0e0;">
-                    <p style="margin: 0 0 12px 0; color: #333333; font-size: 14px; font-weight: 600;">Ekimedo</p>
-                    <p style="margin: 0; color: #999999; font-size: 12px; line-height: 1.6;">
-                      Discover our latest collections and exclusive designs.<br>
-                      <a href="${process.env.NEXT_PUBLIC_SITE_URL}" style="color: #667eea; text-decoration: none;">Visit our website</a>
-                    </p>
+                  <div style="border-top: 1px solid #eeeeee; padding-top: 20px; text-align: center;">
+                      <p style="margin: 0 0 10px 0; color: #000000; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Ekimedo</p>
+                      <p style="margin: 0; color: #999999; font-size: 11px; letter-spacing: 0.5px; line-height: 1.4;">
+                          Discover our latest collections and exclusive designs.<br>
+                          &copy; 2024 EKIMEDO. ALL RIGHTS RESERVED.
+                      </p>
                   </div>
-                </div>
-              </body>
-            </html>
+
+              </div>
+          </body>
+          </html>
           `,
         });
         console.log(`Order confirmation email sent to ${customerEmail}`);

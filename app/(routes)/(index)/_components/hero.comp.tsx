@@ -35,7 +35,7 @@ export const HeroComp = () => {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4, duration: 1 }}
-          className="flex flex-col items-center justify-center gap-4 pt-8 sm:gap-6 md:flex-row md:gap-8 md:pt-12"
+          className="flex flex-col items-center justify-center gap-4 pt-8 sm:gap-6 md:flex-row md:pt-12"
         >
           <Link
             href="/products"
