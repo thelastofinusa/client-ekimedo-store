@@ -538,10 +538,10 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
                   >
                     <div>
                       <Icons.File01Icon
-                        className="text-muted-foreground/80 mx-auto h-12 w-12"
+                        className="text-muted-foreground/80 mx-auto size-8 sm:size-12"
                         aria-hidden={true}
                       />
-                      <div className="text-muted-foreground mt-4 flex text-sm">
+                      <div className="text-muted-foreground mt-4 flex text-xs sm:text-sm">
                         <p>Drag and drop or</p>
                         <label
                           htmlFor="file"

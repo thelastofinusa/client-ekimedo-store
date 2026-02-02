@@ -12,9 +12,13 @@ export default function HomePage() {
       <ServicesComp />
       <LookBookComp />
       <CTA
-        title="Crafting your vision into a masterpiece of couture."
-        href="/consultation"
-        label="Start Consultation"
+        mode="dark"
+        title="Ready to Transform Your Style?"
+        description="Book a consultation with our expert stylists and discover a wardrobe that truly reflects who you are."
+        route={{
+          txt: "Book a Consultation",
+          path: "/consultation",
+        }}
       />
     </div>
   );

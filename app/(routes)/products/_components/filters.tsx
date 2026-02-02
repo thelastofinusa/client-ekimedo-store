@@ -191,7 +191,9 @@ export const Filters: React.FC<Props> = ({ categories, colors }) => {
           <SheetHeader className="mb-4">
             <SheetTitle>Filters</SheetTitle>
           </SheetHeader>
-          <div className="flex flex-1 flex-col px-8">{content}</div>
+          <div className="flex flex-1 flex-col overflow-y-auto px-6 md:px-8">
+            {content}
+          </div>
         </SheetContent>
       </Sheet>
     );

@@ -24,7 +24,7 @@ export const HeroComp = () => {
       </div>
 
       <div className="text-background relative z-10 mx-auto w-full max-w-6xl px-6 md:px-12">
-        <div className="flex flex-col items-center gap-12 text-center">
+        <div className="flex flex-col items-center gap-4 text-center sm:gap-6 md:gap-12">
           {/* Tagline */}
           <motion.span
             initial={{ opacity: 0 }}
@@ -61,7 +61,7 @@ export const HeroComp = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6, duration: 1 }}
-            className="flex flex-col items-center justify-center gap-4 pt-8 sm:gap-6 md:flex-row"
+            className="flex w-full flex-col items-center justify-center gap-4 pt-8 sm:gap-6 md:flex-row"
           >
             <Link
               href="/products"

@@ -36,7 +36,7 @@ export const SnapshotsGrid: React.FC<Props> = ({ snapshots, title }) => {
 
   return (
     <React.Fragment>
-      <div className="grid grid-cols-2 gap-6 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
         {snapshots.map((snapshot, index) => (
           <div
             key={`${snapshot}-${index}`}
@@ -44,7 +44,7 @@ export const SnapshotsGrid: React.FC<Props> = ({ snapshots, title }) => {
             className="group cursor-pointer text-left"
           >
             <div className="bg-secondary/5 relative aspect-4/5 w-full overflow-hidden rounded-md shadow-xs">
-              <div className="absolute top-4 left-4 z-10">
+              <div className="absolute top-3 left-3 z-10 sm:top-4 sm:left-4">
                 <span className="bg-background/80 rounded-md border px-3 py-1 text-[10px] tracking-[0.3em] uppercase backdrop-blur">
                   Phase {index + 1}
                 </span>

@@ -30,9 +30,9 @@ export default async function TestimonialsPage() {
       <ReviewsComp testimonials={testimonials} />
 
       {user && (
-        <div className="bg-foreground text-background py-24 lg:py-32 xl:py-40">
+        <div className="bg-foreground text-background py-24 lg:py-32">
           <Container className="flex flex-col items-center justify-center text-center">
-            <h3 className="mb-8 max-w-2xl">
+            <h3 className="mb-8 max-w-2xl text-4xl md:text-5xl">
               Share your own experience with us
             </h3>
             <TestimonialSheet categories={categories} />

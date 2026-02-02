@@ -4,27 +4,42 @@ import * as React from "react";
 
 import { Container } from "./container";
 import { buttonVariants } from "@/ui/button";
+import { cn } from "@/lib/utils";
 
-interface CompProps {
-  href?: string;
-  label: string;
+interface Props {
+  mode: "dark" | "light";
   title: string;
+  description?: string;
+  route: {
+    txt: string;
+    path: Route;
+  };
 }
 
-export const CTA: React.FC<CompProps> = ({ title, href, label }) => {
+export const CTA: React.FC<Props> = ({ mode, title, description, route }) => {
   return (
-    <div className="bg-foreground text-background py-24 lg:py-32 xl:py-40">
+    <div
+      className={cn(
+        "py-24 lg:py-32",
+        mode === "dark" ? "bg-foreground text-background" : "bg-card",
+      )}
+    >
       <Container className="flex flex-col items-center justify-center text-center">
-        <h3 className="mb-8 max-w-3xl leading-tight">{title}</h3>
+        <h3 className="mb-6 text-4xl md:text-5xl">{title}</h3>
+        {description && (
+          <p className="text-muted-foreground mx-auto mb-10 max-w-2xl text-sm sm:text-base">
+            {description}
+          </p>
+        )}
         <Link
-          href={href as Route}
+          href={route.path}
           className={buttonVariants({
             variant: "outline",
-            size: "xl",
-            className: "hover:text-background",
+            size: "lg",
+            className: cn(mode === "dark" && "hover:text-background"),
           })}
         >
-          {label}
+          {route.txt}
         </Link>
       </Container>
     </div>

@@ -1,6 +1,6 @@
 import { Container } from "@/components/shared/container";
 
-export const PerfomanceComp = () => {
+export const PerformanceComp = () => {
   return (
     <div className="bg-foreground text-background py-24 lg:py-32">
       <Container>

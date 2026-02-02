@@ -253,7 +253,7 @@ export const ContactFormComp = ({ categories }: Props) => {
             <div className="flex flex-col gap-4 md:gap-6 lg:gap-8">
               <div className="flex flex-col gap-3">
                 <p className="text-[10px] tracking-[0.4em] uppercase">
-                  The Atelier
+                  Location
                 </p>
                 <Link
                   target="_blank"

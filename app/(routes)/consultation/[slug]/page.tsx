@@ -25,7 +25,7 @@ export default async function ServicePage(
   return (
     <div className="flex-1 overflow-x-clip">
       {/* Category Hero */}
-      <section className="bg-foreground text-background relative flex h-[60vh] items-center justify-center overflow-hidden">
+      <section className="bg-foreground text-background relative flex items-center justify-center overflow-hidden py-32 sm:h-[60vh]">
         <Container size="sm" className="relative text-center">
           <span className="mb-6 block font-mono text-[10px] tracking-[0.5em] uppercase">
             Service

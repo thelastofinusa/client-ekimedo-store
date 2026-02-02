@@ -8,9 +8,9 @@ export const HeroComp = () => {
     <div className="py-24 lg:py-32">
       <Container>
         <header className="py-24 text-center md:text-left">
-          <h1 className="font-serif text-[12vw] leading-[0.9] tracking-tighter uppercase md:text-[10vw]">
+          <h1 className="font-serif text-5xl leading-none tracking-tighter uppercase md:text-[12vw] md:leading-[0.9] lg:text-[10vw]">
             About <br />
-            <span className="ml-[10vw] italic md:ml-[12vw]">
+            <span className="italic md:ml-[10vw] lg:ml-[12vw]">
               {siteConfig.title}
             </span>
           </h1>

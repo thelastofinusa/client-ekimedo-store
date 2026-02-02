@@ -22,7 +22,6 @@ export const LookBookComp = () => {
           <Link
             href="/gallery"
             className={buttonVariants({
-              variant: "outline",
               className: "hidden! md:inline-flex!",
             })}
           >

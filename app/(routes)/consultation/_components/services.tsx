@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
 
-import { Button } from "@/ui/button";
+import { Button, buttonVariants } from "@/ui/button";
 import { Container } from "@/components/shared/container";
 import { SERVICE_QUERYResult } from "@/sanity.types";
 import { formatPrice, formatDuration } from "@/lib/utils";
@@ -74,7 +74,7 @@ export const Services: React.FC<Props> = ({ services, messageType }) => {
                 </div>
 
                 <div className="flex flex-1 flex-col gap-4 md:gap-6">
-                  <p className="text-muted-foreground flex items-center gap-2 font-mono text-base">
+                  <p className="text-muted-foreground flex items-center gap-2 font-mono text-sm sm:text-base">
                     <span>{formatDuration(service.duration)}</span>
                     <span>•</span>
                     <span>{formatPrice(service.price)}</span>
@@ -99,7 +99,7 @@ export const Services: React.FC<Props> = ({ services, messageType }) => {
                         {service.includes.map((item, i) => (
                           <li
                             key={i}
-                            className="flex items-start gap-2 text-base opacity-80"
+                            className="flex items-start gap-2 text-sm opacity-80 sm:text-base"
                           >
                             <span>✓</span>
                             <span>{item}</span>
@@ -109,13 +109,19 @@ export const Services: React.FC<Props> = ({ services, messageType }) => {
                     </div>
                   )}
 
-                  <Button size="lg" className="mt-4 w-max">
+                  <Link
+                    href={`/consultation/${service.slug}`}
+                    className={buttonVariants({
+                      size: "lg",
+                      className: "mt-4 w-max",
+                    })}
+                  >
                     <span>Book This Service</span>
                     <ArrowUpRight
                       size={16}
                       className="transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1"
                     />
-                  </Button>
+                  </Link>
                 </div>
               </div>
             ))}
@@ -125,52 +131,3 @@ export const Services: React.FC<Props> = ({ services, messageType }) => {
     </>
   );
 };
-
-// <Link
-//   key={service._id}
-//   href={`/consultation/${service.slug}`}
-//   className="group flex h-full flex-col"
-// >
-//   {/* Service Image - Large & Beautiful */}
-//   <div className="bg-secondary/5 relative mb-6 aspect-[1.2] overflow-hidden md:mb-8">
-//     <Image
-//       src={service.image || "/placeholder.svg"}
-//       alt={service.title!}
-//       fill
-//       className="object-cover transition-transform duration-700 group-hover:scale-110"
-//     />
-//     <div className="from-charcoal/20 absolute inset-0 bg-linear-to-t to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-//   </div>
-
-//     {/* Includes - Refined List */}
-//     {service?.includes && service.includes.length > 0 && (
-//       <div className="flex-1 space-y-3">
-//         <p className="mb-2 font-mono text-[10px] tracking-[0.3em] uppercase">
-//           Includes
-//         </p>
-//         <ul className="flex flex-col gap-2">
-//           {service.includes.map((item, i) => (
-//             <li
-//               key={i}
-//               className="flex items-start gap-3 text-sm opacity-80"
-//             >
-//               <span className="text-charcoal/40">—</span>
-//               <span>{item}</span>
-//             </li>
-//           ))}
-//         </ul>
-//       </div>
-//     )}
-
-//     {/* CTA Button */}
-//     <Button asChild size="xl" className="mt-4">
-//       <div>
-//         Book Consultation
-//         <ArrowUpRight
-//           size={16}
-//           className="transition-transform group-hover/btn:translate-x-1 group-hover/btn:-translate-y-1"
-//         />
-//       </div>
-//     </Button>
-//   </div>
-// </Link>

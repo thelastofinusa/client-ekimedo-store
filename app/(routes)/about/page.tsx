@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { siteConfig } from "@/site.config";
 import { HeroComp } from "./_components/hero.comp";
 import { QuoteComp } from "./_components/quote.comp";
-import { PerfomanceComp } from "./_components/perfomance.comp";
+import { PerformanceComp } from "./_components/performance.comp";
+import { CTA } from "@/components/shared/cta";
 
 export const metadata: Metadata = {
   title: "Our Story",
@@ -14,8 +15,17 @@ export default function About() {
   return (
     <div className="flex-1 overflow-x-clip">
       <HeroComp />
-      <PerfomanceComp />
+      <PerformanceComp />
       <QuoteComp />
+      <CTA
+        mode="dark"
+        title="Let's Create Together"
+        description="Whether you're looking for a bespoke piece or a complete style transformation, we're here to bring your vision to life."
+        route={{
+          txt: "Browse Products",
+          path: "/products",
+        }}
+      />
     </div>
   );
 }
