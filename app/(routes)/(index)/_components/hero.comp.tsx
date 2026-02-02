@@ -16,15 +16,25 @@ export const HeroComp = () => {
           src="/hero.avif"
           alt="Background"
           fill
-          className="object-cover"
           priority
           quality={100}
+          className="object-cover"
         />
         <div className="bg-foreground/80 absolute inset-0 backdrop-blur-xs" />
       </div>
 
       <div className="text-background relative z-10 mx-auto w-full max-w-6xl px-6 md:px-12">
         <div className="flex flex-col items-center gap-12 text-center">
+          {/* Tagline */}
+          <motion.span
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1 }}
+            className="text-[11px] tracking-[0.3em] uppercase"
+          >
+            Luxury Fashion & Styling
+          </motion.span>
+
           {/* Main Headline */}
           <motion.h1
             initial={{ opacity: 0, y: 40 }}

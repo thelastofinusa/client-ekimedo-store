@@ -1,6 +1,5 @@
 "use client";
 import * as React from "react";
-import { AnimatePresence, motion } from "motion/react";
 import { useSearchParams } from "next/navigation";
 
 import {
@@ -12,7 +11,7 @@ import {
 } from "@/ui/empty";
 import { ProductCard } from "@/components/shared/product-card";
 import { Icons } from "hugeicons-proxy";
-import { PRODUCT_COLOR_QUERYResult, PRODUCT_QUERYResult } from "@/sanity.types";
+import { PRODUCT_QUERYResult } from "@/sanity.types";
 
 interface Props {
   products: PRODUCT_QUERYResult;
@@ -26,26 +25,23 @@ export const ProductGrid: React.FC<Props> = ({ products }) => {
     let filtered = products;
 
     // Filter by categories
-    const categories = searchParams.getAll("category");
-    if (categories.length > 0) {
+    const category = searchParams.get("category");
+    if (category) {
       filtered = filtered.filter((product) => {
         // category is a single object with slug property
-        const productCategory = product.category?.slug;
-        return productCategory ? categories.includes(productCategory) : false;
+        return product.category?.slug === category;
       });
     }
 
-    // Filter by colors (MULTI SELECT)
-    const colors = searchParams.getAll("color");
-    if (colors.length > 0) {
+    // Filter by colors (SINGLE SELECT)
+    const color = searchParams.get("color");
+    if (color) {
       filtered = filtered.filter((product) => {
         const productColors = product.colors;
 
         if (!productColors || productColors.length === 0) return false;
 
-        return productColors.some((color) =>
-          colors.includes(color.name as string),
-        );
+        return productColors.some((c) => c.name === color);
       });
     }
 
@@ -66,21 +62,18 @@ export const ProductGrid: React.FC<Props> = ({ products }) => {
     <div className="flex-1">
       <div className="mb-6 flex items-center">
         <p className="text-foreground text-sm font-normal">
-          Showing <strong>{filteredProducts.length}</strong> results
+          Showing{" "}
+          <strong className="font-mono">{filteredProducts.length}</strong>{" "}
+          results
         </p>
       </div>
 
       {filteredProducts.length > 0 ? (
-        <motion.div
-          layout
-          className="grid grid-cols-2 gap-4 md:gap-6 lg:grid-cols-3 lg:gap-y-12"
-        >
-          <AnimatePresence mode="popLayout">
-            {filteredProducts.map((product, idx) => (
-              <ProductCard key={`${product._id}-${idx}`} product={product} />
-            ))}
-          </AnimatePresence>
-        </motion.div>
+        <div className="grid grid-cols-2 gap-6 lg:grid-cols-3 lg:gap-y-12">
+          {filteredProducts.map((product, idx) => (
+            <ProductCard key={`${product._id}-${idx}`} product={product} />
+          ))}
+        </div>
       ) : (
         <div className="flex h-96 flex-col items-center justify-center text-center">
           <Empty>

@@ -33,7 +33,7 @@ export const Header = () => {
 
   return (
     <header className="pointer-events-none fixed top-0 left-0 z-50 w-full mix-blend-difference">
-      <Container className="flex w-full items-center justify-between py-6 lg:py-8">
+      <Container className="flex h-24 w-full items-center justify-between lg:h-28">
         <Logo
           href="/"
           srcDesktop="horizontal"

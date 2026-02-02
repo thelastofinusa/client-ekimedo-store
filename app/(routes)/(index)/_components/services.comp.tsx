@@ -1,40 +1,31 @@
+import { Container } from "@/components/shared/container";
+import Link from "next/link";
+import { buttonVariants } from "@/ui/button";
+import { ArrowRight } from "lucide-react";
+import { client } from "@/sanity/lib/client";
+import { SERVICE_QUERY } from "@/sanity/queries/service";
+import { FilteredResponseQueryOptions } from "@sanity/client/stega";
+import Image from "next/image";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
 } from "@/ui/accordion";
-import { Container } from "@/components/shared/container";
 
-const SERVICES = [
-  {
-    id: "01",
-    title: "Bridal Consultation",
-    content:
-      "A one-on-one consultation with the head designer covering sketching, fabric selection, and custom bridal gown design. Consultation fees apply toward dress production if you proceed.",
-  },
-  {
-    id: "02",
-    title: "Premade Dresses Try-On",
-    content:
-      "An in-person styling session to try on selected premade dresses for special occasions, allowing you to assess fit, style, and overall look before purchase.",
-  },
-  {
-    id: "03",
-    title: "Special Event Consultation",
-    content:
-      "A focused consultation for special events, providing expert guidance on design direction, styling options, and custom or semi-custom outfit planning.",
-  },
-];
+export const ServicesComp = async () => {
+  const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
+  const services = await client.fetch(SERVICE_QUERY, {}, options);
 
-export const ServicesComp = () => {
+  if (!services.length) return null;
+
   return (
     <div className="bg-foreground text-background py-24 lg:py-32">
       <Container size="sm">
         <div className="flex flex-col gap-6 sm:gap-10 md:flex-row md:gap-16 lg:gap-20">
           <div className="flex flex-col gap-2 md:w-1/3">
             <span className="text-muted-foreground text-[10px] tracking-[0.4em] uppercase">
-              Expertise
+              Personal Styling
             </span>
             <h4 className="">Our Services</h4>
             <p className="mt-4 text-sm leading-relaxed opacity-60">
@@ -46,16 +37,16 @@ export const ServicesComp = () => {
 
           <div className="md:w-2/3">
             <Accordion type="single" collapsible className="w-full">
-              {SERVICES.map((service) => (
+              {services.map((service, idx) => (
                 <AccordionItem
-                  key={service.id}
-                  value={service.id}
+                  key={service._id}
+                  value={service._id}
                   className="border-border/20 border-b py-4 first-of-type:pt-0 last-of-type:pb-0"
                 >
                   <AccordionTrigger className="group hover:no-underline">
                     <div className="flex items-center gap-4 text-left md:gap-6 lg:gap-8">
                       <span className="text-muted-foreground font-mono text-sm tracking-tighter">
-                        {service.id}
+                        {idx > 9 ? `${idx + 1}` : `0${idx + 1}`}
                       </span>
                       <span className="font-serif text-xl tracking-tight uppercase transition-all group-hover:italic md:text-2xl lg:text-3xl">
                         {service.title}
@@ -63,7 +54,7 @@ export const ServicesComp = () => {
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="max-w-xl pb-4 text-sm leading-relaxed opacity-60 sm:pb-6 md:pb-8">
-                    {service.content}
+                    {service.description}
                   </AccordionContent>
                 </AccordionItem>
               ))}
