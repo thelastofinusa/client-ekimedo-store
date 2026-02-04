@@ -22,8 +22,8 @@ export default function About() {
         title="Let's Create Together"
         description="Whether you're looking for a bespoke piece or a complete style transformation, we're here to bring your vision to life."
         route={{
-          txt: "Browse Products",
-          path: "/products",
+          txt: "Schedule a Consultation",
+          path: "/consultation",
         }}
       />
     </div>

@@ -8,16 +8,12 @@ export const headerRoutes = [
     path: "/about",
   },
   {
-    label: "Our Gallery",
-    path: "/gallery",
+    label: "Custom Orders",
+    path: "/custom-orders",
   },
   {
-    label: "Products",
-    path: "/products",
-  },
-  {
-    label: "Testimonials",
-    path: "/testimonials",
+    label: "Pre-made Dresses",
+    path: "/shop",
   },
   {
     label: "Consultation",

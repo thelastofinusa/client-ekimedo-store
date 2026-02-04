@@ -63,7 +63,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
         <Notify
           type="success"
           title={`${product.name} added`}
-          description={`Size: ${selectedSize}${selectedColor ? `, Color: ${selectedColor}` : "."}`}
+          description={`${selectedSize ? `Size: ${selectedSize}` : ""} ${selectedColor ? `, Color: ${selectedColor}` : ""}`}
         />
       ));
     }
@@ -122,7 +122,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
       <div className="top-28 h-max w-full space-y-8 md:sticky md:w-1/2 lg:max-w-lg">
         <nav className="mb-8 hidden items-center text-sm text-neutral-500 md:flex">
           <Link
-            href="/products"
+            href="/shop"
             className="transition-colors hover:text-neutral-900"
           >
             Products
@@ -169,17 +169,18 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
                           key={color.name}
                           onClick={() => setSelectedColor(color.name || "")}
                           className={cn(
-                            "ring-border size-7 rounded-full ring-1 transition-all hover:scale-110 focus:outline-none",
-                            selectedColor === color.name
-                              ? "ring-2 ring-black ring-offset-2"
-                              : "",
+                            "ring-ring mb-2 size-7 cursor-pointer rounded-full ring-1 transition-all focus:outline-none",
+                            {
+                              "ring-ring ring-2 ring-offset-2":
+                                selectedColor === color.name,
+                            },
                           )}
                           style={{ backgroundColor: color.value }}
                           title={color.name}
                           type="button"
                         />
                       </TooltipTrigger>
-                      <TooltipContent>
+                      <TooltipContent align="start" side="bottom">
                         <p>{color.name}</p>
                       </TooltipContent>
                     </Tooltip>
@@ -190,24 +191,29 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
           )}
 
           {/* Sizes */}
-          <div className="flex flex-col gap-2">
-            <span className="text-xs tracking-wider uppercase">
-              Size: {selectedSize ?? "Select"}
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {product?.sizes?.map((size) => (
-                <Button
-                  key={size}
-                  size="sm"
-                  onClick={() => setSelectedSize(size)}
-                  variant={selectedSize === size ? "default" : "outline"}
-                  className={selectedSize === size ? "pointer-events-none" : ""}
-                >
-                  {size}
-                </Button>
-              ))}
+          {product?.sizes && product?.sizes?.length > 0 && (
+            <div className="flex flex-col gap-2">
+              <span className="text-xs tracking-wider uppercase">
+                Size: {selectedSize ?? "Select"}
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {product?.sizes?.map((size) => (
+                  <Button
+                    key={size}
+                    size="sm"
+                    onClick={() => setSelectedSize(size)}
+                    variant={selectedSize === size ? "default" : "outline"}
+                    className={cn(
+                      "font-mono text-xs! font-normal tracking-normal",
+                      selectedSize === size ? "pointer-events-none" : "",
+                    )}
+                  >
+                    {size}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <Button
             size="xl"
@@ -215,7 +221,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
             onClick={handleAdd}
             disabled={
               isAtMax ||
-              !selectedSize ||
+              ((product?.sizes?.length ?? 0) > 0 && !selectedSize) ||
               ((product?.colors?.length ?? 0) > 0 && !selectedColor)
             }
           >
@@ -223,12 +229,19 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
           </Button>
         </div>
 
+        <div className="mt-6 mb-6">
+          <p className="text-muted-foreground text-center font-mono text-sm">
+            This takes 4-6 weeks to ship out. <br /> Complementary alteration is
+            included.
+          </p>
+        </div>
+
         <div className="border-t pt-6">
-          <div className="flex flex-col gap-2">
-            <p className="font-serif text-sm tracking-wider uppercase">
+          <div className="flex flex-col gap-1">
+            <p className="font-mono text-xs font-medium tracking-wider uppercase">
               Consultation
             </p>
-            <p className="text-muted-foreground pt-2">
+            <p className="text-muted-foreground text-sm">
               Looking for custom modifications? Start a consultation with our
               artisans to refine this design.
             </p>
@@ -237,7 +250,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
               className={buttonVariants({
                 size: "lg",
                 variant: "outline",
-                className: "mt-3 w-full",
+                className: "mt-4 w-full",
               })}
             >
               Start Consultation

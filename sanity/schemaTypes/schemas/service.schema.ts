@@ -3,13 +3,13 @@ import { RiCustomerServiceLine } from "react-icons/ri";
 
 export const serviceType = defineType({
   name: "service",
-  title: "Services",
+  title: "Consultations",
   type: "document",
   icon: RiCustomerServiceLine,
   fields: [
     defineField({
       name: "title",
-      title: "Service Title",
+      title: "Consultation Title",
       type: "string",
       validation: (rule) => rule.required(),
     }),
@@ -25,7 +25,7 @@ export const serviceType = defineType({
     }),
     defineField({
       name: "description",
-      title: "Service Description",
+      title: "Consultation Description",
       type: "text",
       validation: (rule) => rule.required(),
     }),
@@ -41,7 +41,8 @@ export const serviceType = defineType({
       name: "duration",
       title: "Duration (minutes)",
       type: "number",
-      description: "Duration of the service in minutes (e.g., 60 for 1 hour)",
+      description:
+        "Duration of the consultation in minutes (e.g., 60 for 1 hour)",
       validation: (rule) => rule.required().min(1),
     }),
     defineField({
@@ -52,7 +53,7 @@ export const serviceType = defineType({
     }),
     defineField({
       name: "image",
-      title: "Service Banner",
+      title: "Consultation Banner",
       type: "image",
       options: {
         hotspot: true,
@@ -62,7 +63,31 @@ export const serviceType = defineType({
       name: "snapshots",
       title: "Snapshots",
       type: "array",
-      of: [{ type: "image", options: { hotspot: true } }],
+      of: [
+        {
+          type: "object",
+          fields: [
+            defineField({
+              name: "image",
+              title: "Image",
+              type: "image",
+              options: { hotspot: true },
+              validation: (rule) => rule.required(),
+            }),
+            defineField({
+              name: "description",
+              title: "Description",
+              type: "string",
+            }),
+          ],
+          preview: {
+            select: {
+              media: "image",
+              title: "description",
+            },
+          },
+        },
+      ],
     }),
   ],
   preview: {

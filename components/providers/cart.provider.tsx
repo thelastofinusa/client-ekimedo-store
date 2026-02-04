@@ -2,7 +2,7 @@
 import { useStore } from "zustand";
 import {
   createContext,
-  useRef,
+  useState,
   useEffect,
   type ReactNode,
   useContext,
@@ -34,20 +34,18 @@ interface CartProviderProps {
  * @see https://zustand.docs.pmnd.rs/guides/nextjs#hydration-and-asynchronous-storages
  */
 export const CartProvider = ({ children, initialState }: CartProviderProps) => {
-  const storeRef = useRef<CartStoreApi | null>(null);
-
-  if (storeRef.current === null) {
-    storeRef.current = createCartStore(initialState ?? defaultInitState);
-  }
+  const [store] = useState(() =>
+    createCartStore(initialState ?? defaultInitState),
+  );
 
   // Manually trigger rehydration on the client after mount
   // This prevents SSR hydration mismatches since localStorage isn't available on server
   useEffect(() => {
-    storeRef.current?.persist.rehydrate();
-  }, []);
+    store.persist.rehydrate();
+  }, [store]);
 
   return (
-    <CartStoreContext.Provider value={storeRef.current}>
+    <CartStoreContext.Provider value={store}>
       {children}
     </CartStoreContext.Provider>
   );
@@ -82,7 +80,7 @@ export const useCartItems = () => useCartStore((state) => state.items);
  */
 export const useTotalItems = () =>
   useCartStore((state) =>
-    state.items.reduce((sum, item) => sum + item.quantity, 0)
+    state.items.reduce((sum, item) => sum + item.quantity, 0),
   );
 
 /**
@@ -90,7 +88,7 @@ export const useTotalItems = () =>
  */
 export const useTotalPrice = () =>
   useCartStore((state) =>
-    state.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+    state.items.reduce((sum, item) => sum + item.price * item.quantity, 0),
   );
 
 /**
@@ -106,7 +104,7 @@ export const useProductTotalQuantity = (productId: string) =>
   useCartStore((state) =>
     state.items
       .filter((item) => item.productId === productId)
-      .reduce((sum, item) => sum + item.quantity, 0)
+      .reduce((sum, item) => sum + item.quantity, 0),
   );
 
 /**

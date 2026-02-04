@@ -83,12 +83,11 @@ export const productType = defineType({
       of: [{ type: "string" }],
       options: {
         list: [
-          { title: "XS", value: "XS" },
-          { title: "S", value: "S" },
-          { title: "M", value: "M" },
-          { title: "L", value: "L" },
-          { title: "XL", value: "XL" },
-          { title: "XXL", value: "XXL" },
+          { title: "0-2 (XS)", value: "0-2 (XS)" },
+          { title: "4-6 (S)", value: "4-6 (S)" },
+          { title: "8-10 (M)", value: "8-10 (M)" },
+          { title: "12-14 (L)", value: "12-14 (L)" },
+          { title: "16-18 (XL)", value: "16-18 (XL)" },
         ],
       },
     }),

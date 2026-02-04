@@ -14,7 +14,7 @@ import {
 
 export const generateMetadata = async ({
   params,
-}: PageProps<"/products/[slug]">): Promise<Metadata> => {
+}: PageProps<"/shop/[slug]">): Promise<Metadata> => {
   const { slug } = await params;
   const result = await sanityFetch({
     query: PRODUCT_BY_SLUG_QUERY,
@@ -55,7 +55,7 @@ export const generateMetadata = async ({
 
 export default async function ProductsDetailPage({
   params,
-}: PageProps<"/products/[slug]">) {
+}: PageProps<"/shop/[slug]">) {
   const { slug } = await params;
 
   // Fetch the product by slug

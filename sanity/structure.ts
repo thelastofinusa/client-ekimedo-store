@@ -1,7 +1,34 @@
-import type {StructureResolver} from 'sanity/structure'
+import type { StructureResolver } from "sanity/structure";
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title('Content')
-    .items(S.documentTypeListItems())
+    .title("Ekimedo")
+    .items([
+      // Shop
+      S.documentTypeListItem("order").title("Orders"),
+      S.documentTypeListItem("product").title("Products"),
+      S.documentTypeListItem("category").title("Categories"),
+      S.documentTypeListItem("productColor").title("Colors"),
+      S.documentTypeListItem("customer").title("Customers"),
+
+      S.divider(),
+
+      // Services & Bookings
+      S.documentTypeListItem("service").title("Consultation"),
+      S.documentTypeListItem("booking").title("Bookings"),
+      S.documentTypeListItem("inquiry").title("Inquiries"),
+
+      S.divider(),
+
+      // Content
+      S.documentTypeListItem("hero").title("Hero Images"),
+      S.documentTypeListItem("gallery").title("Gallery"),
+      S.documentTypeListItem("testimonial").title("Testimonials"),
+      S.documentTypeListItem("social").title("Social Handles"),
+
+      S.divider(),
+
+      // Settings
+      S.documentTypeListItem("businessHours").title("Business Hours"),
+    ]);

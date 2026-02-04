@@ -47,7 +47,7 @@ export default async function OrdersPage() {
             </EmptyDescription>
           </EmptyHeader>
           <EmptyContent>
-            <Link href="/products" className={buttonVariants({ size: "lg" })}>
+            <Link href="/shop" className={buttonVariants({ size: "lg" })}>
               Start Shopping
             </Link>
           </EmptyContent>
