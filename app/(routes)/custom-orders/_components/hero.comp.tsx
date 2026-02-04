@@ -1,12 +1,12 @@
 "use client";
-
+import React from "react";
 import { motion } from "motion/react";
 
 import { Container } from "@/components/shared/container";
 
 export const HeroComp = () => {
   return (
-    <div className="bg-foreground text-background py-24 lg:py-32">
+    <div className="bg-secondary/30 py-24 lg:py-32">
       <Container size="sm">
         <header className="flex flex-col items-end justify-between gap-12 md:flex-row">
           <motion.div
@@ -16,15 +16,12 @@ export const HeroComp = () => {
             className="max-w-3xl pt-16"
           >
             <h1 className="mb-8 max-w-4xl font-serif text-5xl leading-[1.2] sm:text-6xl md:text-8xl md:leading-[0.98]">
-              Consultations
+              Custom Order Inquiry
             </h1>
-            <p className="text-background/70 max-w-xl text-base leading-relaxed font-light">
-              The Consultation fee goes toward dress production if you wish to
-              move forward with the process, otherwise The Consultation fee is{" "}
-              <strong className="text-background uppercase">
-                nonrefundable
-              </strong>
-              .
+            <p className="max-w-xl text-base leading-relaxed font-light">
+              Bring your dream dress to life. Our bespoke service creates
+              one-of-a-kind pieces tailored perfectly to your vision and
+              measurements.
             </p>
           </motion.div>
         </header>

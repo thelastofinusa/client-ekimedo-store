@@ -80,7 +80,7 @@ export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
               </blockquote>
 
               {/* Author Profile */}
-              <div className="border-border/50 flex flex-wrap items-end justify-between gap-6 border-b pb-6">
+              <div className="flex flex-wrap items-end justify-between gap-6">
                 <div className="flex items-center gap-4">
                   <Avatar className="size-10">
                     <AvatarImage
@@ -115,22 +115,24 @@ export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
               </div>
 
               {/* Work Assets Grid */}
-              <div className="grid grid-cols-4 gap-2">
-                {testimonial.workAssets?.slice(0, 4).map((asset, i) => (
-                  <div
-                    key={i}
-                    className="bg-secondary group relative aspect-[0.8] w-full cursor-pointer overflow-hidden"
-                    onClick={() => setSelectedIndex(offsets[index] + i)}
-                  >
-                    <Image
-                      src={asset || "/placeholder.svg"}
-                      alt={`Work ${i + 1}`}
-                      fill
-                      className="origin-top object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                    />
-                  </div>
-                ))}
-              </div>
+              {testimonial.workAssets && testimonial.workAssets?.length > 0 && (
+                <div className="border-border/50 grid grid-cols-4 gap-2 border-t pt-6">
+                  {testimonial.workAssets?.slice(0, 4).map((asset, i) => (
+                    <div
+                      key={i}
+                      className="bg-secondary group relative aspect-[0.8] w-full cursor-pointer overflow-hidden"
+                      onClick={() => setSelectedIndex(offsets[index] + i)}
+                    >
+                      <Image
+                        src={asset || "/placeholder.svg"}
+                        alt={`Work ${i + 1}`}
+                        fill
+                        className="origin-top object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                      />
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           ))}
         </div>
@@ -156,7 +158,7 @@ export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
 
             <Button
               size={"icon"}
-              variant={"outline"}
+              variant={"secondary"}
               className="hover:bg-background/80 absolute left-4 z-50 md:left-8"
               onClick={handlePrevious}
             >
@@ -165,7 +167,7 @@ export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
 
             <Button
               size={"icon"}
-              variant={"outline"}
+              variant={"secondary"}
               className="hover:bg-background/80 absolute right-4 z-50 md:right-8"
               onClick={handleNext}
             >
@@ -183,9 +185,9 @@ export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
             >
               <div className="relative h-full w-full">
                 <Image
+                  fill
                   src={allImages[selectedIndex]?.url || "/placeholder.svg"}
                   alt={allImages[selectedIndex]?.title ?? ""}
-                  fill
                   className="object-contain"
                   priority
                   quality={100}

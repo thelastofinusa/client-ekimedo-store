@@ -80,7 +80,7 @@ export const CheckoutItems = () => {
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
-          <Link href="/products" className={buttonVariants({ size: "lg" })}>
+          <Link href="/shop" className={buttonVariants({ size: "lg" })}>
             Continue Shopping
           </Link>
         </EmptyContent>
@@ -92,7 +92,7 @@ export const CheckoutItems = () => {
     <div className="flex flex-col gap-6 lg:gap-8">
       <div className="mb-6 lg:mb-8">
         <Link
-          href="/products"
+          href="/shop"
           className="inline-flex items-center text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
         >
           <Icons.ArrowLeft01Icon className="mr-2 h-4 w-4" />

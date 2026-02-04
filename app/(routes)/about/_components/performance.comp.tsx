@@ -6,24 +6,24 @@ export const PerformanceComp = () => {
       <Container>
         <div className="grid grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-10 lg:gap-16 xl:gap-24">
           <h2 className="leading-none uppercase">
-            A Philosophy <br /> of <span className="italic">Permanence</span>
+            A Legacy <br /> of <span className="italic">Craftsmanship</span>
           </h2>
           <div className="flex flex-col gap-6 md:gap-12">
             {[
               {
                 number: "01",
-                title: "Artistry",
-                text: "Transcending trends through timeless design and sculptural form.",
+                title: "Bespoke",
+                text: "Creating one-of-a-kind pieces tailored to your exact measurements and vision.",
               },
               {
                 number: "02",
-                title: "Precision",
-                text: "Every measurement and stitch executed with uncompromising detail.",
+                title: "Quality",
+                text: "Using the finest fabrics and materials to ensure luxury and longevity.",
               },
               {
                 number: "03",
-                title: "Elegance",
-                text: "The quiet confidence found in perfectly tailored simplicity.",
+                title: "Service",
+                text: "A personalized experience from the initial consultation to the final fitting.",
               },
             ].map((v) => (
               <div

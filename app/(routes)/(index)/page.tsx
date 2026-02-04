@@ -3,6 +3,7 @@ import { HeroComp } from "./_components/hero.comp";
 import { HeritageComp } from "./_components/heritage.comp";
 import { ServicesComp } from "./_components/services.comp";
 import { LookBookComp } from "./_components/lookbook.comp";
+import { TestimonialComp } from "./_components/testimonial.comp";
 
 export default function HomePage() {
   return (
@@ -11,8 +12,9 @@ export default function HomePage() {
       <HeritageComp />
       <ServicesComp />
       <LookBookComp />
+      <TestimonialComp />
       <CTA
-        mode="dark"
+        mode="light"
         title="Ready to Transform Your Style?"
         description="Book a consultation with our expert stylists and discover a wardrobe that truly reflects who you are."
         route={{

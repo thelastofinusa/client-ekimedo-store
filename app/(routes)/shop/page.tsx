@@ -22,7 +22,7 @@ export default async function ProductsPage() {
           fallback={
             <div className="flex h-max w-full flex-col gap-10 md:sticky md:top-26 md:w-64 lg:top-32">
               <div className="flex flex-col gap-8">
-                {[3, 3, 5].map((item, idx) => (
+                {[3, 3, 7, 4].map((item, idx) => (
                   <div className="flex flex-col gap-6" key={idx}>
                     <Skeleton className="h-4 w-20" />
 
@@ -46,7 +46,11 @@ export default async function ProductsPage() {
             </div>
           }
         >
-          <Filters categories={categories} colors={colors} />
+          <Filters
+            categories={categories}
+            colors={colors}
+            products={products}
+          />
         </Suspense>
         <Suspense
           fallback={
@@ -60,9 +64,11 @@ export default async function ProductsPage() {
                     <Skeleton className="mb-4 aspect-3/4 w-full" />
 
                     <div className="flex flex-1 flex-col gap-2">
-                      <Skeleton className="h-4 w-10" />
+                      <div className="flex items-center justify-between">
+                        <Skeleton className="h-4 w-10" />
+                        <Skeleton className="h-4 w-20" />
+                      </div>
                       <Skeleton className="h-5 w-40" />
-                      <Skeleton className="h-4 w-20" />
                     </div>
                   </div>
                 ))}

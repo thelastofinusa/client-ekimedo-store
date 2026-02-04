@@ -9,6 +9,9 @@ import { colorType } from "./schemas/color.schema";
 import { serviceType } from "./schemas/service.schema";
 import { bookingType } from "./schemas/booking.schema";
 import { businessHoursType } from "./schemas/hours.schema";
+import { heroType } from "./schemas/hero.schema";
+import { socialType } from "./schemas/social.schema";
+import { inquiryType } from "./schemas/inquiry.schema";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -22,5 +25,8 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     serviceType,
     bookingType,
     businessHoursType,
+    heroType,
+    socialType,
+    inquiryType,
   ],
 };

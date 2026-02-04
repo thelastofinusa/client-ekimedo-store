@@ -6,7 +6,7 @@ import { useEffect, useState, useCallback, useMemo } from "react";
 import type { CartItem } from "@/lib/store/cart.store";
 import { client } from "@/sanity/lib/client";
 import { PRODUCT_BY_IDS_QUERY } from "@/sanity/queries/product";
-// import { PRODUCTS_BY_IDS_QUERY } from "@/sanity/queries/products";
+// import { PRODUCTS_BY_IDS_QUERY } from "@/sanity/queries/shop";
 
 export interface StockInfo {
   productId: string;
@@ -67,10 +67,10 @@ export function useCartStock(items: CartItem[]): UseCartStockReturn {
         // Wait, if I have 2 variants, both map to same productId.
         // stockMap.set(productId, ...) will overwrite.
         // So I should iterate unique productIds or ensure consistent status.
-        
+
         // Actually, the status (isOutOfStock, exceedsStock) depends on the TOTAL quantity.
         // So it is the same for all variants of that product.
-        
+
         const product = products.find(
           (p: { _id: string }) => p._id === item.productId,
         );
@@ -82,7 +82,10 @@ export function useCartStock(items: CartItem[]): UseCartStockReturn {
           currentStock,
           isOutOfStock: currentStock === 0,
           exceedsStock: totalQuantity > currentStock,
-          availableQuantity: Math.max(0, currentStock - (totalQuantity - item.quantity)), // approximate?
+          availableQuantity: Math.max(
+            0,
+            currentStock - (totalQuantity - item.quantity),
+          ), // approximate?
           // availableQuantity is tricky if multiple variants.
           // If I have 3 S and 3 M. Stock 5.
           // Total 6. Exceeds.

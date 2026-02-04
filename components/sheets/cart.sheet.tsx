@@ -75,7 +75,7 @@ export const CartSheet: React.FC<Props> = ({
 
               <SheetClose asChild>
                 <Link
-                  href="/products"
+                  href="/shop"
                   className={buttonVariants({ variant: "outline" })}
                 >
                   Browse Collection

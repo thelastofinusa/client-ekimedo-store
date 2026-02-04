@@ -52,9 +52,12 @@ export default async function ServicePage(
                 </p>
               </div>
               <SnapshotsGrid
-                snapshots={
-                  (service.snapshots || []).filter(Boolean) as string[]
-                }
+                snapshots={(service.snapshots || [])
+                  .filter((s) => s.url)
+                  .map((s) => ({
+                    url: s.url!,
+                    description: s.description || undefined,
+                  }))}
                 title={service.title}
               />
             </>

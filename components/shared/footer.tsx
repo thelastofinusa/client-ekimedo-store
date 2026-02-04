@@ -11,11 +11,15 @@ import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 import { FilteredResponseQueryOptions } from "@sanity/client/stega";
 import { Icons } from "hugeicons-proxy";
 import { BUSINESS_HOUR_QUERY } from "@/sanity/queries/hours";
+import { SOCIAL_QUERY } from "@/sanity/queries/social";
+import { sanityFetch } from "@/sanity/lib/live";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 export const Footer = async () => {
   const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
   const categories = await client.fetch(CATEGORIES_QUERY, {}, options);
   const businessHours = await client.fetch(BUSINESS_HOUR_QUERY, {}, options);
+  const { data: socialHandles } = await sanityFetch({ query: SOCIAL_QUERY });
 
   return (
     <footer className="bg-foreground text-background border-border/20 border-t">
@@ -54,39 +58,44 @@ export const Footer = async () => {
               </Button>
             </div>
 
-            <div className="flex items-center gap-3">
-              <a
-                href="http://instagram.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group"
-              >
-                <Icons.InstagramIcon className="text-muted-foreground group-hover:text-background size-6 transition-colors" />
-              </a>
-              <a
-                href="http://tiktok.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group"
-              >
-                <Icons.TiktokIcon className="text-muted-foreground group-hover:text-background size-6 transition-colors" />
-              </a>
-              <a
-                href="http://facebook.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group"
-              >
-                <Icons.Facebook01Icon className="text-muted-foreground group-hover:text-background size-6 transition-colors" />
-              </a>
-              <a
-                href="http://x.com"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group"
-              >
-                <Icons.NewTwitterRectangleIcon className="text-muted-foreground group-hover:text-background size-6 transition-colors" />
-              </a>
+            <div className="flex items-center gap-2.5">
+              {socialHandles &&
+                socialHandles.map((social) => {
+                  let Icon = Icons.LinkSquare01Icon; // Default icon
+
+                  if (social.name?.toLowerCase().includes("instagram"))
+                    Icon = Icons.InstagramIcon;
+                  else if (social.name?.toLowerCase().includes("tiktok"))
+                    Icon = Icons.TiktokIcon;
+                  else if (social.name?.toLowerCase().includes("facebook"))
+                    Icon = Icons.Facebook01Icon;
+                  else if (social.name?.toLowerCase().includes("linkedin"))
+                    Icon = Icons.Linkedin01Icon;
+                  else if (
+                    social.name?.toLowerCase().includes("twitter") ||
+                    social.name?.toLowerCase().includes("x")
+                  )
+                    Icon = Icons.NewTwitterRectangleIcon;
+
+                  return (
+                    <Tooltip key={social._id}>
+                      <TooltipTrigger>
+                        <a
+                          href={social.url || "#"}
+                          target={social.url ? "_blank" : "_self"}
+                          title={social.name || "Follow us"}
+                          rel="noopener noreferrer"
+                          className="group"
+                        >
+                          <Icon className="text-muted-foreground group-hover:text-background size-6 transition-colors" />
+                        </a>
+                      </TooltipTrigger>
+                      <TooltipContent theme="light" align="start" side="bottom">
+                        <p>{social.name}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  );
+                })}
             </div>
           </div>
 
@@ -99,7 +108,7 @@ export const Footer = async () => {
               {categories.map((cat) => (
                 <Link
                   key={cat._id}
-                  href={`/products?category=${cat.slug}`}
+                  href={`/shop?category=${cat.slug}`}
                   className="text-sm opacity-70 transition-opacity hover:opacity-100"
                 >
                   {cat.name}

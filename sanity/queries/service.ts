@@ -10,7 +10,10 @@ export const SERVICE_QUERY = defineQuery(`
   "slug": slug.current,
   includes,
   "image": image.asset->url,
-  "snapshots": snapshots[].asset->url
+  "snapshots": snapshots[]{
+    "url": image.asset->url,
+    description
+  }
 }
 `);
 
@@ -24,6 +27,9 @@ export const SERVICE_BY_ID_QUERY = defineQuery(`
   "slug": slug.current,
   includes,
   "image": image.asset->url,
-  "snapshots": snapshots[].asset->url
+  "snapshots": snapshots[]{
+    "url": image.asset->url,
+    description
+  }
 }
 `);

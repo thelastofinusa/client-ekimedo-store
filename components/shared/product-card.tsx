@@ -16,10 +16,7 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
   const isOutOfStock = stock <= 0;
 
   return (
-    <Link
-      href={`/products/${product.slug}`}
-      className="group block cursor-pointer"
-    >
+    <Link href={`/shop/${product.slug}`} className="group block cursor-pointer">
       <div className="border-border/50 relative mb-4 aspect-3/4 overflow-hidden border shadow-sm">
         <Image
           src={product?.images?.[0] ?? ""}
@@ -55,15 +52,17 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
         )}
       </div>
       <div className="flex flex-1 flex-col">
-        <p className="text-muted-foreground line-clamp-2 text-sm">
-          {product?.category?.name}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground line-clamp-2 text-sm">
+            {product?.category?.name}
+          </p>
+          <span className="text-muted-foreground font-mono text-sm font-medium">
+            {formatPrice(product.price)}
+          </span>
+        </div>
         <h3 className="mb-1 font-serif text-base font-medium transition-opacity group-hover:opacity-60 sm:text-lg">
           {product.name}
         </h3>
-        <span className="text-muted-foreground font-mono text-sm font-normal sm:text-base">
-          {formatPrice(product.price)}
-        </span>
       </div>
     </Link>
   );
