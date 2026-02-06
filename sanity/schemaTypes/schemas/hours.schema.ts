@@ -48,7 +48,8 @@ export const businessHoursType = defineType({
               hidden: ({ parent }) => parent?.isOpen === false,
               validation: (rule) =>
                 rule.custom((value, context) => {
-                  if ((context.parent as any)?.isOpen && !value) {
+                  const parent = context.parent as { isOpen?: boolean } | undefined;
+                  if (parent?.isOpen && !value) {
                     return "Start time is required when open";
                   }
                   return true;
@@ -62,7 +63,8 @@ export const businessHoursType = defineType({
               hidden: ({ parent }) => parent?.isOpen === false,
               validation: (rule) =>
                 rule.custom((value, context) => {
-                  if ((context.parent as any)?.isOpen && !value) {
+                  const parent = context.parent as { isOpen?: boolean } | undefined;
+                  if (parent?.isOpen && !value) {
                     return "End time is required when open";
                   }
                   return true;

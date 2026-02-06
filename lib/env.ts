@@ -13,6 +13,8 @@ export const env = createEnv({
     NEXT_PUBLIC_SITE_URL: z.url().min(1),
     NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(1),
     NEXT_PUBLIC_RESEND_CONTACT_EMAIL: z.email().min(1),
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: z.string().min(1),
+    NEXT_PUBLIC_RESEND_INFO_EMAIL: z.email().min(1),
   },
   experimental__runtimeEnv: {
     NEXT_PUBLIC_SITE_URL: process.env.NEXT_PUBLIC_SITE_URL,
@@ -20,5 +22,8 @@ export const env = createEnv({
       process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
     NEXT_PUBLIC_RESEND_CONTACT_EMAIL:
       process.env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL,
+    NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY:
+      process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_RESEND_INFO_EMAIL: process.env.NEXT_PUBLIC_RESEND_INFO_EMAIL,
   },
 });

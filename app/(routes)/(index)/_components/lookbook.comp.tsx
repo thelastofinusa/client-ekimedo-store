@@ -18,7 +18,9 @@ export const LookBookComp = () => {
               <span className="text-muted-foreground text-[10px] tracking-[0.4em] uppercase">
                 Visual Journal
               </span>
-              <h2 className="leading-[1.1]">Runway & Beyond</h2>
+              <h2 className="font-serif text-4xl capitalize md:text-5xl">
+                discover our signature style
+              </h2>
             </div>
             <Link
               href="/gallery"

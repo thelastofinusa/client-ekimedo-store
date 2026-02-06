@@ -2,6 +2,7 @@
 import { motion } from "motion/react";
 
 import { Container } from "@/components/shared/container";
+import { siteConfig } from "@/site.config";
 
 export const HeroComp = () => {
   return (
@@ -21,9 +22,9 @@ export const HeroComp = () => {
               Stories of <br /> Transformation
             </h1>
             <p className="max-w-xl text-base leading-relaxed font-light opacity-70 md:text-lg">
-              &quot;Real experiences from individuals who trusted EKIMEDO with
-              their most cherished moments. Discover the elegance and
-              craftsmanship that defines our Maison.&quot;
+              &quot;Real experiences from individuals who trusted{" "}
+              {siteConfig.title} with their most cherished moments. Discover the
+              elegance and craftsmanship that defines our Maison.&quot;
             </p>
           </motion.div>
         </header>

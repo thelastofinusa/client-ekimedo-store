@@ -39,7 +39,7 @@ export const CartProvider = ({ children, initialState }: CartProviderProps) => {
   );
 
   // Manually trigger rehydration on the client after mount
-  // This prevents SSR hydration mismatches since localStorage isn't available on server
+  // This is required to prevent SSR hydration mismatches since localStorage isn't available on server
   useEffect(() => {
     store.persist.rehydrate();
   }, [store]);

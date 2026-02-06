@@ -6,7 +6,7 @@ import { siteConfig } from "@/site.config";
 
 export const metadata: Metadata = {
   title: {
-    default: `${siteConfig.title} - ${siteConfig.tagline}`,
+    default: siteConfig.title,
     template: `%s - ${siteConfig.title}`,
   },
   description: siteConfig.description,
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "en_US",
     url: siteConfig.url,
-    title: `${siteConfig.title} - ${siteConfig.tagline}`,
+    title: siteConfig.title,
     siteName: siteConfig.title,
     description: siteConfig.description,
     images: [
@@ -24,13 +24,13 @@ export const metadata: Metadata = {
         url: "/og.png",
         width: 1200,
         height: 630,
-        alt: `${siteConfig.title} - ${siteConfig.tagline}`,
+        alt: siteConfig.title,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${siteConfig.title} - ${siteConfig.tagline}`,
+    title: siteConfig.title,
     description: siteConfig.description,
     images: ["/twitter-image.png"],
   },

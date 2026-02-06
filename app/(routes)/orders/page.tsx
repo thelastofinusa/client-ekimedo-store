@@ -35,7 +35,7 @@ export default async function OrdersPage() {
 
   if (orders.length === 0) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-2xl px-4 py-24 sm:px-6 md:py-32 lg:px-8">
         <Empty>
           <EmptyHeader>
             <EmptyMedia variant="icon">

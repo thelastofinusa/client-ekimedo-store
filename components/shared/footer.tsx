@@ -14,6 +14,27 @@ import { BUSINESS_HOUR_QUERY } from "@/sanity/queries/hours";
 import { SOCIAL_QUERY } from "@/sanity/queries/social";
 import { sanityFetch } from "@/sanity/lib/live";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
+import { env } from "@/lib/env";
+
+export const getSocialIcon = (name: string) => {
+  switch (name) {
+    case "instagram":
+      return Icons.InstagramIcon;
+    case "facebook":
+      return Icons.Facebook01Icon;
+    case "twitter":
+      return Icons.NewTwitterRectangleIcon;
+    case "x":
+      return Icons.NewTwitterRectangleIcon;
+    case "linkedin":
+      return Icons.Linkedin01Icon;
+    case "tiktok":
+      return Icons.TiktokIcon;
+
+    default:
+      return Icons.LinkSquare01Icon;
+  }
+};
 
 export const Footer = async () => {
   const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
@@ -61,21 +82,7 @@ export const Footer = async () => {
             <div className="flex items-center gap-2.5">
               {socialHandles &&
                 socialHandles.map((social) => {
-                  let Icon = Icons.LinkSquare01Icon; // Default icon
-
-                  if (social.name?.toLowerCase().includes("instagram"))
-                    Icon = Icons.InstagramIcon;
-                  else if (social.name?.toLowerCase().includes("tiktok"))
-                    Icon = Icons.TiktokIcon;
-                  else if (social.name?.toLowerCase().includes("facebook"))
-                    Icon = Icons.Facebook01Icon;
-                  else if (social.name?.toLowerCase().includes("linkedin"))
-                    Icon = Icons.Linkedin01Icon;
-                  else if (
-                    social.name?.toLowerCase().includes("twitter") ||
-                    social.name?.toLowerCase().includes("x")
-                  )
-                    Icon = Icons.NewTwitterRectangleIcon;
+                  const Icon = getSocialIcon(social.name?.toLowerCase() || "");
 
                   return (
                     <Tooltip key={social._id}>
@@ -164,10 +171,10 @@ export const Footer = async () => {
               </Link>
               <a
                 target="_blank"
-                href="mailto:ekimedoatelier1@gmail.com"
+                href={`mailto:${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}`}
                 className="flex items-center gap-2 text-sm opacity-70 transition-opacity hover:opacity-100"
               >
-                ekimedoatelier1@gmail.com
+                {env.NEXT_PUBLIC_RESEND_INFO_EMAIL}
               </a>
               <a
                 target="_blank"

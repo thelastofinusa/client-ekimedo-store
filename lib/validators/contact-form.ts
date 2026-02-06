@@ -1,5 +1,5 @@
 import z from "zod";
-import { isValidPhoneNumber } from "react-phone-number-input";
+// import { isValidPhoneNumber } from "react-phone-number-input";
 
 const formSchema = z.object({
   fName: z
@@ -15,7 +15,8 @@ const formSchema = z.object({
   phone: z
     .string("Phone number is required")
     .min(2, "Phone number is required")
-    .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
+    // .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
+    .min(10, "Phone number must be at least 10 digits"),
   message: z
     .string("Message is required")
     .min(10, "At least 10 characters long")

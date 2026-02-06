@@ -28,8 +28,8 @@ import { Textarea } from "@/ui/textarea";
 import { PhoneInput } from "@/ui/phone-input";
 import { Notify } from "@/components/shared/notify";
 import { formSchema, FormType } from "@/lib/validators/contact-form";
-import { sendContactMessage } from "@/lib/actions/contact";
 import { CATEGORIES_QUERYResult } from "@/sanity.types";
+import { env } from "@/lib/env";
 
 interface Props {
   categories: CATEGORIES_QUERYResult;
@@ -49,29 +49,42 @@ export const ContactFormComp = ({ categories }: Props) => {
   });
 
   async function onSubmit(values: FormType) {
-    const result = await sendContactMessage({
-      fName: values.fName,
-      lName: values.lName,
-      email: values.email,
-      inquiryType: values.inquiryType,
-      phone: values.phone,
-      message: values.message,
-    });
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
 
-    if (result.success) {
-      toast.custom(() => (
-        <Notify
-          type="success"
-          title={`Message has been sent, ${values.fName}`}
-        />
-      ));
-      form.reset();
-    } else {
+      const result = await response.json();
+
+      if (result.success) {
+        toast.custom(() => (
+          <Notify
+            type="success"
+            title={`Message has been sent, ${values.fName}`}
+          />
+        ));
+        form.reset();
+      } else {
+        toast.custom(() => (
+          <Notify
+            type="error"
+            title="Something went wrong"
+            description={result.error}
+          />
+        ));
+      }
+    } catch (error) {
       toast.custom(() => (
         <Notify
           type="error"
           title="Something went wrong"
-          description={result.error}
+          description={
+            error instanceof Error ? error.message : "Failed to send message"
+          }
         />
       ));
     }
@@ -278,9 +291,9 @@ export const ContactFormComp = ({ categories }: Props) => {
                   <Link
                     target="_blank"
                     className="hover:underline"
-                    href="mailto:ekimedoatelier1@gmail.com"
+                    href={`mailto:${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}`}
                   >
-                    ekimedoatelier1@gmail.com
+                    {env.NEXT_PUBLIC_RESEND_INFO_EMAIL}
                   </Link>
                 </h4>
               </div>

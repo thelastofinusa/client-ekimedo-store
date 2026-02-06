@@ -33,12 +33,10 @@ import {
   InputGroupInput,
 } from "@/ui/input-group";
 import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
-import { cn, formatPrice } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { Calendar } from "@/ui/calendar";
 import { Checkbox } from "@/ui/checkbox";
-import { getBookedDates } from "@/lib/actions/calendar";
-import { createBooking } from "@/lib/actions/booking";
-import { File as FileIcon, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { ScrollArea } from "@/ui/scroll-area";
 
 interface Service {
@@ -111,22 +109,25 @@ type BookingFormSchemaType = z.infer<typeof bookingFormSchema>;
 export const BookingForm: React.FC<Props> = ({ service }) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [bookedDates, setBookedDates] = React.useState<Date[]>([]);
-
-  const [open, setOpen] = React.useState<boolean>(false);
+  const [open, setOpen] = React.useState(false);
   const [date, setDate] = React.useState<Date | undefined>();
-  const [month, setMonth] = React.useState<Date | undefined>(date);
-  const [value, setValue] = React.useState(formatDate(date));
+  const [month, setMonth] = React.useState<Date>(new Date());
+  const [value, setValue] = React.useState("");
 
   React.useEffect(() => {
-    const fetchDates = async () => {
+    async function fetchBookedDates() {
       try {
-        const dates = await getBookedDates();
-        setBookedDates(dates);
+        const response = await fetch("/api/bookings/dates");
+        if (response.ok) {
+          const dates = await response.json();
+          setBookedDates(dates.map((date: string) => new Date(date)));
+        }
       } catch (error) {
         console.error("Failed to fetch booked dates:", error);
       }
-    };
-    fetchDates();
+    }
+
+    fetchBookedDates();
   }, []);
 
   const form = useForm<BookingFormSchemaType>({
@@ -198,10 +199,17 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
         });
       }
 
-      const result = await createBooking(formData);
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (result.url) {
+      const result = await response.json();
+
+      if (response.ok && result.success && result.url) {
         window.location.href = result.url;
+      } else {
+        alert(result.error || "Something went wrong");
       }
     } catch (error) {
       console.error(error);

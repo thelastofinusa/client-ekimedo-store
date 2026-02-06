@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import { notFound } from "next/navigation";
 
 import { sanityFetch } from "@/sanity/lib/live";
