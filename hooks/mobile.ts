@@ -65,7 +65,7 @@ export function useIsMobile(breakpoint = 768): PropsReturn {
       }
       window.removeEventListener("resize", checkIsMobile);
     };
-  }, []);
+  }, [breakpoint]);
 
   return {
     isMobile,

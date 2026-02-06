@@ -42,7 +42,6 @@ import {
   testimonialSchema,
   TestimonialFormValues,
 } from "@/lib/validators/testimonial";
-import { createTestimonial } from "@/lib/actions/testimonial";
 import { Notify } from "../shared/notify";
 import { CATEGORIES_QUERYResult } from "@/sanity.types";
 
@@ -137,9 +136,14 @@ export function TestimonialSheet({ categories }: Props) {
         });
       }
 
-      const result = await createTestimonial(formData);
+      const response = await fetch("/api/testimonials", {
+        method: "POST",
+        body: formData,
+      });
 
-      if (result.success) {
+      const result = await response.json();
+
+      if (response.ok && result.success) {
         toast.custom(() => (
           <Notify
             type="success"
@@ -164,11 +168,7 @@ export function TestimonialSheet({ categories }: Props) {
         <Notify
           type="error"
           title="Something went wrong"
-          description={
-            error instanceof Error
-              ? error.message
-              : "An error occurred. Please try again."
-          }
+          description="An error occurred. Please try again."
         />
       ));
     } finally {

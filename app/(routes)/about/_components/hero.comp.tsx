@@ -42,12 +42,12 @@ export const HeroComp = () => {
               </div>
               <div className="space-y-8 text-lg leading-relaxed opacity-90 md:w-2/3 md:text-xl">
                 <p>
-                  At 22, Ekimedo picked up her first needle. What started as
-                  practice became purpose.
+                  At 22, {siteConfig.title} picked up her first needle. What
+                  started as practice became purpose.
                 </p>
                 <p>
-                  Ekimedo was born from a love for detail, movement, and quiet
-                  elegance. Not just gowns but moments made to last.
+                  {siteConfig.title} was born from a love for detail, movement,
+                  and quiet elegance. Not just gowns but moments made to last.
                 </p>
               </div>
             </div>

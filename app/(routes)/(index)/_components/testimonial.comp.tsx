@@ -22,7 +22,9 @@ export const TestimonialComp = async () => {
           <p className="text-primary-foreground/60 mb-4 text-[11px] tracking-[0.3em] uppercase">
             Testimonials
           </p>
-          <h2 className="font-serif text-4xl md:text-5xl">Client Stories</h2>
+          <h2 className="font-serif text-4xl capitalize md:text-5xl">
+            What our clients say
+          </h2>
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">

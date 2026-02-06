@@ -1,10 +1,10 @@
 import { env } from "./lib/env";
 
 const siteConfig = {
-  title: "Ekimedo",
+  title: "Ekimedo Atelier",
   tagline: "Where luxury meets timeless designs",
   description:
-    "Our elegant designs blend tradition with contemporary style, ensuring you shine on your special day and beyond.",
+    "Custom Bridals dresses, Robes and evening Gowns for your special occasions!",
   url:
     process.env.NODE_ENV === "production"
       ? env.NEXT_PUBLIC_SITE_URL

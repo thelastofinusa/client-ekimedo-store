@@ -1,6 +1,5 @@
 "use client";
 import Link from "next/link";
-import { Route } from "next";
 import * as React from "react";
 import { toast } from "sonner";
 import Image from "next/image";
@@ -21,6 +20,52 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 interface Props {
   product: PRODUCT_QUERYResult[number];
 }
+
+interface SizeChart {
+  size: string;
+  numeric: string;
+  bust: string;
+  waist: string;
+  hip: string;
+}
+
+const sizeChart: SizeChart[] = [
+  {
+    size: "XS",
+    numeric: "0-2",
+    bust: "32-33 / 81-84",
+    waist: "24-25 / 61-64",
+    hip: "34-35 / 86-89",
+  },
+  {
+    size: "S",
+    numeric: "4-6",
+    bust: "34-35 / 86-89",
+    waist: "26-27 / 66-69",
+    hip: "36-37 / 91-94",
+  },
+  {
+    size: "M",
+    numeric: "8-10",
+    bust: "36-37 / 91-94",
+    waist: "28-29 / 71-74",
+    hip: "38-39 / 96-99",
+  },
+  {
+    size: "L",
+    numeric: "12-14",
+    bust: "38.5-40 / 98-101",
+    waist: "30.5-32 / 77-81",
+    hip: "40.5-42 / 103-107",
+  },
+  {
+    size: "XL",
+    numeric: "16-18",
+    bust: "41.5-43 / 105-109",
+    waist: "33.5-35 / 85-89",
+    hip: "44.5-46 / 113-117",
+  },
+];
 
 export const ProductDetails: React.FC<Props> = ({ product }) => {
   const { addItem } = useCartActions();
@@ -72,45 +117,39 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
   return (
     <div className="flex flex-col gap-8 md:flex-row lg:gap-12">
       <div className="flex h-max flex-1 gap-4 md:w-1/2 lg:w-max">
-        <div className="flex flex-1 flex-col gap-4">
-          {displayImage ? (
+        <div className="flex flex-1 flex-col gap-5">
+          <div className="relative overflow-hidden rounded-xl border bg-neutral-50">
             <Image
               src={displayImage}
               alt={product.name ?? "Product image"}
               width={600}
               height={800}
               quality={100}
-              className="h-auto w-full object-contain"
               priority
+              className="h-auto w-full object-contain transition-transform duration-700 hover:scale-[1.02]"
             />
-          ) : (
-            <div className="flex aspect-3/4 h-full w-full items-center justify-center overflow-hidden bg-gray-100">
-              <span className="text-gray-400">No image available</span>
-            </div>
-          )}
+          </div>
 
-          {/* Thumbnails */}
           {images.length > 1 && (
-            <div className="grid flex-1 grid-cols-3 gap-4 md:grid-cols-4">
+            <div className="grid grid-cols-4 gap-3">
               {images.map((img, idx) => (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => setSelectedImage(img)}
-                  className={`relative aspect-3/4 cursor-pointer overflow-hidden border transition-all ${
-                    selectedImage === img ? "border-2" : "border"
-                  }`}
+                  className={cn(
+                    "relative aspect-3/4 overflow-hidden rounded-md border bg-neutral-50 transition",
+                    selectedImage === img
+                      ? "ring-2 ring-neutral-900"
+                      : "hover:ring-1 hover:ring-neutral-400",
+                  )}
                 >
                   <Image
                     src={img}
                     alt={`${product.name} ${idx + 1}`}
                     fill
                     className="object-cover"
-                    sizes="(max-width: 768px) 25vw, 10vw"
                   />
-                  {selectedImage === img && (
-                    <div className="absolute inset-0 border-2 border-black" />
-                  )}
                 </button>
               ))}
             </div>
@@ -133,12 +172,11 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
           </span>
         </nav>
 
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-3">
           <h2 className="font-serif text-2xl md:text-3xl">{product.name}</h2>
-          <p className="flex items-center gap-3 text-base font-medium md:text-lg">
+          <p className="flex items-center gap-3 text-base font-medium md:text-xl">
             <span>
-              Price:{" "}
-              <span className="font-mono">{formatPrice(product?.price)}</span>
+              Price: <span>{formatPrice(product?.price)}</span>
             </span>
             {isOutOfStock ? (
               <Badge variant="destructive">Out of Stock</Badge>
@@ -147,12 +185,12 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
             )}
           </p>
 
-          <pre className="text-muted-foreground font-sans text-base leading-relaxed whitespace-pre-wrap">
+          <pre className="font-sans text-base leading-relaxed font-light whitespace-pre-wrap">
             {product.description}
           </pre>
         </div>
 
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6">
           {/* Colors */}
           {product?.colors && product?.colors?.length > 0 && (
             <div className="flex flex-col gap-2">
@@ -169,7 +207,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
                           key={color.name}
                           onClick={() => setSelectedColor(color.name || "")}
                           className={cn(
-                            "ring-ring mb-2 size-7 cursor-pointer rounded-full ring-1 transition-all focus:outline-none",
+                            "ring-ring size-7 cursor-pointer rounded-full ring-1 transition-all focus:outline-none",
                             {
                               "ring-ring ring-2 ring-offset-2":
                                 selectedColor === color.name,
@@ -230,32 +268,26 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
         </div>
 
         <div className="mt-6 mb-6">
-          <p className="text-muted-foreground text-center font-mono text-sm">
-            This takes 4-6 weeks to ship out. <br /> Complementary alteration is
-            included.
+          <p className="text-sm font-semibold">
+            Estimate delivery: 4-6 weeks. Complementary alteration is included.
           </p>
         </div>
 
-        <div className="border-t pt-6">
-          <div className="flex flex-col gap-1">
-            <p className="font-mono text-xs font-medium tracking-wider uppercase">
-              Consultation
-            </p>
-            <p className="text-muted-foreground text-sm">
-              Looking for custom modifications? Start a consultation with our
-              artisans to refine this design.
-            </p>
-            <Link
-              href={"/consultation" as Route}
-              className={buttonVariants({
-                size: "lg",
-                variant: "outline",
-                className: "mt-4 w-full",
-              })}
-            >
-              Start Consultation
-            </Link>
-          </div>
+        <div className="mt-6 border-t pt-6">
+          <p className="text-sm text-neutral-600">
+            Looking for custom modifications? Start a consultation with our
+            artisans to refine this design.
+          </p>
+
+          <Link
+            href="/consultation"
+            className={buttonVariants({
+              variant: "outline",
+              className: "mt-4",
+            })}
+          >
+            Start Consultation
+          </Link>
         </div>
       </div>
     </div>

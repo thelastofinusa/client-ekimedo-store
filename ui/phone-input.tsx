@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import { Icons } from "hugeicons-proxy";
 import * as RPNInput from "react-phone-number-input";

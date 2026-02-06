@@ -3,6 +3,7 @@ import Image from "next/image";
 
 import { buttonVariants } from "@/ui/button";
 import { Container } from "@/components/shared/container";
+import { siteConfig } from "@/site.config";
 
 export const HeritageComp = () => {
   return (
@@ -22,9 +23,9 @@ export const HeritageComp = () => {
 
               <div className="flex max-w-lg flex-col gap-6 md:gap-8">
                 <p className="text-lg leading-relaxed font-light">
-                  Since its inception, EKIMEDO has stood at the intersection of
-                  classical craftsmanship and radical modernism. Every piece is
-                  a dialogue between the past and the future.
+                  Since its inception, {siteConfig.title} has stood at the
+                  intersection of classical craftsmanship and radical modernism.
+                  Every piece is a dialogue between the past and the future.
                 </p>
                 <p className="text-sm leading-relaxed opacity-40">
                   Our atelier in the heart of Paris remains the soul of our

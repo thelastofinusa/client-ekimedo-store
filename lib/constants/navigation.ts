@@ -1,19 +1,22 @@
+import { siteConfig } from "@/site.config";
+import { env } from "../env";
+
 export const headerRoutes = [
   {
     label: "Home",
     path: "/",
   },
   {
-    label: "About Us",
-    path: "/about",
-  },
-  {
-    label: "Custom Orders",
-    path: "/custom-orders",
+    label: "Custom Order",
+    path: "/custom-order",
   },
   {
     label: "Pre-made Dresses",
     path: "/shop",
+  },
+  {
+    label: "Pricing",
+    path: "/pricing",
   },
   {
     label: "Consultation",
@@ -55,8 +58,8 @@ export const footerRoutes = [
     title: "Inquiries",
     routes: [
       {
-        label: "ekimedoatelier1@gmail.com",
-        path: "mailto:ekimedoatelier1@gmail.com",
+        label: `${siteConfig.title} <${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}>`,
+        path: `mailto:${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}`,
         newTab: true,
       },
       {

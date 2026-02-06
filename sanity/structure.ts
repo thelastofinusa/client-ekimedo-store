@@ -1,9 +1,10 @@
+import { siteConfig } from "@/site.config";
 import type { StructureResolver } from "sanity/structure";
 
 // https://www.sanity.io/docs/structure-builder-cheat-sheet
 export const structure: StructureResolver = (S) =>
   S.list()
-    .title("Ekimedo")
+    .title(siteConfig.title)
     .items([
       // Shop
       S.documentTypeListItem("order").title("Orders"),
