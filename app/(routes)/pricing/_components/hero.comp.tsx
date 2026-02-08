@@ -5,7 +5,7 @@ import { Container } from "@/components/shared/container";
 
 export const HeroComp = () => {
   return (
-    <div className="bg-secondary/30 py-24 lg:py-32">
+    <div className="py-24 lg:py-32">
       <Container size="sm">
         <header className="flex flex-col items-end justify-between gap-12 md:flex-row">
           <motion.div

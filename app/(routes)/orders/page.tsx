@@ -17,10 +17,33 @@ import { formatPrice, formatDate, formatOrderNumber } from "@/lib/utils";
 import { Icons } from "hugeicons-proxy";
 import { buttonVariants } from "@/ui/button";
 import Image from "next/image";
+import { Metadata } from "next";
+import { siteConfig } from "@/site.config";
 
-export const metadata = {
-  title: "Your Orders | Furniture Shop",
-  description: "View your order history",
+export const metadata: Metadata = {
+  title: "Your Orders",
+  description: `View your order history`,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    title: "Your Orders",
+    siteName: siteConfig.title,
+    description: `View your order history`,
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: siteConfig.title,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Your Orders",
+    description: `View your order history`,
+    images: ["/twitter-image.png"],
+  },
 };
 
 export default async function OrdersPage() {

@@ -6,6 +6,47 @@ import { Container } from "@/components/shared/container";
 import { SERVICE_BY_ID_QUERY } from "@/sanity/queries/service";
 import { SnapshotsGrid } from "../_components/snapshots-grid";
 import { BookingForm } from "../_components/booking-form";
+import { Metadata } from "next";
+import { siteConfig } from "@/site.config";
+
+export const generateMetadata = async (
+  props: PageProps<"/consultation/[slug]">,
+): Promise<Metadata> => {
+  const { slug } = await props.params;
+  const { data: services } = await sanityFetch({
+    query: SERVICE_BY_ID_QUERY,
+    params: { slug },
+  });
+  const service = services[0];
+
+  if (!service) return notFound();
+
+  return {
+    title: service.title,
+    description: service.description,
+    openGraph: {
+      type: "website",
+      locale: "en_US",
+      title: service.title!,
+      siteName: siteConfig.title,
+      description: service.description!,
+      images: [
+        {
+          url: service.image ?? "",
+          width: 1200,
+          height: 630,
+          alt: service.title!,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: service.title!,
+      description: service.description!,
+      images: [service.image ?? ""],
+    },
+  };
+};
 
 export default async function ServicePage(
   props: PageProps<"/consultation/[slug]">,
@@ -17,9 +58,7 @@ export default async function ServicePage(
   });
   const service = services[0];
 
-  if (!service) {
-    return notFound();
-  }
+  if (!service) return notFound();
 
   return (
     <div className="flex-1 overflow-x-clip">

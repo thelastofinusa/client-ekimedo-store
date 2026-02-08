@@ -5,8 +5,38 @@ import Link from "next/link";
 import { buttonVariants } from "@/ui/button";
 import { Card } from "@/ui/card";
 import { Icons } from "hugeicons-proxy";
-import { Separator } from "@/ui/separator";
 import { formatPrice } from "@/lib/utils";
+import { Metadata } from "next";
+import { siteConfig } from "@/site.config";
+
+export const metadata: Metadata = {
+  title: "Pricing",
+  description:
+    "Because every gown is custom-designed, final pricing depends on your selected style, fabric, detailing and production timeline. Below are starting ranges to help you plan.",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    title: "Pricing",
+    siteName: siteConfig.title,
+    description:
+      "Because every gown is custom-designed, final pricing depends on your selected style, fabric, detailing and production timeline. Below are starting ranges to help you plan.",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: siteConfig.title,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pricing",
+    description:
+      "Because every gown is custom-designed, final pricing depends on your selected style, fabric, detailing and production timeline. Below are starting ranges to help you plan.",
+    images: ["/twitter-image.png"],
+  },
+};
 
 interface PricingTier {
   name: string;
@@ -92,12 +122,12 @@ export default function PricingPage() {
   return (
     <div className="flex-1 overflow-x-clip">
       <HeroComp />
-      <div className="bg-foreground text-background py-24">
-        <Container className="flex flex-col gap-24">
+      <div className="bg-secondary/30 py-24">
+        <Container className="flex flex-col gap-16">
           {/* Desktop Table */}
           <div className="border-border hidden overflow-x-auto rounded-lg border md:block">
             <table className="w-full">
-              <thead className="bg-primary/5 border-border border-b">
+              <thead className="bg-secondary/30 border-border border-b">
                 <tr>
                   <th className="px-6 py-4 text-left font-serif text-lg font-light">
                     Dress Type
@@ -114,7 +144,7 @@ export default function PricingPage() {
                 {pricingTiers.map((tier, idx) => (
                   <tr
                     key={idx}
-                    className="hover:bg-secondary/20 transition-colors duration-300"
+                    className="bg-card hover:bg-card/70 transition-colors duration-300"
                   >
                     <td className="px-6 py-6 font-serif text-xl font-light">
                       {tier.name}
@@ -186,7 +216,7 @@ export default function PricingPage() {
             </p>
             <Link
               href="/consultation"
-              className={buttonVariants({ size: "lg", variant: "secondary" })}
+              className={buttonVariants({ size: "lg" })}
             >
               <span>Book A Consultation</span>
             </Link>

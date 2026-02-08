@@ -14,6 +14,27 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "Our Gallery",
   description: `Explore the gallery of ${siteConfig.title}—a curated archive of bridal, prom, and special-event looks captured across recent collections.`,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    title: "Our Gallery",
+    siteName: siteConfig.title,
+    description: `Explore the gallery of ${siteConfig.title}—a curated archive of bridal, prom, and special-event looks captured across recent collections.`,
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: siteConfig.title,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Our Gallery",
+    description: `Explore the gallery of ${siteConfig.title}—a curated archive of bridal, prom, and special-event looks captured across recent collections.`,
+    images: ["/twitter-image.png"],
+  },
 };
 
 export default async function GalleryPage() {

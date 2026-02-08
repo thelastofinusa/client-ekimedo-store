@@ -7,6 +7,10 @@ export const headerRoutes = [
     path: "/",
   },
   {
+    label: "About Us",
+    path: "/about",
+  },
+  {
     label: "Custom Order",
     path: "/custom-order",
   },

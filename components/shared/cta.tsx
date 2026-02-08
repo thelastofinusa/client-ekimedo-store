@@ -34,7 +34,7 @@ export const CTA: React.FC<Props> = ({ mode, title, description, route }) => {
         <Link
           href={route.path}
           className={buttonVariants({
-            variant: "outline",
+            variant: mode === "dark" ? "outline" : "default",
             size: "lg",
             className: cn(mode === "dark" && "hover:text-background"),
           })}

@@ -92,7 +92,7 @@ export const HeroSlider = ({ images }: { images: string[] }) => {
                 href="/shop"
                 className={buttonVariants({
                   variant: "secondary",
-                  size: "lg",
+                  size: "xl",
                   className: "w-full md:w-max md:flex-1",
                 })}
               >
@@ -102,7 +102,7 @@ export const HeroSlider = ({ images }: { images: string[] }) => {
                 href={"/consultation" as Route}
                 className={buttonVariants({
                   variant: "outline",
-                  size: "lg",
+                  size: "xl",
                   className: "hover:text-card w-full md:w-max md:flex-1",
                 })}
               >
