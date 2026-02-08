@@ -8,10 +8,32 @@ import { currentUser } from "@clerk/nextjs/server";
 import { Container } from "@/components/shared/container";
 import { TestimonialSheet } from "@/components/sheets/testimonial.sheet";
 import { CATEGORIES_QUERY } from "@/sanity/queries/category";
+import { siteConfig } from "@/site.config";
 
 export const metadata: Metadata = {
   title: "Testimonials",
-  description: "Read what our clients have to say about us.",
+  description: `Read what our clients have to say about ${siteConfig.title}.`,
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    title: "Testimonials",
+    siteName: siteConfig.title,
+    description: `Read what our clients have to say about ${siteConfig.title}.`,
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: siteConfig.title,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Testimonials",
+    description: `Read what our clients have to say about ${siteConfig.title}.`,
+    images: ["/twitter-image.png"],
+  },
 };
 
 export default async function TestimonialsPage() {

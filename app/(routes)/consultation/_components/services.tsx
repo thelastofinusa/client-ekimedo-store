@@ -6,7 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight } from "lucide-react";
 
-import { Button, buttonVariants } from "@/ui/button";
+import { buttonVariants } from "@/ui/button";
 import { Container } from "@/components/shared/container";
 import { SERVICE_QUERYResult } from "@/sanity.types";
 import { formatPrice, formatDuration } from "@/lib/utils";

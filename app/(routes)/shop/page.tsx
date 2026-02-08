@@ -7,8 +7,39 @@ import { PRODUCT_QUERY } from "@/sanity/queries/product";
 import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 import { Skeleton } from "@/ui/skeleton";
 import { PRODUCT_COLOR_QUERY } from "@/sanity/queries/color";
+import { Metadata } from "next";
+import { siteConfig } from "@/site.config";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = {
+  title: "Pre-made Dresses",
+  description:
+    "Shop our collection of pre-made dresses. Find the perfect piece to suit your style and measurements.",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    title: "Pre-made Dresses",
+    siteName: siteConfig.title,
+    description:
+      "Shop our collection of pre-made dresses. Find the perfect piece to suit your style and measurements.",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: siteConfig.title,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pre-made Dresses",
+    description:
+      "Shop our collection of pre-made dresses. Find the perfect piece to suit your style and measurements.",
+    images: ["/twitter-image.png"],
+  },
+};
 
 export default async function ProductsPage() {
   const { data: products } = await sanityFetch({ query: PRODUCT_QUERY });

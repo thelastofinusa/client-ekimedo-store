@@ -1,15 +1,40 @@
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
-import { getCheckoutSession, getOrderByPaymentIntent } from "@/lib/services/checkout";
+import {
+  getCheckoutSession,
+  getOrderByPaymentIntent,
+} from "@/lib/services/checkout";
 import { SuccessClient } from "../_components/success-card";
+import { siteConfig } from "@/site.config";
 
 export const metadata = {
-  title: "Order Confirmed | Furniture Shop",
+  title: "Order Confirmed",
   description: "Your order has been placed successfully",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    title: "Order Confirmed",
+    siteName: siteConfig.title,
+    description: "Your order has been placed successfully",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: siteConfig.title,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Order Confirmed",
+    description: "Your order has been placed successfully",
+    images: ["/twitter-image.png"],
+  },
 };
 
 interface SuccessPageProps {
-  searchParams: Promise<{ 
+  searchParams: Promise<{
     session_id?: string;
     payment_intent?: string;
     payment_intent_client_secret?: string;
