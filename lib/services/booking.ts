@@ -41,6 +41,21 @@ export async function createBookingService(formData: FormData) {
       throw new Error("Service not found");
     }
 
+    // Process dynamic form fields
+    const responses: { key: string; label: string; value: string }[] = [];
+    if (service.formBuilder && Array.isArray(service.formBuilder)) {
+      for (const field of service.formBuilder) {
+        const value = formData.get(field.name);
+        if (value) {
+          responses.push({
+            key: field.name,
+            label: field.label,
+            value: value.toString(),
+          });
+        }
+      }
+    }
+
     const imageAssetIds: string[] = [];
     const imageUrls: string[] = [];
 
@@ -75,6 +90,7 @@ export async function createBookingService(formData: FormData) {
       location,
       groupSize,
       socialMediaHandles,
+      responses,
       styleInspiration: imageAssetIds.map((id) => ({
         _key: randomUUID(),
         _type: "image",

@@ -85,6 +85,27 @@ export const bookingType = defineType({
       of: [{ type: "image", options: { hotspot: true } }],
     }),
     defineField({
+      name: "responses",
+      title: "Form Responses",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "key", type: "string", title: "Field Key" },
+            { name: "label", type: "string", title: "Field Label" },
+            { name: "value", type: "string", title: "Value" },
+          ],
+          preview: {
+            select: {
+              title: "label",
+              subtitle: "value",
+            },
+          },
+        },
+      ],
+    }),
+    defineField({
       name: "agreedToCancellation",
       title: "Agreed to Cancellation Policy",
       type: "boolean",

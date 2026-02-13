@@ -7,10 +7,15 @@ import { SERVICE_QUERY } from "@/sanity/queries/service";
 import { FilteredResponseQueryOptions } from "@sanity/client/stega";
 import Image from "next/image";
 import { formatDuration, formatPrice } from "@/lib/utils";
+import { SERVICE_QUERYResult } from "@/sanity.types";
 
 export const ServicesComp = async () => {
   const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
-  const services = await client.fetch(SERVICE_QUERY, {}, options);
+  const services = await client.fetch<SERVICE_QUERYResult>(
+    SERVICE_QUERY,
+    {},
+    options,
+  );
 
   if (!services.length) return null;
 

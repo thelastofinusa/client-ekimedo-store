@@ -53,7 +53,16 @@ export default async function ProductsPage() {
           fallback={
             <div className="flex h-max w-full flex-col gap-10 md:sticky md:top-26 md:w-64 lg:top-32">
               <div className="flex flex-col gap-8">
-                {[3, 3, 7, 4].map((item, idx) => (
+                <div className="flex flex-col gap-3">
+                  <Skeleton className="h-4 w-20" />
+                  <Skeleton className="h-3 w-40" />
+                  <div className="relative mt-2 w-full">
+                    <Skeleton className="absolute top-1/2 left-0 size-4.5 -translate-y-1/2 rounded-full" />
+                    <Skeleton className="absolute top-1/2 right-0 size-4.5 -translate-y-1/2 rounded-full" />
+                    <Skeleton className="h-2 w-full" />
+                  </div>
+                </div>
+                {[3, 7, 4].map((item, idx) => (
                   <div className="flex flex-col gap-6" key={idx}>
                     <Skeleton className="h-4 w-20" />
 

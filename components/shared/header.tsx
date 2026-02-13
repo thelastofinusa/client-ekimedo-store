@@ -33,7 +33,7 @@ export const Header = () => {
   const [openCart, setOpenCart] = React.useState(false);
 
   return (
-    <header className="pointer-events-none fixed top-0 left-0 z-50 w-full mix-blend-difference backdrop-blur-xs">
+    <header className="pointer-events-none fixed top-0 left-0 z-50 w-full mix-blend-difference md:backdrop-blur-xs">
       <Container className="flex h-20 w-full items-center justify-between gap-6 lg:h-24">
         <div className="flex w-full max-w-[150px] justify-start">
           <Logo
@@ -115,7 +115,7 @@ export const Header = () => {
                           <UserButton.Link
                             label="Admin Dashboard"
                             labelIcon={<RiAdminLine className="mt-px size-4" />}
-                            href="/studio"
+                            href="/admin"
                           />
                         )}
                       </UserButton.MenuItems>

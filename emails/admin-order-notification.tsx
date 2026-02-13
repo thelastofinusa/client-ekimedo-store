@@ -146,7 +146,7 @@ export const AdminOrderNotificationEmail = ({
           {/* Action */}
           <Section style={btnContainer}>
             <Link
-              href={`${siteUrl}/studio/structure/order;${orderId}`}
+              href={`${siteUrl}/admin/structure/order;${orderId}`}
               style={button}
             >
               View Order Details

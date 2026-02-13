@@ -8,15 +8,17 @@ import { SnapshotsGrid } from "../_components/snapshots-grid";
 import { BookingForm } from "../_components/booking-form";
 import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
+import { SERVICE_BY_ID_QUERYResult } from "@/sanity.types";
 
 export const generateMetadata = async (
   props: PageProps<"/consultation/[slug]">,
 ): Promise<Metadata> => {
   const { slug } = await props.params;
-  const { data: services } = await sanityFetch({
+  const { data } = await sanityFetch({
     query: SERVICE_BY_ID_QUERY,
     params: { slug },
   });
+  const services = data as SERVICE_BY_ID_QUERYResult;
   const service = services[0];
 
   if (!service) return notFound();
@@ -52,10 +54,11 @@ export default async function ServicePage(
   props: PageProps<"/consultation/[slug]">,
 ) {
   const { slug } = await props.params;
-  const { data: services } = await sanityFetch({
+  const { data } = await sanityFetch({
     query: SERVICE_BY_ID_QUERY,
     params: { slug },
   });
+  const services = data as SERVICE_BY_ID_QUERYResult;
   const service = services[0];
 
   if (!service) return notFound();
@@ -91,11 +94,16 @@ export default async function ServicePage(
               </div>
               <SnapshotsGrid
                 snapshots={(service.snapshots || [])
-                  .filter((s) => s.url)
-                  .map((s) => ({
-                    url: s.url!,
-                    description: s.description || undefined,
-                  }))}
+                  .filter(
+                    (s: { url: string | null; description: string | null }) =>
+                      s.url,
+                  )
+                  .map(
+                    (s: { url: string | null; description: string | null }) => ({
+                      url: s.url!,
+                      description: s.description || undefined,
+                    }),
+                  )}
                 title={service.title}
               />
             </>

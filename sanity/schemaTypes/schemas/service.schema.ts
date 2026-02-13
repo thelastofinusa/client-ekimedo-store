@@ -46,6 +46,13 @@ export const serviceType = defineType({
       validation: (rule) => rule.required().min(1),
     }),
     defineField({
+      name: "formBuilder",
+      title: "Booking Form Builder",
+      description: "Define custom fields for the booking form",
+      type: "array",
+      of: [{ type: "formField" }],
+    }),
+    defineField({
       name: "includes",
       title: "Also includes",
       type: "array",

@@ -118,7 +118,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
     <div className="flex flex-col gap-8 md:flex-row lg:gap-12">
       <div className="flex h-max flex-1 gap-4 md:w-1/2 lg:w-max">
         <div className="flex flex-1 flex-col gap-5">
-          <div className="relative overflow-hidden rounded-xl border bg-neutral-50">
+          <div className="bg-secondary relative overflow-hidden border shadow-xs">
             <Image
               src={displayImage}
               alt={product.name ?? "Product image"}
@@ -138,10 +138,10 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
                   type="button"
                   onClick={() => setSelectedImage(img)}
                   className={cn(
-                    "relative aspect-3/4 overflow-hidden rounded-md border bg-neutral-50 transition",
+                    "bg-secondary relative aspect-3/4 cursor-pointer overflow-hidden rounded-md border transition",
                     selectedImage === img
-                      ? "ring-2 ring-neutral-900"
-                      : "hover:ring-1 hover:ring-neutral-400",
+                      ? "ring-primary ring-2"
+                      : "hover:ring-primary-foreground hover:ring-1",
                   )}
                 >
                   <Image

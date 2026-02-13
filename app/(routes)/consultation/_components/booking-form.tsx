@@ -1,10 +1,11 @@
 "use client";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import z from "zod";
 import React from "react";
-import { format } from "date-fns";
 import { useDropzone } from "react-dropzone";
 import { useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 import {
   Form,
@@ -24,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/select";
+import { Textarea } from "@/ui/textarea";
 import { Button } from "@/ui/button";
 import { Icons } from "hugeicons-proxy";
 import {
@@ -32,45 +34,48 @@ import {
   InputGroupButton,
   InputGroupInput,
 } from "@/ui/input-group";
-import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
-import { cn } from "@/lib/utils";
-import { Calendar } from "@/ui/calendar";
 import { Checkbox } from "@/ui/checkbox";
-import { Trash } from "lucide-react";
-import { ScrollArea } from "@/ui/scroll-area";
+
+interface FormFieldDef {
+  name: string;
+  label: string;
+  type:
+    | "text"
+    | "email"
+    | "tel"
+    | "textarea"
+    | "select"
+    | "number"
+    | "date"
+    | "checkbox";
+  placeholder?: string;
+  required?: boolean;
+  options?: string[];
+  errorMessage?: string;
+  description?: string;
+}
 
 interface Service {
   slug: string | null;
   title: string | null;
   price: number | null;
   duration: number | null;
+  formBuilder?: FormFieldDef[];
 }
 
 interface Props {
   service: Service;
 }
 
-function isValidDate(date: Date | undefined) {
-  if (!date) {
-    return false;
-  }
-
-  return !isNaN(date.getTime());
+interface Step {
+  id: string;
+  title: string;
+  question: string;
+  fields: string[];
+  description?: string;
 }
 
-function formatDate(date: Date | undefined) {
-  if (!date) {
-    return "";
-  }
-
-  return date.toLocaleDateString("en-US", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
-}
-
-const bookingFormSchema = z.object({
+const baseBookingFormSchema = z.object({
   customerName: z.string().min(2, "Name must be at least 2 characters"),
   customerEmail: z.email("Invalid email address"),
   customerPhone: z.string().min(10, "Phone number must be at least 10 digits"),
@@ -78,7 +83,7 @@ const bookingFormSchema = z.object({
     .number("Group size is required")
     .min(1, "Must be at least 1")
     .max(10, "Must be at most 10"),
-  date: z.date("Date is required"),
+  date: z.date(),
   startTime: z.string().min(1, "Start time is required"),
   location: z.enum(["virtual", "in-person"], {
     message: "Please select a location",
@@ -99,20 +104,15 @@ const bookingFormSchema = z.object({
       ]),
     }),
   ),
+  styleNotes: z.string().optional(),
   agreedToCancellation: z.boolean().refine((val) => val === true, {
     message: "You must agree to the cancellation policy",
   }),
 });
 
-type BookingFormSchemaType = z.infer<typeof bookingFormSchema>;
-
 export const BookingForm: React.FC<Props> = ({ service }) => {
   const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [bookedDates, setBookedDates] = React.useState<Date[]>([]);
-  const [open, setOpen] = React.useState(false);
-  const [date, setDate] = React.useState<Date | undefined>();
-  const [month, setMonth] = React.useState<Date>(new Date());
-  const [value, setValue] = React.useState("");
 
   React.useEffect(() => {
     async function fetchBookedDates() {
@@ -130,9 +130,64 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
     fetchBookedDates();
   }, []);
 
-  const form = useForm<BookingFormSchemaType>({
-    resolver: zodResolver(bookingFormSchema),
-    defaultValues: {
+  const [currentStep, setCurrentStep] = React.useState(0);
+
+  const formSchema = React.useMemo(() => {
+    let schema: z.ZodObject<any, any> = baseBookingFormSchema;
+
+    if (service.formBuilder) {
+      service.formBuilder.forEach((field) => {
+        let zField: z.ZodTypeAny;
+
+        switch (field.type) {
+          case "email":
+            zField = z.email(field.errorMessage || "Invalid email");
+            break;
+          case "number":
+            zField = z.coerce.number();
+            break;
+          case "checkbox":
+            zField = z.boolean();
+            break;
+          case "date":
+            // Date input usually returns a string "YYYY-MM-DD"
+            zField = z.string();
+            break;
+          default:
+            zField = z.string();
+        }
+
+        if (field.required) {
+          if (field.type === "checkbox") {
+            zField = (zField as z.ZodBoolean).refine(
+              (val) => val === true,
+              field.errorMessage || "Required",
+            );
+          } else if (field.type === "number") {
+            zField = (zField as z.ZodNumber).min(
+              1,
+              field.errorMessage || "Required",
+            );
+          } else {
+            zField = (zField as z.ZodString).min(
+              1,
+              field.errorMessage || "Required",
+            );
+          }
+        } else {
+          zField = zField.optional();
+        }
+
+        schema = schema.extend({ [field.name]: zField });
+      });
+    }
+    return schema;
+  }, [service.formBuilder]);
+
+  type BookingFormSchemaType = any;
+
+  const defaultValues = React.useMemo(() => {
+    const defaults = {
       customerName: "",
       customerEmail: "",
       customerPhone: "",
@@ -142,7 +197,24 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
       agreedToCancellation: false,
       startTime: "",
       styleInspiration: [],
-    },
+      styleNotes: "",
+    };
+
+    if (service.formBuilder) {
+      service.formBuilder.forEach((field) => {
+        if (field.type === "checkbox") {
+          (defaults as any)[field.name] = false;
+        } else {
+          (defaults as any)[field.name] = "";
+        }
+      });
+    }
+    return defaults;
+  }, [service.formBuilder]);
+
+  const form = useForm<BookingFormSchemaType>({
+    resolver: zodResolver(formSchema),
+    defaultValues: defaultValues as any,
   });
 
   const { fields, append, remove } = useFieldArray({
@@ -150,9 +222,109 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
     name: "socialMediaHandles",
   });
 
-  async function onSubmit(values: BookingFormSchemaType) {
-    setIsLoading(true);
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    accept: {
+      "image/*": [".png", ".jpg", ".jpeg", ".svg", ".gif"],
+    },
+    maxFiles: 5,
+    maxSize: 5 * 1024 * 1024, // 5MB
+    onDrop: (acceptedFiles) => {
+      form.setValue("styleInspiration", acceptedFiles, {
+        shouldValidate: true,
+      });
+    },
+  });
 
+  const files = form.watch("styleInspiration") || [];
+
+  const filesList = files.map((file: File) => (
+    <li
+      key={file.name}
+      className="flex items-center justify-between rounded-md border p-3"
+    >
+      <div className="flex items-center space-x-3">
+        <div className="bg-secondary/50 flex h-10 w-10 items-center justify-center rounded-md">
+          <Icons.Image01Icon className="text-foreground h-5 w-5" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm leading-none font-medium">{file.name}</p>
+          <p className="text-muted-foreground text-xs">
+            {(file.size / 1024 / 1024).toFixed(2)} MB
+          </p>
+        </div>
+      </div>
+    </li>
+  ));
+
+  const steps = React.useMemo(() => {
+    const staticSteps: Step[] = [
+      {
+        id: "intro",
+        title: "Let's get to know you",
+        question: "What's your name, beautiful?",
+        fields: ["customerName", "customerEmail"],
+      },
+      {
+        id: "contact",
+        title: "Contact Details",
+        question: "How can we reach you?",
+        fields: ["customerPhone", "groupSize"],
+      },
+      {
+        id: "details",
+        title: "Session Details",
+        question: "When and where?",
+        fields: ["location", "date", "startTime"],
+      },
+    ];
+
+    const dynamicSteps: Step[] =
+      service.formBuilder?.map((field) => ({
+        id: field.name,
+        title: field.label,
+        question: field.label,
+        fields: [field.name],
+        description: field.description,
+      })) || [];
+
+    const finalSteps: Step[] = [
+      {
+        id: "socials",
+        title: "Social Media",
+        question: "Where can we find you online?",
+        fields: ["socialMediaHandles"],
+      },
+      {
+        id: "inspiration",
+        title: "Style Inspiration",
+        question: "Show us what you love",
+        fields: ["styleInspiration", "styleNotes"],
+      },
+      {
+        id: "review",
+        title: "Review & Confirm",
+        question: "Ready to book?",
+        fields: ["agreedToCancellation"],
+      },
+    ];
+
+    return [...staticSteps, ...dynamicSteps, ...finalSteps];
+  }, [service.formBuilder]);
+
+  const nextStep = async () => {
+    const fields = steps[currentStep].fields;
+    const isValid = await form.trigger(fields as any);
+    if (isValid) {
+      setCurrentStep((prev) => Math.min(prev + 1, steps.length - 1));
+    }
+  };
+
+  const prevStep = () => {
+    setCurrentStep((prev) => Math.max(prev - 1, 0));
+  };
+
+  const onSubmit = async (values: any) => {
+    setIsLoading(true);
     try {
       const formData = new FormData();
       formData.append("serviceType", service.slug || "");
@@ -162,40 +334,45 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
       formData.append("groupSize", values.groupSize.toString());
       formData.append("location", values.location);
 
-      const handles = values.socialMediaHandles
-        .map((h) => h.value)
-        .filter((h) => h !== "");
+      if (values.date && values.startTime) {
+        const [hours, minutes] = values.startTime.split(":");
+        const dateTime = new Date(values.date);
+        dateTime.setHours(parseInt(hours), parseInt(minutes));
+        formData.append("dateTime", dateTime.toISOString());
 
-      if (handles.length > 0) {
-        handles.forEach((handle) => {
-          formData.append("socialMediaHandle", handle);
+        // Default duration 1 hour if not specified
+        const duration = service.duration || 60;
+        const endTime = new Date(dateTime);
+        endTime.setMinutes(endTime.getMinutes() + duration);
+        formData.append("endTime", endTime.toISOString());
+      }
+
+      if (values.socialMediaHandles) {
+        values.socialMediaHandles.forEach((handle: { value: string }) => {
+          if (handle.value) formData.append("socialMediaHandle", handle.value);
         });
-      } else {
-        formData.append("socialMediaHandle", "");
+      }
+
+      if (values.styleInspiration) {
+        values.styleInspiration.forEach((file: File) => {
+          formData.append("styleInspiration", file);
+        });
+      }
+
+      if (values.styleNotes) {
+        formData.append("styleNotes", values.styleNotes);
       }
 
       formData.append(
         "agreedToCancellation",
-        values.agreedToCancellation.toString(),
+        values.agreedToCancellation ? "true" : "false",
       );
 
-      // Combine date and time
-      const dateStr = format(values.date, "yyyy-MM-dd");
-      const dateTime = `${dateStr}T${values.startTime}`;
-      formData.append("dateTime", dateTime);
-
-      // Calculate end time
-      const [hours, minutes] = values.startTime.split(":").map(Number);
-      const startDate = new Date(values.date);
-      startDate.setHours(hours, minutes, 0, 0);
-      const durationMinutes = service.duration || 60; // Default to 60 minutes if not set
-      const endDate = new Date(startDate.getTime() + durationMinutes * 60000);
-      formData.append("endTime", endDate.toISOString());
-
-      // Handle files
-      if (values.styleInspiration && Array.isArray(values.styleInspiration)) {
-        (values.styleInspiration as unknown as File[]).forEach((file) => {
-          formData.append("styleInspiration", file);
+      if (service.formBuilder) {
+        service.formBuilder.forEach((field) => {
+          if (values[field.name]) {
+            formData.append(field.name, values[field.name]);
+          }
         });
       }
 
@@ -204,428 +381,504 @@ export const BookingForm: React.FC<Props> = ({ service }) => {
         body: formData,
       });
 
-      const result = await response.json();
+      const data = await response.json();
 
-      if (response.ok && result.success && result.url) {
-        window.location.href = result.url;
-      } else {
-        alert(result.error || "Something went wrong");
+      if (!response.ok) {
+        throw new Error(data.error || "Something went wrong");
       }
-    } catch (error) {
-      console.error(error);
-      alert("Something went wrong. Please try again.");
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        toast.success("Booking request sent!");
+      }
+    } catch (error: any) {
+      toast.error(error.message);
     } finally {
       setIsLoading(false);
     }
-  }
-
-  const [files, setFiles] = React.useState<File[]>([]);
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop: (acceptedFiles) => {
-      setFiles(acceptedFiles);
-      form.setValue("styleInspiration", acceptedFiles as unknown as File[], {
-        shouldValidate: true,
-      });
-    },
-  });
-
-  const filesList = files.map((file) => (
-    <li
-      key={file.name}
-      className="relative flex items-center justify-between border p-4 shadow-xs"
-    >
-      <div className="flex items-center space-x-3 p-0">
-        <span className="bg-secondary/50 flex h-10 w-10 shrink-0 items-center justify-center rounded-md">
-          <Icons.File02Icon
-            className="text-foreground h-5 w-5"
-            aria-hidden={true}
-          />
-        </span>
-        <div>
-          <p className="text-foreground text-sm font-medium">{file.name}</p>
-          <p className="text-muted-foreground mt-0.5 text-xs tracking-wide uppercase">
-            {file.size} bytes
-          </p>
-        </div>
-      </div>
-      <Button
-        type="button"
-        variant="ghost"
-        size="icon"
-        aria-label="Remove file"
-        onClick={() => {
-          const newFiles = files.filter((f) => f.name !== file.name);
-          setFiles(newFiles);
-          form.setValue("styleInspiration", newFiles, { shouldValidate: true });
-        }}
-      >
-        <Trash className="h-5 w-5" aria-hidden={true} />
-      </Button>
-    </li>
-  ));
+  };
 
   return (
-    <div className="bg-card rounded-md border p-6 shadow-xs md:p-8">
+    <div className="bg-card mx-auto w-full max-w-2xl rounded-md border p-6 shadow-xs md:p-8">
       <div className="mb-8">
-        <h2 className="text-2xl">Book Your Session</h2>
-        <p className="text-muted-foreground mt-2">
-          Complete the form below to schedule your consultation for{" "}
-          <span className="text-foreground font-medium">{service.title}</span>.
-        </p>
+        <div className="mb-6 flex items-center justify-between">
+          {currentStep > 0 && (
+            <Button
+              variant="ghost"
+              onClick={prevStep}
+              className="pl-0 hover:bg-transparent"
+            >
+              <Icons.ArrowLeft01Icon className="mr-2 h-4 w-4" />
+              Back
+            </Button>
+          )}
+          <span className="text-muted-foreground ml-auto text-xs font-medium tracking-wider uppercase">
+            Step {currentStep + 1} of {steps.length} —{" "}
+            {steps[currentStep].title}
+          </span>
+        </div>
+
+        <h2 className="text-foreground mb-2 font-serif text-3xl leading-tight md:text-4xl">
+          {steps[currentStep].question}
+        </h2>
+        {steps[currentStep].description && (
+          <p className="text-muted-foreground mt-2 text-sm">
+            {steps[currentStep].description}
+          </p>
+        )}
       </div>
 
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-4 md:gap-6"
+          className="flex flex-col gap-6"
         >
-          <div className="flex w-full flex-col gap-4 md:flex-row md:gap-6">
-            <FormField
-              control={form.control}
-              name="customerName"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Jane Doe"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="customerEmail"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Email Address</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="jane@example.com"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="flex w-full flex-col gap-4 md:flex-row md:gap-6">
-            <FormField
-              control={form.control}
-              name="customerPhone"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <PhoneInput
-                      defaultCountry="US"
-                      placeholder="+1 (555) 000-0000"
-                      disabled={isLoading}
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="groupSize"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>
-                    Number of people that are coming with you
-                  </FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      {...field}
-                      placeholder="2 People"
-                      disabled={isLoading}
-                      onChange={(e) => field.onChange(e.target.valueAsNumber)}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="flex w-full flex-col gap-4 md:flex-row md:gap-6">
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem className="h-max w-full">
-                  <FormLabel>Booking Location Preference</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                    disabled={isLoading}
-                  >
-                    <FormControl>
-                      <SelectTrigger className="w-full" disabled={isLoading}>
-                        <SelectValue placeholder="Select location" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="virtual">
-                        Virtual (Zoom/Google Meet)
-                      </SelectItem>
-                      <SelectItem value="in-person">
-                        In-Person (Showroom)
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <div className="flex w-full flex-col gap-1">
-              <FormLabel className="flex items-center justify-between">
-                <span>Social Media Handles (Optional)</span>
-                <Icons.Add01Icon
-                  className="size-4 cursor-pointer"
-                  onClick={() => append({ value: "" })}
-                />
-              </FormLabel>
-              {fields.map((field, index) => (
+          <div className="min-h-[300px]">
+            {/* Step 1: Intro */}
+            {currentStep === 0 && (
+              <div className="space-y-6">
                 <FormField
-                  key={field.id}
                   control={form.control}
-                  name={`socialMediaHandles.${index}.value`}
-                  render={({ field: controlField }) => (
-                    <FormItem className="mb-1 w-full last-of-type:mb-0">
+                  name="customerName"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <InputGroup className="h-12 w-full">
-                          <InputGroupInput
-                            type="url"
-                            placeholder="https://example.com/yourhandle"
-                            {...controlField}
-                            disabled={isLoading}
-                          />
-                          {fields.length > 1 && (
-                            <InputGroupAddon align="inline-end">
-                              <InputGroupButton
-                                size="icon-sm"
-                                onClick={() => remove(index)}
-                              >
-                                <Icons.Cancel01Icon className="h-4 w-4 text-red-500" />
-                              </InputGroupButton>
-                            </InputGroupAddon>
-                          )}
-                        </InputGroup>
+                        <Input
+                          placeholder="Jane Doe"
+                          disabled={isLoading}
+                          className="focus-visible:border-primary rounded-none border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
+                          {...field}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              ))}
-            </div>
-          </div>
-          <div className="flex w-full flex-col gap-4 md:flex-row md:gap-6">
-            <FormField
-              control={form.control}
-              name="date"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Preferred Date & Time</FormLabel>
-                  <InputGroup className="h-12 w-full">
-                    <FormControl>
-                      <InputGroupInput
-                        placeholder="January 01, 2025"
-                        disabled={isLoading}
-                        value={value}
-                        onChange={(e) => {
-                          const inputValue = e.target.value;
-                          setValue(inputValue);
-                          const date = new Date(inputValue);
-                          if (isValidDate(date)) {
-                            setDate(date);
-                            setMonth(date);
-                            field.onChange(date);
-                          }
-                        }}
-                        onBlur={field.onBlur}
-                        onKeyDown={(e) => {
-                          if (e.key === "ArrowDown") {
-                            e.preventDefault();
-                            setOpen(true);
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <Popover open={open} onOpenChange={setOpen}>
-                      <PopoverTrigger asChild>
-                        <InputGroupAddon align="inline-end">
-                          <InputGroupButton size="icon-sm" disabled={isLoading}>
-                            <Icons.Calendar03Icon />
-                            <span className="sr-only">Pick a date</span>
-                          </InputGroupButton>
-                        </InputGroupAddon>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-auto overflow-hidden p-0"
-                        align="end"
-                        alignOffset={-8}
-                        sideOffset={10}
-                      >
-                        <Calendar
-                          mode="single"
-                          selected={field.value}
-                          month={month}
-                          onMonthChange={setMonth}
-                          disabled={[
-                            ...bookedDates,
-                            (date) =>
-                              date < new Date() ||
-                              date < new Date("1900-01-01"),
-                            isLoading,
-                          ]}
-                          modifiers={{
-                            booked: bookedDates,
-                          }}
-                          onSelect={(date) => {
-                            if (date) {
-                              setDate(date);
-                              setValue(formatDate(date));
-                              field.onChange(date);
-                              setOpen(false);
-                            }
-                          }}
-                          autoFocus
+                <FormField
+                  control={form.control}
+                  name="customerEmail"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Email Address</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="jane@example.com"
+                          disabled={isLoading}
+                          className="focus-visible:border-primary rounded-none border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
+                          {...field}
                         />
-                      </PopoverContent>
-                    </Popover>
-                  </InputGroup>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
 
-            <FormField
-              control={form.control}
-              name="startTime"
-              render={({ field }) => (
-                <FormItem className="w-full">
-                  <FormLabel>Start Time</FormLabel>
-                  <Input
-                    type="time"
-                    step="1"
-                    disabled={isLoading}
-                    className="peer appearance-none [&::-webkit-calendar-picker-indicator]:hidden [&::-webkit-calendar-picker-indicator]:appearance-none"
-                    {...field}
-                  />
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+            {/* Step 2: Contact */}
+            {currentStep === 1 && (
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="customerPhone"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Phone Number</FormLabel>
+                      <FormControl>
+                        <PhoneInput
+                          defaultCountry="US"
+                          placeholder="+1 (555) 000-0000"
+                          disabled={isLoading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="groupSize"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Number of people</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          {...field}
+                          placeholder="2"
+                          disabled={isLoading}
+                          className="focus-visible:border-primary rounded-none border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
+                          onChange={(e) =>
+                            field.onChange(e.target.valueAsNumber)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
 
-          <FormField
-            control={form.control}
-            name="styleInspiration"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel>Style Inspiration</FormLabel>
-                <FormControl>
-                  <div
-                    {...getRootProps()}
-                    className={cn(
-                      isDragActive
-                        ? "border-primary bg-primary/10 ring-primary/20 ring-2"
-                        : "border-border",
-                      isLoading ? "pointer-events-none opacity-50" : "",
-                      "flex justify-center rounded-md border border-dashed px-6 py-20 transition-colors duration-200",
+            {/* Step 3: Details */}
+            {currentStep === 2 && (
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormLabel>Location Preference</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        disabled={isLoading}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select location" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="virtual">
+                            Virtual (Zoom/Google Meet)
+                          </SelectItem>
+                          <SelectItem value="in-person">
+                            In-Person (Showroom)
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <FormField
+                    control={form.control}
+                    name="date"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-col">
+                        <FormLabel>Preferred Date</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="date"
+                            disabled={isLoading}
+                            min={new Date().toISOString().split("T")[0]}
+                            value={
+                              field.value instanceof Date &&
+                              !isNaN(field.value.getTime())
+                                ? field.value.toISOString().split("T")[0]
+                                : ""
+                            }
+                            onChange={(e) => {
+                              const dateStr = e.target.value;
+                              if (dateStr) {
+                                // Create date object from string (YYYY-MM-DD)
+                                // We use simple string parsing to avoid timezone issues for the day
+                                const [year, month, day] = dateStr
+                                  .split("-")
+                                  .map(Number);
+                                const date = new Date(year, month - 1, day);
+                                field.onChange(date);
+                              } else {
+                                field.onChange(undefined);
+                              }
+                            }}
+                            className="focus-visible:border-primary rounded-none border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
                     )}
-                  >
-                    <div>
-                      <Icons.File01Icon
-                        className="text-muted-foreground/80 mx-auto size-8 sm:size-12"
-                        aria-hidden={true}
-                      />
-                      <div className="text-muted-foreground mt-4 flex text-xs sm:text-sm">
-                        <p>Drag and drop or</p>
-                        <label
-                          htmlFor="file"
-                          className="text-primary hover:text-primary/80 relative cursor-pointer rounded-sm pl-1 font-medium hover:underline hover:underline-offset-4"
+                  />
+                  <FormField
+                    control={form.control}
+                    name="startTime"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Time</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={isLoading}
                         >
-                          <span>choose file(s)</span>
-                          <input
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select time" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {[
+                              "09:00",
+                              "10:00",
+                              "11:00",
+                              "13:00",
+                              "14:00",
+                              "15:00",
+                              "16:00",
+                            ].map((time) => (
+                              <SelectItem key={time} value={time}>
+                                {time}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Dynamic Steps */}
+            {currentStep >= 3 &&
+              currentStep < 3 + (service.formBuilder?.length || 0) && (
+                <div className="space-y-6">
+                  {service.formBuilder?.map((fieldDef, index) => {
+                    if (currentStep !== 3 + index) return null;
+                    return (
+                      <FormField
+                        key={fieldDef.name}
+                        control={form.control}
+                        name={fieldDef.name as any}
+                        render={({ field }) => (
+                          <FormItem className="w-full">
+                            <FormLabel className="sr-only">
+                              {fieldDef.label}
+                            </FormLabel>
+                            <FormControl>
+                              {fieldDef.type === "textarea" ? (
+                                <Textarea
+                                  placeholder={fieldDef.placeholder}
+                                  disabled={isLoading}
+                                  {...field}
+                                  value={field.value as string}
+                                  className="min-h-[150px]"
+                                />
+                              ) : fieldDef.type === "select" ? (
+                                <Select
+                                  onValueChange={field.onChange}
+                                  defaultValue={field.value as string}
+                                  disabled={isLoading}
+                                >
+                                  <FormControl>
+                                    <SelectTrigger
+                                      className="w-full"
+                                      disabled={isLoading}
+                                    >
+                                      <SelectValue
+                                        placeholder={
+                                          fieldDef.placeholder ||
+                                          "Select option"
+                                        }
+                                      />
+                                    </SelectTrigger>
+                                  </FormControl>
+                                  <SelectContent>
+                                    {fieldDef.options?.map((opt) => (
+                                      <SelectItem key={opt} value={opt}>
+                                        {opt}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              ) : fieldDef.type === "checkbox" ? (
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    checked={!!field.value}
+                                    onCheckedChange={field.onChange}
+                                    disabled={isLoading}
+                                  />
+                                  <span className="text-muted-foreground text-sm">
+                                    {fieldDef.placeholder || fieldDef.label}
+                                  </span>
+                                </div>
+                              ) : (
+                                <Input
+                                  type={fieldDef.type}
+                                  placeholder={fieldDef.placeholder}
+                                  disabled={isLoading}
+                                  {...field}
+                                  value={
+                                    field.value as string | number | undefined
+                                  }
+                                  className="focus-visible:border-primary rounded-none border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
+                                  onChange={(e) => {
+                                    if (fieldDef.type === "number") {
+                                      field.onChange(e.target.valueAsNumber);
+                                    } else {
+                                      field.onChange(e);
+                                    }
+                                  }}
+                                />
+                              )}
+                            </FormControl>
+                            {fieldDef.description && (
+                              <FormDescription>
+                                {fieldDef.description}
+                              </FormDescription>
+                            )}
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    );
+                  })}
+                </div>
+              )}
+
+            {/* Socials Step */}
+            {steps[currentStep].id === "socials" && (
+              <div className="space-y-6">
+                <div className="flex w-full flex-col gap-1">
+                  <FormLabel className="flex items-center justify-between">
+                    <span>Social Media Handles (Optional)</span>
+                    <Icons.Add01Icon
+                      className="size-4 cursor-pointer"
+                      onClick={() => append({ value: "" })}
+                    />
+                  </FormLabel>
+                  {fields.map((field, index) => (
+                    <FormField
+                      key={field.id}
+                      control={form.control}
+                      name={`socialMediaHandles.${index}.value`}
+                      render={({ field: controlField }) => (
+                        <FormItem className="mb-1 w-full last-of-type:mb-0">
+                          <FormControl>
+                            <InputGroup className="h-12 w-full">
+                              <InputGroupInput
+                                type="url"
+                                placeholder="https://example.com/yourhandle"
+                                {...controlField}
+                                disabled={isLoading}
+                              />
+                              {fields.length > 1 && (
+                                <InputGroupAddon align="inline-end">
+                                  <InputGroupButton
+                                    size="icon-sm"
+                                    onClick={() => remove(index)}
+                                  >
+                                    <Icons.Cancel01Icon className="h-4 w-4 text-red-500" />
+                                  </InputGroupButton>
+                                </InputGroupAddon>
+                              )}
+                            </InputGroup>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Inspiration Step */}
+            {steps[currentStep].id === "inspiration" && (
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="styleInspiration"
+                  render={() => (
+                    <FormItem>
+                      <FormLabel>Upload Images</FormLabel>
+                      <FormControl>
+                        <div
+                          {...getRootProps()}
+                          className={`border-input ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex min-h-[150px] cursor-pointer flex-col items-center justify-center rounded-md border-2 border-dashed bg-transparent px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 ${
+                            isDragActive ? "border-primary" : ""
+                          }`}
+                        >
+                          <Input
                             {...getInputProps()}
-                            type="file"
-                            className="sr-only"
+                            className="hidden"
                             disabled={isLoading}
                           />
-                        </label>
-                        <p className="pl-1">to upload</p>
-                      </div>
-                    </div>
-                  </div>
-                </FormControl>
-                <FormDescription className="sm:flex sm:items-center sm:justify-between">
-                  <span>Allowed files are PNG, JPEG, JPG.</span>
-                  <span className="pl-1 sm:pl-0">
-                    Max 5. size per file: 5MB
-                  </span>
-                </FormDescription>
-                <FormMessage />
-                {filesList.length > 0 && (
-                  <div className="flex flex-col gap-2">
-                    <p className="text-foreground mt-6 text-sm font-medium">
-                      File(s) to upload
-                    </p>
-                    <ScrollArea className="border-border/50 max-h-[200px] border p-4 shadow-xs">
-                      <ul role="list" className="flex flex-col gap-4">
-                        {filesList}
-                      </ul>
-                    </ScrollArea>
-                  </div>
-                )}
-              </FormItem>
+                          <Icons.CloudUploadIcon className="text-muted-foreground mb-4 h-10 w-10" />
+                          <p className="text-muted-foreground text-center text-sm">
+                            Drag & drop images here, or click to select
+                          </p>
+                          <p className="text-muted-foreground mt-2 text-xs">
+                            Max 5 files, 5MB each
+                          </p>
+                        </div>
+                      </FormControl>
+                      <FormMessage />
+                      {files.length > 0 && (
+                        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+                          {filesList}
+                        </ul>
+                      )}
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="styleNotes"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description / Notes</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Tell us more about your style..."
+                          className="focus-visible:border-primary min-h-[100px] resize-none rounded-none border-0 border-b bg-transparent px-0 shadow-none focus-visible:ring-0"
+                          disabled={isLoading}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
             )}
-          />
-          <FormField
-            control={form.control}
-            name="agreedToCancellation"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-y-0 space-x-3">
-                <FormControl>
-                  <Checkbox
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                    disabled={isLoading}
-                  />
-                </FormControl>
 
-                <FormLabel
-                  aria-invalid={!!form.formState.errors.agreedToCancellation}
-                  className="text-muted-foreground aria-invalid:text-destructive -mt-0.5 font-sans text-sm font-normal tracking-normal normal-case"
-                >
-                  I understand that cancellations must be made at least 24 hours
-                  in advance to receive a full refund. Late cancellations or
-                  no-shows may be subject to a fee.
-                </FormLabel>
-              </FormItem>
+            {/* Review Step */}
+            {steps[currentStep].id === "review" && (
+              <div className="space-y-6">
+                <FormField
+                  control={form.control}
+                  name="agreedToCancellation"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-y-0 space-x-3 rounded-md border p-4">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>
+                          I agree to the cancellation policy
+                        </FormLabel>
+                        <FormDescription>
+                          Cancellations must be made at least 24 hours in
+                          advance.
+                        </FormDescription>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+              </div>
             )}
-          />
-          <Button
-            type="submit"
-            size="xl"
-            className="w-full"
-            isLoading={isLoading}
-            loadingText="Processing..."
-          >
-            Proceed to Payment • ${service.price?.toFixed(2)}
-          </Button>
-          <p className="text-muted-foreground text-center text-xs">
-            Secure payment processed by Stripe
-          </p>
+          </div>
+
+          <div className="flex justify-end pt-6">
+            {currentStep < steps.length - 1 ? (
+              <Button type="button" size="lg" onClick={nextStep}>
+                Continue
+              </Button>
+            ) : (
+              <Button type="submit" size="lg" disabled={isLoading}>
+                {isLoading ? "Processing..." : "Pay & Book"}
+              </Button>
+            )}
+          </div>
         </form>
       </Form>
     </div>

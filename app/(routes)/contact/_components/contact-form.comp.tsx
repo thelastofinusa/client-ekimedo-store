@@ -96,13 +96,10 @@ export const ContactFormComp = ({ categories }: Props) => {
         <div className="grid grid-cols-1 gap-8 py-16 sm:gap-10 md:grid-cols-2 md:gap-16 lg:gap-24">
           <div className="flex flex-col gap-10 md:gap-16">
             <header>
-              <span className="text-muted-foreground mb-4 text-[10px] tracking-[0.4em] uppercase md:mb-6">
-                Get in touch
-              </span>
-              <h2 className="font-serif text-5xl md:text-6xl">
+              <h1 className="mb-6 max-w-4xl font-serif text-5xl leading-[1.2] sm:text-6xl md:leading-[0.98]">
                 Let&apos; Talk
-              </h2>
-              <p className="mt-6 max-w-md text-sm leading-relaxed opacity-60">
+              </h1>
+              <p className="max-w-xl text-base leading-relaxed font-light">
                 Whether you have a specific vision or are just beginning your
                 journey, our atelier is ready to assist you.
               </p>

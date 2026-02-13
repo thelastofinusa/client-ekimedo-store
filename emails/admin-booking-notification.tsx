@@ -99,7 +99,7 @@ export const AdminBookingNotificationEmail = ({
           {/* Action */}
           <Section style={btnContainer}>
             <Link
-              href={`${siteUrl}/studio/structure/booking;${bookingId}`}
+              href={`${siteUrl}/admin/structure/booking;${bookingId}`}
               style={button}
             >
               View in Studio

@@ -22,14 +22,10 @@ import { Container } from "@/components/shared/container";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PhoneInput } from "@/ui/phone-input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Button } from "@/ui/button";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
-import { Calendar } from "@/ui/calendar";
 import { toast } from "sonner";
 import { Notify } from "@/components/shared/notify";
-import { format } from "date-fns";
 import { Icons } from "hugeicons-proxy";
 import {
   inquireFormSchema,
@@ -277,37 +273,31 @@ export const InquireForm = () => {
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Event Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger disabled={isSubmitting}>
-                          <FormControl>
-                            <div
-                              className={cn(
-                                "text-foreground border-input/40 bg-card inline-flex h-12 w-full cursor-pointer items-center border px-4 text-sm shadow-xs",
-                                !field.value && "text-muted-foreground",
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </div>
-                          </FormControl>
-                        </PopoverTrigger>
-                        {!isSubmitting && (
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) => date < new Date()}
-                              autoFocus
-                              className="pointer-events-auto p-3"
-                            />
-                          </PopoverContent>
-                        )}
-                      </Popover>
+                      <FormControl>
+                        <Input
+                          type="date"
+                          disabled={isSubmitting}
+                          min={new Date().toISOString().split("T")[0]}
+                          value={
+                            field.value instanceof Date &&
+                            !isNaN(field.value.getTime())
+                              ? field.value.toISOString().split("T")[0]
+                              : ""
+                          }
+                          onChange={(e) => {
+                            const dateStr = e.target.value;
+                            if (dateStr) {
+                              const [year, month, day] = dateStr
+                                .split("-")
+                                .map(Number);
+                              const date = new Date(year, month - 1, day);
+                              field.onChange(date);
+                            } else {
+                              field.onChange(undefined);
+                            }
+                          }}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

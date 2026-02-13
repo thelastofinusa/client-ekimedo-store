@@ -159,6 +159,20 @@ export type Service = {
     description?: string;
     _key: string;
   }>;
+  formBuilder?: Array<{
+    _key: string;
+  } & FormField>;
+};
+
+export type FormField = {
+  _type: "formField";
+  name?: string;
+  label?: string;
+  type?: "text" | "email" | "tel" | "textarea" | "select" | "number" | "date" | "checkbox";
+  placeholder?: string;
+  required?: boolean;
+  options?: Array<string>;
+  errorMessage?: string;
 };
 
 export type Slug = {

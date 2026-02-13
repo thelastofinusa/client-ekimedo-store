@@ -14,7 +14,7 @@ export default function RoutesLayout(
 ) {
   return (
     <ClerkProvider>
-      <NextTopLoader showSpinner={false} />
+      <NextTopLoader showSpinner={false} color="var(--primary)" />
       <CartProvider>
         <React.Fragment>
           <Header />

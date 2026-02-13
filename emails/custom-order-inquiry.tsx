@@ -138,7 +138,7 @@ export const CustomOrderInquiryEmail = ({
             Reply to Customer
           </Button>
           <Button
-            href={`${siteUrl}/studio/structure/inquiry;${inquiryId}`}
+            href={`${siteUrl}/admin/structure/inquiry;${inquiryId}`}
             style={{ ...buttonSecondary, marginLeft: "10px" }}
           >
             Open in Studio

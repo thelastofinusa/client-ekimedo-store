@@ -77,9 +77,8 @@ export default function About() {
                     started as practice became purpose.
                   </p>
                   <p>
-                    {siteConfig.title} was born from a love for detail,
-                    movement, and quiet elegance. Not just gowns but moments
-                    made to last.
+                    Eki was born from a love for detail, movement, and quiet
+                    elegance. Not just gowns but moments made to last.
                   </p>
                 </div>
               </div>

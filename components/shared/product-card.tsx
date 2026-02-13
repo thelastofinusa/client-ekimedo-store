@@ -17,7 +17,7 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
 
   return (
     <Link href={`/shop/${product.slug}`} className="group block cursor-pointer">
-      <div className="border-border/50 relative mb-4 aspect-3/4 overflow-hidden border shadow-sm">
+      <div className="relative mb-4 aspect-3/4 overflow-hidden border shadow-sm">
         <Image
           src={product?.images?.[0] ?? ""}
           alt={product.name ?? ""}
@@ -27,7 +27,7 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
           className="object-cover transition-transform duration-700 group-hover:scale-105"
         />
         {/* Subtle Hover Reveal */}
-        <div className="bg-primary/5 absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
+        <div className="bg-foreground/5 absolute inset-0 opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
         {isOutOfStock ? (
           <Badge
             variant="destructive"
@@ -60,7 +60,7 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
             {formatPrice(product.price)}
           </span>
         </div>
-        <h3 className="mb-1 font-serif text-base font-medium transition-opacity group-hover:opacity-60 sm:text-lg">
+        <h3 className="group-hover:text-primary transition-color mb-1 font-serif text-base font-medium sm:text-lg">
           {product.name}
         </h3>
       </div>

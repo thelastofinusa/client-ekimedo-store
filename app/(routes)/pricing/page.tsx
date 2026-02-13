@@ -1,13 +1,14 @@
 import React from "react";
+import { Metadata } from "next";
+import { siteConfig } from "@/site.config";
+
 import { HeroComp } from "./_components/hero.comp";
 import { Container } from "@/components/shared/container";
-import Link from "next/link";
-import { buttonVariants } from "@/ui/button";
 import { Card } from "@/ui/card";
 import { Icons } from "hugeicons-proxy";
 import { formatPrice } from "@/lib/utils";
-import { Metadata } from "next";
-import { siteConfig } from "@/site.config";
+import Link from "next/link";
+import { buttonVariants } from "@/ui/button";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -38,38 +39,31 @@ export const metadata: Metadata = {
   },
 };
 
-interface PricingTier {
-  name: string;
-  price: number;
-  description: string;
-  features: string[];
-}
-
-const pricingTiers: PricingTier[] = [
+const pricingTiers = [
   {
     name: "Custom Wedding Dress",
     price: 5000,
+    tag: "The Masterpiece",
     description:
       "A fully bespoke bridal gown designed exclusively for your wedding day.",
     features: [
       "In-depth bridal design consultation",
       "Luxury couture fabric sourcing",
       "Custom silhouette & structural tailoring",
-      "Handcrafted embellishments & 3D details (optional)",
+      "Handcrafted embellishments & 3D details",
       "Multiple fittings for a perfect bridal fit",
-      "One-of-a-kind couture wedding gown",
     ],
   },
   {
-    name: "Custom Reception/Evening Gowns",
+    name: "Reception & Evening Gowns",
     price: 3500,
+    tag: "Evening Elegance",
     description:
       "A show-stopping gown designed for wedding receptions or formal evenings.",
     features: [
       "Personalized design consultation",
       "Premium or custom fabric selection",
       "Elegant evening-wear silhouettes",
-      "Optional hand embellishments & 3D details",
       "Comfort-focused tailoring for movement",
       "Modern, red-carpet–inspired finish",
     ],
@@ -77,42 +71,42 @@ const pricingTiers: PricingTier[] = [
   {
     name: "Custom Bridal Robe",
     price: 1200,
+    tag: "The Morning Of",
     description:
       "A luxurious custom robe designed for bridal prep and special moments.",
     features: [
       "Custom robe design consultation",
       "Silk, satin, chiffon, or lace options",
       "Lightweight & comfortable construction",
-      "Personalized detailing or embroidery (optional)",
+      "Personalized detailing or embroidery",
       "Perfect for getting-ready photos",
-      "Elegant, relaxed bridal fit",
     ],
   },
   {
     name: "Custom Prom Dresses",
     price: 1750,
+    tag: "Red Carpet Ready",
     description:
       "A unique, custom-made prom dress tailored to your personal style.",
     features: [
       "One-on-one design consultation",
       "Essential to premium fabric options",
-      "Trend-forward or classic prom silhouettes",
-      "Optional 3D details or embellishments",
+      "Trend-forward or classic silhouettes",
       "Flattering, body-conscious tailoring",
       "Standout look not found in stores",
     ],
   },
   {
-    name: "Custom Special Event",
+    name: "Special Event Couture",
     price: 2000,
+    tag: "Milestone Celebration",
     description:
       "A custom outfit designed for galas, parties, or milestone celebrations.",
     features: [
       "Personalized design consultation",
       "Fabric selection based on event type",
       "Custom silhouette and styling",
-      "Optional embellishments or statement details",
-      "Elegant yet comfortable tailoring",
+      "Optional embellishments",
       "Versatile couture-level finish",
     ],
   },
@@ -122,123 +116,135 @@ export default function PricingPage() {
   return (
     <div className="flex-1 overflow-x-clip">
       <HeroComp />
-      <div className="bg-secondary/30 py-24">
-        <Container className="flex flex-col gap-16">
-          {/* Desktop Table */}
-          <div className="border-border hidden overflow-x-auto rounded-lg border md:block">
-            <table className="w-full">
-              <thead className="bg-secondary/30 border-border border-b">
-                <tr>
-                  <th className="px-6 py-4 text-left font-serif text-lg font-light">
-                    Dress Type
-                  </th>
-                  <th className="px-6 py-4 text-left font-serif text-lg font-light">
-                    Starting Price
-                  </th>
-                  <th className="px-6 py-4 text-left font-serif text-lg font-light">
-                    What&apos;s Included
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-border divide-y">
-                {pricingTiers.map((tier, idx) => (
-                  <tr
-                    key={idx}
-                    className="bg-card hover:bg-card/70 transition-colors duration-300"
-                  >
-                    <td className="px-6 py-6 font-serif text-xl font-light">
-                      {tier.name}
-                    </td>
-                    <td className="px-6 py-6">
-                      <div className="flex items-baseline gap-1">
-                        <span className="font-mono text-3xl font-light">
-                          {formatPrice(tier.price)}
+
+      {/* Main Pricing Section */}
+      <section className="bg-secondary/30 py-24">
+        <Container>
+          <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12">
+            {/* Left Column: Process Highlights */}
+            <div className="space-y-12 lg:sticky lg:top-28 lg:col-span-4">
+              <Card className="p-8">
+                <h3 className="mb-4 font-serif text-2xl">
+                  The Atelier Experience
+                </h3>
+                <ul className="space-y-6">
+                  {[
+                    {
+                      icon: Icons.SparklesIcon,
+                      title: "Bespoke Design",
+                      desc: "Crafted from scratch to your proportions.",
+                    },
+                    {
+                      icon: Icons.ScissorIcon,
+                      title: "Luxury Fabrics",
+                      desc: "The finest silks, laces, and hand-beading.",
+                    },
+                    {
+                      icon: Icons.RulerIcon,
+                      title: "Perfect Fit",
+                      desc: "Multiple fittings ensure flawless silhouette.",
+                    },
+                  ].map((item, i) => (
+                    <li key={i} className="flex gap-3">
+                      <div className="bg-primary-foreground text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
+                        <item.icon size={18} />
+                      </div>
+                      <div className="mt-0.5">
+                        <p className="text-xs font-medium tracking-widest uppercase">
+                          {item.title}
+                        </p>
+                        <p className="text-muted-foreground text-sm">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </Card>
+            </div>
+
+            {/* Right Column: Pricing Tiers */}
+            <div className="space-y-6 lg:col-span-8">
+              {pricingTiers.map((tier, idx) => (
+                <Card
+                  key={idx}
+                  className="p-8 transition-all duration-500 hover:-translate-y-1"
+                >
+                  <div className="flex flex-col justify-between gap-8 md:flex-row md:items-start">
+                    {/* Tier Info */}
+                    <div className="flex-1">
+                      <div className="mb-4 flex items-center gap-3">
+                        <span className="bg-primary-foreground text-primary rounded px-2 py-1 text-[9px] font-medium tracking-[0.2em] uppercase">
+                          {tier.tag}
                         </span>
                       </div>
-                    </td>
-                    <td className="px-6 py-6">
-                      <div className="space-y-2">
-                        {tier.features.map((feature, featureIdx) => (
+                      <h2 className="group-hover:text-primary mb-3 font-serif text-3xl font-normal transition-colors">
+                        {tier.name}
+                      </h2>
+                      <p className="text-muted-foreground mb-6 max-w-md text-sm leading-relaxed font-normal">
+                        {tier.description}
+                      </p>
+
+                      {/* Features Grid */}
+                      <div className="grid grid-cols-1 gap-x-8 gap-y-3 md:grid-cols-2">
+                        {tier.features.map((feature, fIdx) => (
                           <div
-                            key={featureIdx}
-                            className="flex items-start gap-3 text-sm"
+                            key={fIdx}
+                            className="text-muted-foreground flex items-center gap-2 text-[13px]"
                           >
-                            <Icons.CheckmarkCircle01Icon className="mt-0.5 h-4 w-4 shrink-0" />
-                            <span className="">{feature}</span>
+                            <Icons.CheckmarkCircle01Icon
+                              size={14}
+                              className="text-primary shrink-0"
+                            />
+                            <span>{feature}</span>
                           </div>
                         ))}
                       </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                    </div>
 
-          {/* Mobile Cards */}
-          <div className="space-y-4 md:hidden">
-            {pricingTiers.map((tier, idx) => (
-              <Card key={idx} className="overflow-hidden py-0!">
-                <div className="bg-primary absolute top-0 right-0 left-0 h-1" />
-
-                <div className="p-6">
-                  <h3 className="mb-3 font-serif text-xl font-light">
-                    {tier.name}
-                  </h3>
-
-                  <div className="mb-4 flex items-baseline gap-1">
-                    <span className="font-mono text-4xl font-light">
-                      {formatPrice(tier.price)}
-                    </span>
-                  </div>
-
-                  <p className="mb-4 text-sm leading-relaxed">
-                    {tier.description}
-                  </p>
-
-                  <div className="mb-6 space-y-3">
-                    {tier.features.map((feature, featureIdx) => (
-                      <div key={featureIdx} className="flex items-start gap-3">
-                        <Icons.CheckmarkCircle01Icon className="mt-0.5 h-4 w-4 shrink-0" />
-                        <span className="text-sm leading-relaxed">
-                          {feature}
-                        </span>
+                    {/* Price & Action */}
+                    <div className="border-border/50 flex shrink-0 flex-col items-center justify-center border-t pt-6 md:items-end md:border-t-0 md:pt-0">
+                      <span className="text-muted-foreground mb-1 text-[10px] font-bold tracking-widest uppercase">
+                        Starts At
+                      </span>
+                      <div className="text-primary mb-6 text-4xl">
+                        {formatPrice(tier.price)}
                       </div>
-                    ))}
+                    </div>
                   </div>
-                </div>
-              </Card>
-            ))}
+                </Card>
+              ))}
+            </div>
           </div>
-          <div className="flex flex-col items-center gap-6">
-            <p className="text-background text-center text-[15px] font-normal sm:text-base">
+        </Container>
+      </section>
+
+      <section className="bg-card py-24">
+        <Container size="xs" className="text-center">
+          <div className="mb-10 flex flex-col items-center">
+            <p className="mb-2 font-serif text-xl italic">
+              Ready to start your journey?
+            </p>
+            <p className="text-muted-foreground mb-8 font-light">
               Book a consultation and let&apos;s bring your vision to life.
             </p>
             <Link
               href="/consultation"
-              className={buttonVariants({ size: "lg" })}
+              className={buttonVariants({ size: "xl" })}
             >
-              <span>Book A Consultation</span>
+              Schedule Consultation
             </Link>
           </div>
+
+          <div className="border-border/50 border-t pt-16 text-[13px] leading-relaxed font-light">
+            <p>
+              <strong>Note:</strong> Our pre-made dresses begin at{" "}
+              <strong>$1,500</strong>. <br />
+              Custom designs fall within the mid-luxury to high-luxury range.
+            </p>
+          </div>
         </Container>
-      </div>
-      <div className="bg-card py-24">
-        <Container size="xs" className="flex flex-col items-center gap-4">
-          <p className="text-center text-[15px] font-normal sm:text-base">
-            <strong>Note:</strong> Our pre-made dresses begin at{" "}
-            <strong>$1,500</strong> and are available for purchase on our
-            website or{" "}
-            <strong>
-              <Link href="/shop" className="underline">
-                click here
-              </Link>
-            </strong>
-            . <br className="hidden md:block" />
-            Customize dresses fall within the mid-luxury to high-luxury range.
-          </p>
-        </Container>
-      </div>
+      </section>
     </div>
   );
 }

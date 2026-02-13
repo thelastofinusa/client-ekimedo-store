@@ -6,6 +6,7 @@ import { sanityFetch } from "@/sanity/lib/live";
 import { SERVICE_QUERY } from "@/sanity/queries/service";
 import { CTA } from "@/components/shared/cta";
 import { siteConfig } from "@/site.config";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "Book a Consultation",
@@ -51,6 +52,8 @@ export default async function ConsultationPage({
       : params.canceled === "true"
         ? "canceled"
         : null;
+
+  if (!services.length) return redirect("/");
 
   return (
     <div className="flex-1 overflow-x-clip">

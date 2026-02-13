@@ -13,7 +13,8 @@ export const SERVICE_QUERY = defineQuery(`
   "snapshots": snapshots[]{
     "url": image.asset->url,
     description
-  }
+  },
+  formBuilder
 }
 `);
 
@@ -30,6 +31,7 @@ export const SERVICE_BY_ID_QUERY = defineQuery(`
   "snapshots": snapshots[]{
     "url": image.asset->url,
     description
-  }
+  },
+  formBuilder
 }
 `);

@@ -12,6 +12,15 @@ import {
 import { ProductCard } from "@/components/shared/product-card";
 import { Icons } from "hugeicons-proxy";
 import { PRODUCT_QUERYResult } from "@/sanity.types";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/ui/pagination";
 
 interface Props {
   products: PRODUCT_QUERYResult;
@@ -19,6 +28,9 @@ interface Props {
 
 export const ProductGrid: React.FC<Props> = ({ products }) => {
   const searchParams = useSearchParams();
+
+  const currentPage = Number(searchParams.get("page")) || 1;
+  const itemsPerPage = 9;
 
   // Filter products based on URL parameters
   const filteredProducts = React.useMemo(() => {
@@ -58,19 +70,32 @@ export const ProductGrid: React.FC<Props> = ({ products }) => {
     return filtered;
   }, [products, searchParams]);
 
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const paginatedProducts = filteredProducts.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage,
+  );
+
+  const createPageURL = (pageNumber: number | string) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("page", pageNumber.toString());
+    return `?${params.toString()}`;
+  };
+
   return (
     <div className="flex-1">
       <div className="mb-6 flex items-center">
         <p className="text-foreground text-sm font-normal">
           Showing{" "}
+          <strong className="font-mono">{paginatedProducts.length}</strong> of{" "}
           <strong className="font-mono">{filteredProducts.length}</strong>{" "}
           results
         </p>
       </div>
 
-      {filteredProducts.length > 0 ? (
+      {paginatedProducts.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-y-12">
-          {filteredProducts.map((product, idx) => (
+          {paginatedProducts.map((product, idx) => (
             <ProductCard key={`${product._id}-${idx}`} product={product} />
           ))}
         </div>
@@ -88,6 +113,35 @@ export const ProductGrid: React.FC<Props> = ({ products }) => {
             </EmptyHeader>
           </Empty>
         </div>
+      )}
+
+      {totalPages > 1 && (
+        <Pagination className="mt-6">
+          <PaginationContent>
+            {currentPage > 1 && (
+              <PaginationItem>
+                <PaginationPrevious href={createPageURL(currentPage - 1)} />
+              </PaginationItem>
+            )}
+
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+              <PaginationItem key={page}>
+                <PaginationLink
+                  href={createPageURL(page)}
+                  isActive={currentPage === page}
+                >
+                  {page}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+
+            {currentPage < totalPages && (
+              <PaginationItem>
+                <PaginationNext href={createPageURL(currentPage + 1)} />
+              </PaginationItem>
+            )}
+          </PaginationContent>
+        </Pagination>
       )}
     </div>
   );

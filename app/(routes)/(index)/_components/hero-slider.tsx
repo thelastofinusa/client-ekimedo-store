@@ -110,7 +110,7 @@ export const HeroSlider = ({ images }: { images: string[] }) => {
               </Link>
             </div>
             <Link
-              href={"/custom-orders" as Route}
+              href={"/custom-order" as Route}
               className="group flex items-center gap-1.5 font-mono text-[11px] tracking-[0.3em] uppercase transition"
             >
               Custom Order
