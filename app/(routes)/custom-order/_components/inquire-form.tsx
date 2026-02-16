@@ -22,14 +22,10 @@ import { Container } from "@/components/shared/container";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { PhoneInput } from "@/ui/phone-input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/ui/popover";
 import { Button } from "@/ui/button";
 import { cn } from "@/lib/utils";
-import { CalendarIcon } from "lucide-react";
-import { Calendar } from "@/ui/calendar";
 import { toast } from "sonner";
 import { Notify } from "@/components/shared/notify";
-import { format } from "date-fns";
 import { Icons } from "hugeicons-proxy";
 import {
   inquireFormSchema,
@@ -51,6 +47,26 @@ const BUDGET_RANGES = [
   { value: "over-5000", label: "$5,000+" },
 ];
 
+const formatDateTimeLocal = (date?: Date): string => {
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    return "";
+  }
+  const pad = (value: number) => String(value).padStart(2, "0");
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+const parseDateTimeLocal = (value: string): Date | undefined => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return undefined;
+  return date;
+};
+
 export const InquireForm = () => {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [inspirationPhotos, setInspirationPhotos] = React.useState<File[]>([]);
@@ -63,7 +79,7 @@ export const InquireForm = () => {
       email: "",
       phone: "",
       eventType: "",
-      eventDate: undefined,
+      eventDate: new Date(),
       budget: "",
       dreamDress: "",
     },
@@ -164,7 +180,7 @@ export const InquireForm = () => {
   }
 
   return (
-    <div className="bg-card py-24 lg:py-32">
+    <div className="from-secondary/80 via-secondary/30 to-background bg-linear-to-b py-24 lg:py-32">
       <Container size="xs" className="max-w-3xl">
         <div className="bg-card border-border rounded-md border p-6 shadow-xs md:p-8 lg:p-12">
           <h2 className="mb-1 text-center font-serif text-xl md:text-2xl">
@@ -277,37 +293,18 @@ export const InquireForm = () => {
                   render={({ field }) => (
                     <FormItem className="flex flex-col">
                       <FormLabel>Event Date</FormLabel>
-                      <Popover>
-                        <PopoverTrigger disabled={isSubmitting}>
-                          <FormControl>
-                            <div
-                              className={cn(
-                                "text-foreground border-input/40 bg-card inline-flex h-12 w-full cursor-pointer items-center border px-4 text-sm shadow-xs",
-                                !field.value && "text-muted-foreground",
-                              )}
-                            >
-                              {field.value ? (
-                                format(field.value, "PPP")
-                              ) : (
-                                <span>Pick a date</span>
-                              )}
-                              <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                            </div>
-                          </FormControl>
-                        </PopoverTrigger>
-                        {!isSubmitting && (
-                          <PopoverContent className="w-auto p-0" align="start">
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              disabled={(date) => date < new Date()}
-                              autoFocus
-                              className="pointer-events-auto p-3"
-                            />
-                          </PopoverContent>
-                        )}
-                      </Popover>
+                      <FormControl>
+                        <Input
+                          type="datetime-local"
+                          disabled={isSubmitting}
+                          min={formatDateTimeLocal(new Date())}
+                          value={formatDateTimeLocal(field.value)}
+                          onChange={(e) => {
+                            const date = parseDateTimeLocal(e.target.value);
+                            field.onChange(date);
+                          }}
+                        />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

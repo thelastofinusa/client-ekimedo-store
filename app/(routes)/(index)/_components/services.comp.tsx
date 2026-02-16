@@ -1,25 +1,19 @@
-import { Container } from "@/components/shared/container";
 import Link from "next/link";
-import { buttonVariants } from "@/ui/button";
-import { ArrowRight } from "lucide-react";
-import { client } from "@/sanity/lib/client";
-import { SERVICE_QUERY } from "@/sanity/queries/service";
-import { FilteredResponseQueryOptions } from "@sanity/client/stega";
 import Image from "next/image";
+import { ArrowRight } from "lucide-react";
+
+import { Container } from "@/components/shared/container";
+import { buttonVariants } from "@/ui/button";
 import { formatDuration, formatPrice } from "@/lib/utils";
+import { consultationsData } from "@/lib/constants/consultation";
 
 export const ServicesComp = async () => {
-  const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
-  const services = await client.fetch(SERVICE_QUERY, {}, options);
-
-  if (!services.length) return null;
-
   return (
     <div className="bg-background">
       <section className="from-secondary via-secondary/50 overflow-x-clip bg-linear-to-b to-transparent py-24 lg:py-32">
         <Container>
           <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-2">
-            {services.slice(0, 2).map((service) => (
+            {consultationsData.slice(0, 2).map((service) => (
               <Link
                 key={service._id}
                 href={`/consultation/${service.slug}`}

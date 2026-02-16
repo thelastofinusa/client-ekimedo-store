@@ -14,11 +14,11 @@ export default function RoutesLayout(
 ) {
   return (
     <ClerkProvider>
-      <NextTopLoader showSpinner={false} />
+      <NextTopLoader showSpinner={false} color="var(--primary)" />
       <CartProvider>
         <React.Fragment>
           <Header />
-          {props.children}
+          <main>{props.children}</main>
           <Footer />
         </React.Fragment>
         <Toaster position="bottom-center" />

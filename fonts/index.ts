@@ -10,7 +10,7 @@ const fontSans = localFont({
 
 const fontSerif = localFont({
   variable: "--font-serif",
-  src: "./NotoSerifDisplay/NotoSerifDisplay-VariableFont_wdth,wght.ttf",
+  src: "./PlayfairDisplay/PlayfairDisplay-VariableFont_wght.ttf",
   style: "normal",
 });
 

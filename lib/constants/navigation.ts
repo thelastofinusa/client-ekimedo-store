@@ -3,10 +3,6 @@ import { env } from "../env";
 
 export const headerRoutes = [
   {
-    label: "Home",
-    path: "/",
-  },
-  {
     label: "About Us",
     path: "/about",
   },

@@ -15,6 +15,7 @@ import { SOCIAL_QUERY } from "@/sanity/queries/social";
 import { sanityFetch } from "@/sanity/lib/live";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 import { env } from "@/lib/env";
+import { cn } from "@/lib/utils";
 
 export const getSocialIcon = (name: string) => {
   switch (name) {
@@ -41,6 +42,14 @@ export const Footer = async () => {
   const categories = await client.fetch(CATEGORIES_QUERY, {}, options);
   const businessHours = await client.fetch(BUSINESS_HOUR_QUERY, {}, options);
   const { data: socialHandles } = await sanityFetch({ query: SOCIAL_QUERY });
+
+  // Utility to check if the day is "Today" for highlighting
+  const isToday = (dayName: string) => {
+    const today = new Intl.DateTimeFormat("en-US", { weekday: "long" }).format(
+      new Date(),
+    );
+    return dayName.toLowerCase() === today.toLowerCase();
+  };
 
   return (
     <footer className="bg-foreground text-background border-border/20 border-t">
@@ -108,7 +117,7 @@ export const Footer = async () => {
 
           {/* Collections */}
           <div className="space-y-6">
-            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
+            <h4 className="text-muted-foreground font-sans text-[11px] font-medium tracking-[0.3em] uppercase">
               Collections
             </h4>
             <nav className="flex flex-col gap-4">
@@ -126,7 +135,7 @@ export const Footer = async () => {
 
           {/* Explore */}
           <div className="space-y-6">
-            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
+            <h4 className="text-muted-foreground font-sans text-[11px] font-medium tracking-[0.3em] uppercase">
               Explore
             </h4>
             <nav className="flex flex-col gap-4">
@@ -159,7 +168,7 @@ export const Footer = async () => {
 
           {/* Connect */}
           <div className="space-y-6">
-            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
+            <h4 className="text-muted-foreground font-sans text-[11px] font-medium tracking-[0.3em] uppercase">
               Services
             </h4>
             <nav className="flex flex-col gap-4">
@@ -188,25 +197,62 @@ export const Footer = async () => {
         </div>
 
         {businessHours?.hours && businessHours.hours.length > 0 && (
-          <div className="space-y-6 py-16">
-            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
-              Business Hours
-            </h4>
-            <nav className="flex flex-col gap-4 sm:max-w-sm">
-              {businessHours.hours?.map((item) => (
-                <p
-                  key={item._key}
-                  className="flex items-center justify-between text-sm opacity-70 transition-opacity hover:opacity-100"
-                >
-                  <span className="font-medium">{item.day}</span>{" "}
-                  <span>
-                    {item.isOpen
-                      ? `${item.startTime} - ${item.endTime}`
-                      : "Closed"}
-                  </span>
-                </p>
-              ))}
-            </nav>
+          <div className="py-16">
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4 lg:grid-cols-7">
+              {businessHours?.hours?.map((item) => {
+                const active = isToday(item.day || "");
+
+                return (
+                  <div
+                    key={item._key}
+                    className={cn(
+                      "relative flex flex-col gap-1 p-4 transition-all duration-500 last-of-type:col-span-2 lg:last-of-type:col-span-1",
+                      {
+                        "bg-background/10 ring-background/20 shadow-sm ring-1":
+                          active,
+                      },
+                    )}
+                  >
+                    {/* Active Indicator Dot */}
+                    {active && (
+                      <div className="absolute top-3 right-3">
+                        <span className="relative flex h-2 w-2">
+                          <span className="bg-secondary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
+                          <span className="bg-secondary relative inline-flex h-2 w-2 rounded-full"></span>
+                        </span>
+                      </div>
+                    )}
+
+                    <span
+                      className={cn(
+                        "text-background text-[11px] font-bold tracking-wide uppercase",
+                        {
+                          "text-muted-foreground": !active,
+                        },
+                      )}
+                    >
+                      {item.day ? item.day : ""}
+                    </span>
+
+                    <div className="flex flex-col">
+                      {item.isOpen ? (
+                        <span className="text-muted-foreground mt-1 text-xs font-normal">
+                          {item.startTime
+                            ? item.startTime.replace(":00", "")
+                            : ""}{" "}
+                          to{" "}
+                          {item.endTime ? item.endTime.replace(":00", "") : ""}
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground/80 mt-1 text-xs font-normal italic">
+                          Closed
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         )}
 

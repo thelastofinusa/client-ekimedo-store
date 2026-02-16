@@ -27,9 +27,9 @@ export const CTA: React.FC<Props> = ({ mode, title, description, route }) => {
       <Container className="flex flex-col items-center justify-center text-center">
         <h3 className="mb-6 text-4xl md:text-5xl">{title}</h3>
         {description && (
-          <p className="text-muted-foreground mx-auto mb-10 max-w-2xl text-sm sm:text-base">
+          <pre className="text-muted-foreground mx-auto mb-10 max-w-2xl font-sans text-sm whitespace-pre-wrap sm:text-base">
             {description}
-          </p>
+          </pre>
         )}
         <Link
           href={route.path}

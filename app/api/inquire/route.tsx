@@ -125,7 +125,7 @@ export async function POST(req: Request) {
         imageCount={imageAssetIds.length}
         inquiryId={inquiryId}
         socialLinks={socialHandles || []}
-        siteUrl={env.NEXT_PUBLIC_SITE_URL}
+        siteUrl={siteConfig.url}
       />,
     );
 

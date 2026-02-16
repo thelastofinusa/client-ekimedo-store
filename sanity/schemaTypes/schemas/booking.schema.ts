@@ -27,8 +27,8 @@ export const bookingType = defineType({
     defineField({
       name: "service",
       title: "Service",
-      type: "reference",
-      to: [{ type: "service" }],
+      type: "string",
+      validation: (rule) => rule.required(),
     }),
     defineField({
       name: "bookingDate",
@@ -73,10 +73,30 @@ export const bookingType = defineType({
       type: "number",
     }),
     defineField({
-      name: "socialMediaHandles",
-      title: "Social Media Handles",
-      type: "array",
-      of: [{ type: "string" }],
+      name: "eventDate",
+      title: "Event Date",
+      type: "datetime",
+    }),
+    defineField({
+      name: "budgetType",
+      title: "Budget Tier",
+      type: "string",
+    }),
+    defineField({
+      name: "customBudget",
+      title: "Custom Budget",
+      type: "string",
+    }),
+    defineField({
+      name: "paymentMethod",
+      title: "Payment Method",
+      type: "string",
+      options: {
+        list: [
+          { title: "Stripe", value: "stripe" },
+          { title: "PayPal", value: "paypal" },
+        ],
+      },
     }),
     defineField({
       name: "styleInspiration",
@@ -85,8 +105,29 @@ export const bookingType = defineType({
       of: [{ type: "image", options: { hotspot: true } }],
     }),
     defineField({
-      name: "agreedToCancellation",
-      title: "Agreed to Cancellation Policy",
+      name: "responses",
+      title: "Form Responses",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "key", type: "string", title: "Field Key" },
+            { name: "label", type: "string", title: "Field Label" },
+            { name: "value", type: "string", title: "Value" },
+          ],
+          preview: {
+            select: {
+              title: "label",
+              subtitle: "value",
+            },
+          },
+        },
+      ],
+    }),
+    defineField({
+      name: "understoodProductionProcess",
+      title: "Understood Production Process",
       type: "boolean",
     }),
   ],
@@ -99,7 +140,9 @@ export const bookingType = defineType({
     prepare({ title, subtitle, media }) {
       return {
         title,
-        subtitle: subtitle ? new Date(subtitle).toLocaleString() : "No date set",
+        subtitle: subtitle
+          ? new Date(subtitle).toLocaleString()
+          : "No date set",
         media,
       };
     },

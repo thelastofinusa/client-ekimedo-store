@@ -15,6 +15,7 @@ const cartItemSchema = z.object({
 
 const createSessionSchema = z.object({
   items: z.array(cartItemSchema),
+  paymentMethod: z.string().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -25,7 +26,7 @@ export async function POST(req: NextRequest) {
     if (!userId || !user) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
@@ -35,15 +36,19 @@ export async function POST(req: NextRequest) {
     if (!validation.success) {
       return NextResponse.json(
         { success: false, error: "Invalid request body" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const result = await createCheckoutSession(validation.data.items, {
-      id: userId,
-      email: user.emailAddresses[0]?.emailAddress || "",
-      name: `${user.firstName} ${user.lastName}`.trim(),
-    });
+    const result = await createCheckoutSession(
+      validation.data.items,
+      {
+        id: userId,
+        email: user.emailAddresses[0]?.emailAddress || "",
+        name: `${user.firstName} ${user.lastName}`.trim(),
+      },
+      validation.data.paymentMethod || "stripe",
+    );
 
     if (!result.success) {
       return NextResponse.json(result, { status: 400 });

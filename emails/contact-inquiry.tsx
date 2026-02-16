@@ -31,8 +31,6 @@ interface ContactInquiryProps {
   siteUrl?: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
-
 export const ContactInquiryEmail = ({
   fullName,
   email,
@@ -40,7 +38,7 @@ export const ContactInquiryEmail = ({
   inquiryType,
   message,
   socialLinks,
-  siteUrl = baseUrl,
+  siteUrl,
 }: ContactInquiryProps) => (
   <Html>
     <Head />

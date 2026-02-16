@@ -30,19 +30,19 @@ export const Notify: React.FC<CompProps> = (props) => {
     {
       success: {
         icon: "text-green-600",
-        wrapper: "text-green-600 bg-green-600/5 border-green-600/50",
+        wrapper: "text-green-600 bg-green-600/10 border-green-600/50",
       },
       info: {
         icon: "text-blue-600",
-        wrapper: "text-blue-600 bg-blue-600/5 border-blue-600/50",
+        wrapper: "text-blue-600 bg-blue-600/10 border-blue-600/50",
       },
       warning: {
         icon: "text-yellow-600",
-        wrapper: "text-yellow-600 bg-yellow-600/5 border-yellow-600/50",
+        wrapper: "text-yellow-600 bg-yellow-600/10 border-yellow-600/50",
       },
       error: {
         icon: "text-red-600",
-        wrapper: "text-red-600 bg-red-600/5 border-red-600/50",
+        wrapper: "text-red-600 bg-red-600/10 border-red-600/50",
       },
       loading: {
         icon: "text-foreground",

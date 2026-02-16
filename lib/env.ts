@@ -8,6 +8,8 @@ export const env = createEnv({
     STRIPE_WEBHOOK_SECRET: z.string().min(1),
     SANITY_API_WRITE_TOKEN: z.string().min(1),
     RESEND_API_KEY: z.string().min(1),
+    PAYPAL_CLIENT_ID: z.string().min(1),
+    PAYPAL_CLIENT_SECRET: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_SITE_URL: z.url().min(1),

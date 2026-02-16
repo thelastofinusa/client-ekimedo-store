@@ -9,6 +9,9 @@ import { getOrCreateStripeCustomer } from "@/lib/services/customer";
 import { env } from "../env";
 import { stripe } from "@/lib/stripe";
 import { Product } from "@/sanity.types";
+import { paypalClient } from "@/lib/paypal";
+import checkoutNodeJssdk from "@paypal/checkout-server-sdk";
+import { siteConfig } from "@/site.config";
 
 // Types
 interface ProductPayload {
@@ -72,6 +75,7 @@ export interface PaymentIntentResult {
 export async function createCheckoutSession(
   items: CartItem[],
   user: { id: string; email: string; name: string },
+  paymentMethod: string = "stripe",
 ): Promise<CheckoutResult> {
   try {
     const { id: userId, email: userEmail, name: userName } = user;
@@ -188,78 +192,159 @@ export async function createCheckoutSession(
     // 8. Create Stripe Checkout Session
     // Priority: NEXT_PUBLIC_BASE_URL > Vercel URL > localhost
     const baseUrl =
-      env.NEXT_PUBLIC_SITE_URL ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null) ||
-      "http://localhost:3000";
+      siteConfig.url ||
+      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null);
 
-    const session = await stripe.checkout.sessions.create({
-      mode: "payment",
-      payment_method_types: ["card"],
-      line_items: lineItems,
-      customer: stripeCustomerId,
-      shipping_address_collection: {
-        allowed_countries: [
-          "GB", // United Kingdom
-          "US", // United States
-          "CA", // Canada
-          "AU", // Australia
-          "NZ", // New Zealand
-          "IE", // Ireland
-          "DE", // Germany
-          "FR", // France
-          "ES", // Spain
-          "IT", // Italy
-          "NL", // Netherlands
-          "BE", // Belgium
-          "AT", // Austria
-          "CH", // Switzerland
-          "SE", // Sweden
-          "NO", // Norway
-          "DK", // Denmark
-          "FI", // Finland
-          "PT", // Portugal
-          "PL", // Poland
-          "CZ", // Czech Republic
-          "GR", // Greece
-          "HU", // Hungary
-          "RO", // Romania
-          "BG", // Bulgaria
-          "HR", // Croatia
-          "SI", // Slovenia
-          "SK", // Slovakia
-          "LT", // Lithuania
-          "LV", // Latvia
-          "EE", // Estonia
-          "LU", // Luxembourg
-          "MT", // Malta
-          "CY", // Cyprus
-          "JP", // Japan
-          "SG", // Singapore
-          "HK", // Hong Kong
-          "KR", // South Korea
-          "TW", // Taiwan
-          "MY", // Malaysia
-          "TH", // Thailand
-          "IN", // India
-          "AE", // United Arab Emirates
-          "SA", // Saudi Arabia
-          "IL", // Israel
-          "ZA", // South Africa
-          "BR", // Brazil
-          "MX", // Mexico
-          "AR", // Argentina
-          "CL", // Chile
-          "CO", // Colombia
+    // 8. Handle Payment based on method
+    if (paymentMethod === "stripe") {
+      const session = await stripe.checkout.sessions.create({
+        mode: "payment",
+        payment_method_types: ["card"],
+        line_items: lineItems,
+        customer: stripeCustomerId,
+        shipping_address_collection: {
+          allowed_countries: [
+            "GB", // United Kingdom
+            "US", // United States
+            "CA", // Canada
+            "AU", // Australia
+            "NZ", // New Zealand
+            "IE", // Ireland
+            "DE", // Germany
+            "FR", // France
+            "ES", // Spain
+            "IT", // Italy
+            "NL", // Netherlands
+            "BE", // Belgium
+            "AT", // Austria
+            "CH", // Switzerland
+            "SE", // Sweden
+            "NO", // Norway
+            "DK", // Denmark
+            "FI", // Finland
+            "PT", // Portugal
+            "PL", // Poland
+            "CZ", // Czech Republic
+            "GR", // Greece
+            "HU", // Hungary
+            "RO", // Romania
+            "BG", // Bulgaria
+            "HR", // Croatia
+            "SI", // Slovenia
+            "SK", // Slovakia
+            "LT", // Lithuania
+            "LV", // Latvia
+            "EE", // Estonia
+            "LU", // Luxembourg
+            "MT", // Malta
+            "CY", // Cyprus
+            "JP", // Japan
+            "SG", // Singapore
+            "HK", // Hong Kong
+            "KR", // South Korea
+            "TW", // Taiwan
+            "MY", // Malaysia
+            "TH", // Thailand
+            "IN", // India
+            "AE", // United Arab Emirates
+            "SA", // Saudi Arabia
+            "IL", // Israel
+            "ZA", // South Africa
+            "BR", // Brazil
+            "MX", // Mexico
+            "AR", // Argentina
+            "CL", // Chile
+            "CO", // Colombia
+          ],
+        },
+        metadata,
+        success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${baseUrl}/checkout`,
+      });
+
+      return { success: true, url: session.url ?? undefined };
+    } else if (paymentMethod === "paypal") {
+      const totalAmount = items.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0,
+      );
+
+      const request = new checkoutNodeJssdk.orders.OrdersCreateRequest();
+      request.prefer("return=representation");
+      request.requestBody({
+        intent: "CAPTURE",
+        purchase_units: [
+          {
+            amount: {
+              currency_code: "USD",
+              value: totalAmount.toFixed(2),
+              breakdown: {
+                item_total: {
+                  currency_code: "USD",
+                  value: totalAmount.toFixed(2),
+                },
+                discount: { currency_code: "USD", value: "0.00" },
+                handling: { currency_code: "USD", value: "0.00" },
+                insurance: { currency_code: "USD", value: "0.00" },
+                shipping_discount: { currency_code: "USD", value: "0.00" },
+                shipping: { currency_code: "USD", value: "0.00" },
+                tax_total: { currency_code: "USD", value: "0.00" },
+              },
+            },
+            items: items.map((item) => ({
+              name: item.name,
+              unit_amount: {
+                currency_code: "USD",
+                value: item.price.toFixed(2),
+              },
+              quantity: item.quantity.toString(),
+              category: "PHYSICAL_GOODS",
+            })),
+            description: `${siteConfig.title} Order`,
+          },
         ],
-      },
-      metadata,
-      success_url: `${baseUrl}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${baseUrl}/checkout`,
-    });
+        application_context: {
+          return_url: `${baseUrl}/api/checkout/paypal/capture`,
+          cancel_url: `${baseUrl}/checkout`,
+          brand_name: `${siteConfig.title}`,
+          user_action: "PAY_NOW",
+          shipping_preference: "GET_FROM_FILE",
+        },
+      });
 
-    return { success: true, url: session.url ?? undefined };
-  } catch (error) {
+      const response = await paypalClient.client().execute(request);
+      const order = response.result;
+
+      const approvalLink = order.links.find(
+        (link: { rel: string; href: string }) => link.rel === "approve",
+      );
+
+      if (!approvalLink) {
+        throw new Error("PayPal approval link not found");
+      }
+
+      return { success: true, url: approvalLink.href };
+    }
+
+    return { success: false, error: "Invalid payment method" };
+  } catch (error: unknown) {
     console.error("Checkout error:", error);
+
+    if (error instanceof Error && error.message) {
+      try {
+        const parsedError = JSON.parse(error.message);
+        if (parsedError.error_description || parsedError.error) {
+          return {
+            success: false,
+            error: (parsedError.error_description ||
+              parsedError.error) as string,
+          };
+        }
+      } catch (e) {
+        // Not a JSON error message
+      }
+    }
+
     return {
       success: false,
       error:

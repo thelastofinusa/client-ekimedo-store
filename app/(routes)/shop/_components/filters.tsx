@@ -18,15 +18,8 @@ import {
   PRODUCT_COLOR_QUERYResult,
   PRODUCT_QUERYResult,
 } from "@/sanity.types";
-import { cn } from "@/lib/utils";
-
-const priceRangeFilters = [
-  { name: "Under $500", slug: "0-500" },
-  { name: "$500 - $1,000", slug: "500-1000" },
-  { name: "$1,000 - $3,000", slug: "1000-3000" },
-  { name: "$3,000 - $5,000", slug: "3000-5000" },
-  { name: "Above $5,000", slug: "5000-999999" },
-];
+import { cn, formatPrice } from "@/lib/utils";
+import { Slider } from "@/ui/slider";
 
 const sizeFilters = [
   { name: "0-2 (XS)", value: "0-2 (XS)" },
@@ -55,24 +48,58 @@ export const Filters: React.FC<Props> = ({ categories, colors, products }) => {
     sizesValue,
     priceValue,
     hasActiveFilters,
+    minPrice,
+    maxPrice,
   } = React.useMemo(() => {
     const categoriesValue = searchParams.getAll("category");
     const colorsValue = searchParams.getAll("color");
     const sizesValue = searchParams.getAll("size");
     const priceValue = searchParams.get("price");
 
+    const allPrices = products?.map((p) => p.price || 0) || [];
+    const minPrice = allPrices.length > 0 ? Math.min(...allPrices) : 500;
+    const maxPrice = allPrices.length > 0 ? Math.max(...allPrices) : 5000;
+
     return {
       categoriesValue,
       colorsValue,
       sizesValue,
       priceValue,
+      minPrice,
+      maxPrice: Math.ceil(maxPrice / 5000) * 5000, // Round up to nearest 100
       hasActiveFilters:
         !!priceValue ||
         categoriesValue.length > 0 ||
         colorsValue.length > 0 ||
         sizesValue.length > 0,
     };
-  }, [searchParams]);
+  }, [searchParams, products]);
+
+  const [sliderValue, setSliderValue] = React.useState<number[]>([
+    minPrice,
+    maxPrice,
+  ]);
+
+  React.useEffect(() => {
+    if (priceValue) {
+      const [min, max] = priceValue.split("-").map(Number);
+      if (!isNaN(min) && !isNaN(max)) {
+        setSliderValue([min, max]);
+      }
+    } else {
+      setSliderValue([minPrice, maxPrice]);
+    }
+  }, [priceValue, minPrice, maxPrice]);
+
+  const handleSliderChange = (value: number[]) => {
+    setSliderValue(value);
+  };
+
+  const handleSliderCommit = (value: number[]) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("price", `${value[0]}-${value[1]}`);
+    pushParams(params);
+  };
 
   const pushParams = React.useCallback(
     (params: URLSearchParams) => {
@@ -113,9 +140,6 @@ export const Filters: React.FC<Props> = ({ categories, colors, products }) => {
             return product.colors?.some((c) => c.name === value);
           case "size":
             return product.sizes?.includes(value);
-          case "price":
-            const [min, max] = value.split("-").map(Number);
-            return (product.price || 0) >= min && (product.price || 0) < max;
           default:
             return false;
         }
@@ -125,8 +149,24 @@ export const Filters: React.FC<Props> = ({ categories, colors, products }) => {
   );
 
   const content = (
-    <div className="flex h-max w-full flex-col gap-8 md:sticky md:top-26 md:w-64 lg:top-32">
+    <div className="z-20 flex h-max w-full flex-col gap-8 md:sticky md:top-26 md:w-64 lg:top-32">
       <div className="flex flex-col gap-8">
+        <FilterSection title="Price Range" className="gap-2">
+          <span className="text-muted-foreground text-xs">
+            Budget range <strong>{formatPrice(sliderValue[0])}</strong> -{" "}
+            <strong>{formatPrice(sliderValue[1])}</strong>.
+          </span>
+          <Slider
+            value={sliderValue}
+            min={minPrice}
+            max={maxPrice}
+            step={100}
+            onValueChange={handleSliderChange}
+            onValueCommit={handleSliderCommit}
+            className="mt-2 w-full"
+          />
+        </FilterSection>
+
         {categories.length > 0 && (
           <FilterSection title="Categories">
             {categories.map((category) => {
@@ -154,32 +194,6 @@ export const Filters: React.FC<Props> = ({ categories, colors, products }) => {
             })}
           </FilterSection>
         )}
-
-        <FilterSection title="Price Range">
-          {priceRangeFilters.map((option) => {
-            const isSelected = priceValue === option.slug;
-            const count = getProductCount("price", option.slug);
-
-            return (
-              <div
-                key={option.slug}
-                className={cn(
-                  "hover:text-primary flex cursor-pointer items-center justify-between text-sm transition-colors",
-                  isSelected
-                    ? "text-primary font-medium"
-                    : "text-muted-foreground",
-                )}
-                onClick={() => toggleParam("price", option.slug)}
-              >
-                <div className="flex items-center gap-2">
-                  {isSelected && <span>✓</span>}
-                  <span>{option.name}</span>
-                  <span>({count})</span>
-                </div>
-              </div>
-            );
-          })}
-        </FilterSection>
 
         {colors.length > 0 && (
           <FilterSection title="Colors">
@@ -251,12 +265,12 @@ export const Filters: React.FC<Props> = ({ categories, colors, products }) => {
 
       {hasActiveFilters && (
         <Button
-          className="w-max"
-          size="sm"
-          variant="outline"
+          size="icon-xs"
           onClick={clearFilters}
+          className="absolute -top-0.5 right-0"
         >
-          <span>Clear</span>
+          <Icons.Cancel01Icon />
+          <span className="sr-only">Clear</span>
         </Button>
       )}
     </div>
@@ -291,11 +305,13 @@ export const Filters: React.FC<Props> = ({ categories, colors, products }) => {
 const FilterSection = ({
   title,
   children,
+  className,
 }: {
   title: string;
   children: React.ReactNode;
+  className?: string;
 }) => (
-  <div className="flex flex-col gap-4">
+  <div className={cn("flex flex-col gap-4", className)}>
     <p className="text-foreground flex items-center gap-2 text-sm font-normal">
       <span>{title}</span>
     </p>

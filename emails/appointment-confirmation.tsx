@@ -28,9 +28,11 @@ interface AppointmentConfirmationProps {
   calendarUrl: string;
   siteUrl?: string;
   socialLinks?: SocialLink[];
+  eventDate?: string | Date | null;
+  budgetType?: string | null;
+  customBudget?: string | null;
+  paymentMethod?: string | null;
 }
-
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
 
 export const AppointmentConfirmationEmail = ({
   customerName,
@@ -38,8 +40,12 @@ export const AppointmentConfirmationEmail = ({
   dateTime,
   location,
   calendarUrl,
-  siteUrl = baseUrl,
+  siteUrl,
   socialLinks = [],
+  eventDate,
+  budgetType,
+  customBudget,
+  paymentMethod,
 }: AppointmentConfirmationProps) => {
   const dateObj = new Date(dateTime);
   const dateStr = dateObj.toLocaleDateString("en-US", {
@@ -52,6 +58,25 @@ export const AppointmentConfirmationEmail = ({
     hour: "2-digit",
     minute: "2-digit",
   });
+
+  const eventDateStr = eventDate
+    ? new Date(eventDate).toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : null;
+
+  const budgetLabel =
+    (customBudget && customBudget.length > 0 ? customBudget : budgetType) ||
+    null;
+
+  const paymentMethodLabel = paymentMethod
+    ? paymentMethod === "stripe"
+      ? "Credit Card (Stripe)"
+      : "PayPal"
+    : null;
 
   return (
     <Html>
@@ -85,6 +110,12 @@ export const AppointmentConfirmationEmail = ({
                 <Column style={labelColumn}>What</Column>
                 <Column style={valueColumn}>{serviceTitle}</Column>
               </Row>
+              {eventDateStr && (
+                <Row style={row}>
+                  <Column style={labelColumn}>Event</Column>
+                  <Column style={valueColumn}>{eventDateStr}</Column>
+                </Row>
+              )}
               <Row style={row}>
                 <Column style={labelColumn}>When</Column>
                 <Column style={valueColumn}>
@@ -95,6 +126,18 @@ export const AppointmentConfirmationEmail = ({
                 <Column style={labelColumn}>Where</Column>
                 <Column style={valueColumn}>{location}</Column>
               </Row>
+              {budgetLabel && (
+                <Row style={row}>
+                  <Column style={labelColumn}>Budget</Column>
+                  <Column style={valueColumn}>{budgetLabel}</Column>
+                </Row>
+              )}
+              {paymentMethodLabel && (
+                <Row style={row}>
+                  <Column style={labelColumn}>Payment</Column>
+                  <Column style={valueColumn}>{paymentMethodLabel}</Column>
+                </Row>
+              )}
             </Section>
 
             <Text style={policyText}>

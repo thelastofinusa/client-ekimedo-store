@@ -51,7 +51,7 @@ export default async function GalleryPage() {
     categoryResult.data as CATEGORIES_QUERYResult;
 
   return (
-    <div className="bg-foreground text-background flex-1 overflow-x-clip py-28 lg:py-36">
+    <div className="flex-1 overflow-x-clip">
       <React.Suspense fallback={<SplashScreen />}>
         <GallerySection gallery={gallery} category={category} />
       </React.Suspense>

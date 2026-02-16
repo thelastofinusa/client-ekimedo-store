@@ -35,8 +35,6 @@ interface CustomOrderInquiryProps {
   siteUrl?: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
-
 export const CustomOrderInquiryEmail = ({
   fullName,
   email,
@@ -48,7 +46,7 @@ export const CustomOrderInquiryEmail = ({
   imageCount,
   inquiryId,
   socialLinks,
-  siteUrl = baseUrl,
+  siteUrl,
 }: CustomOrderInquiryProps) => (
   <Html>
     <Head />
@@ -138,7 +136,7 @@ export const CustomOrderInquiryEmail = ({
             Reply to Customer
           </Button>
           <Button
-            href={`${siteUrl}/studio/structure/inquiry;${inquiryId}`}
+            href={`${siteUrl}/admin/structure/inquiry;${inquiryId}`}
             style={{ ...buttonSecondary, marginLeft: "10px" }}
           >
             Open in Studio

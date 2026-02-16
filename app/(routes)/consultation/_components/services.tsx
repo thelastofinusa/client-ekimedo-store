@@ -8,11 +8,11 @@ import { ArrowUpRight } from "lucide-react";
 
 import { buttonVariants } from "@/ui/button";
 import { Container } from "@/components/shared/container";
-import { SERVICE_QUERYResult } from "@/sanity.types";
 import { formatPrice, formatDuration } from "@/lib/utils";
+import { consultationsData } from "@/lib/constants/consultation";
 
 interface Props {
-  services: SERVICE_QUERYResult;
+  services: typeof consultationsData;
   messageType?: "success" | "canceled" | null;
 }
 
@@ -23,7 +23,7 @@ export const Services: React.FC<Props> = ({ services, messageType }) => {
     if (messageType) {
       const t = setTimeout(() => {
         router.replace("/consultation", { scroll: false });
-      }, 8000);
+      }, 12000);
       return () => clearTimeout(t);
     }
   }, [messageType, router]);
@@ -62,7 +62,7 @@ export const Services: React.FC<Props> = ({ services, messageType }) => {
                 key={service._id}
                 className="flex flex-col items-center justify-start gap-4 md:gap-6 lg:flex-row lg:gap-8 lg:even:flex-row-reverse xl:gap-10"
               >
-                <div className="relative aspect-[1.3] w-full flex-1">
+                <div className="bg-secondary relative aspect-[1.3] w-full flex-1 shadow-xs">
                   <Image
                     src={service.image || "/placeholder.svg"}
                     alt={service.title || "Service title"}

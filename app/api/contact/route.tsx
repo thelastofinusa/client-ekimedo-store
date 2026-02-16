@@ -5,15 +5,15 @@ import { SOCIAL_QUERY } from "@/sanity/queries/social";
 import { env } from "@/lib/env";
 import { siteConfig } from "@/site.config";
 import { ContactInquiryEmail } from "@/emails/contact-inquiry";
-import { formSchema } from "@/lib/validators/contact-form";
 import { render } from "@react-email/render";
+import { contactFormSchema } from "@/app/(routes)/contact/_components/contact-form.comp";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const result = formSchema.safeParse(body);
+    const result = contactFormSchema.safeParse(body);
 
     if (!result.success) {
       return NextResponse.json(
@@ -47,7 +47,7 @@ export async function POST(req: Request) {
         inquiryType={inquiryType}
         message={message}
         socialLinks={socialHandles || []}
-        siteUrl={env.NEXT_PUBLIC_SITE_URL}
+        siteUrl={siteConfig.url}
       />,
     );
 

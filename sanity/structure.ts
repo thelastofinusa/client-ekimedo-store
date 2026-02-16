@@ -11,14 +11,13 @@ export const structure: StructureResolver = (S) =>
       S.documentTypeListItem("product").title("Products"),
       S.documentTypeListItem("category").title("Categories"),
       S.documentTypeListItem("productColor").title("Colors"),
-      S.documentTypeListItem("customer").title("Customers"),
 
       S.divider(),
 
       // Services & Bookings
-      S.documentTypeListItem("service").title("Consultation"),
       S.documentTypeListItem("booking").title("Bookings"),
       S.documentTypeListItem("inquiry").title("Inquiries"),
+      S.documentTypeListItem("customer").title("Customers"),
 
       S.divider(),
 
@@ -32,4 +31,5 @@ export const structure: StructureResolver = (S) =>
 
       // Settings
       S.documentTypeListItem("businessHours").title("Business Hours"),
+      S.documentTypeListItem("faq").title("Frequently Asked Questions"),
     ]);

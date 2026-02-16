@@ -2,10 +2,9 @@ import { Metadata } from "next";
 import { HeroComp } from "./_components/hero.comp";
 
 import { Services } from "./_components/services";
-import { sanityFetch } from "@/sanity/lib/live";
-import { SERVICE_QUERY } from "@/sanity/queries/service";
 import { CTA } from "@/components/shared/cta";
 import { siteConfig } from "@/site.config";
+import { consultationsData } from "@/lib/constants/consultation";
 
 export const metadata: Metadata = {
   title: "Book a Consultation",
@@ -36,26 +35,18 @@ export const metadata: Metadata = {
   },
 };
 
-interface ConsultationPageProps {
-  searchParams: Promise<{ success?: string; canceled?: string }>;
-}
+export default async function ConsultationPage(
+  props: PageProps<"/consultation/[type]">,
+) {
+  const { success, canceled } = await props.searchParams;
 
-export default async function ConsultationPage({
-  searchParams,
-}: ConsultationPageProps) {
-  const { data: services } = await sanityFetch({ query: SERVICE_QUERY });
-  const params = await searchParams;
   const messageType =
-    params.success === "true"
-      ? "success"
-      : params.canceled === "true"
-        ? "canceled"
-        : null;
+    success === "true" ? "success" : canceled === "true" ? "canceled" : null;
 
   return (
     <div className="flex-1 overflow-x-clip">
       <HeroComp />
-      <Services services={services} messageType={messageType} />
+      <Services services={consultationsData} messageType={messageType} />
       <CTA
         mode="dark"
         title="Ready to Begin?"

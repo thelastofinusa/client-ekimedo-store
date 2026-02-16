@@ -36,13 +36,11 @@ interface OrderConfirmationProps {
   socialLinks?: SocialLink[];
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
-
 export const OrderConfirmationEmail = ({
   orderNumber,
   totalAmount,
   items,
-  siteUrl = baseUrl,
+  siteUrl,
   socialLinks = [],
 }: OrderConfirmationProps) => {
   return (
