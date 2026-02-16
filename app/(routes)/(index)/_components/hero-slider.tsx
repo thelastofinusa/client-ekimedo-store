@@ -19,7 +19,7 @@ export const HeroSlider = ({ images }: { images: string[] }) => {
 
     const interval = setInterval(() => {
       setIndex((prev) => (prev + 1) % images.length);
-    }, 8000); // 8s per slide
+    }, 5000); // 5s per slide
 
     return () => clearInterval(interval);
   }, [images.length]);
@@ -46,7 +46,7 @@ export const HeroSlider = ({ images }: { images: string[] }) => {
           ))}
         </motion.div>
 
-        <div className="bg-foreground/80 absolute inset-0 backdrop-blur-xs" />
+        <div className="bg-foreground/70 absolute inset-0 backdrop-blur-xs" />
       </div>
 
       <Container className="text-background relative z-10">

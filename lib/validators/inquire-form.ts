@@ -1,5 +1,4 @@
 import z from "zod";
-// import { isValidPhoneNumber } from "react-phone-number-input";
 
 export const inquireFormSchema = z.object({
   fullName: z
@@ -14,7 +13,6 @@ export const inquireFormSchema = z.object({
   phone: z
     .string()
     .trim()
-    // .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
     .min(10, "Phone number must be at least 10 digits"),
   eventType: z.string().min(1, "Please select an event type"),
   eventDate: z.date(),

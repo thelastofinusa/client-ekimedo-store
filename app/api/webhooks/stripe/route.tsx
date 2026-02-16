@@ -106,6 +106,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       dateTime,
       endTime,
       location,
+      eventDate,
+      budgetType,
+      customBudget,
+      paymentMethod,
     } = metadata;
 
     if (!bookingId) {
@@ -118,9 +122,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
       console.log(`Booking ${bookingId} confirmed`);
 
-      const adminTo = (
-        process.env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL ?? ""
-      ).trim();
+      const adminTo = env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
 
       if (!adminTo) {
         console.error(
@@ -134,8 +136,12 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             dateTime={dateTime}
             location={location}
             bookingId={bookingId}
-            siteUrl={env.NEXT_PUBLIC_SITE_URL}
+            siteUrl={siteConfig.url}
             socialLinks={socialHandles || []}
+            eventDate={eventDate}
+            budgetType={budgetType}
+            customBudget={customBudget}
+            paymentMethod={paymentMethod}
           />,
         );
 
@@ -144,7 +150,31 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           to: adminTo,
           replyTo: metadataCustomerEmail || undefined,
           subject: `New Appointment: ${serviceTitle}`,
-          text: `New appointment confirmed.\nService: ${serviceTitle}\nCustomer: ${customerName}\nDate: ${new Date(dateTime).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date(dateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}\nLocation: ${location}`,
+          text: `New appointment confirmed.\nService: ${serviceTitle}\nCustomer: ${customerName}\nDate: ${new Date(dateTime).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date(dateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}\nLocation: ${location}${
+            eventDate
+              ? `\nEvent Date: ${new Date(eventDate).toLocaleDateString(
+                  "en-US",
+                  {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  },
+                )}`
+              : ""
+          }${
+            budgetType || customBudget
+              ? `\nBudget: ${
+                  customBudget && customBudget.length > 0
+                    ? customBudget
+                    : budgetType
+                }`
+              : ""
+          }${
+            paymentMethod
+              ? `\nPayment Method: ${String(paymentMethod).toUpperCase()}`
+              : ""
+          }`,
           html: adminHtml,
         });
         if (adminError) {
@@ -177,8 +207,12 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             dateTime={dateTime}
             location={location}
             calendarUrl={calendarUrl}
-            siteUrl={env.NEXT_PUBLIC_SITE_URL}
+            siteUrl={siteConfig.url}
             socialLinks={socialHandles || []}
+            eventDate={eventDate}
+            budgetType={budgetType}
+            customBudget={customBudget}
+            paymentMethod={paymentMethod}
           />,
         );
 
@@ -187,7 +221,31 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           to: customerTo,
           replyTo: adminTo,
           subject: `${serviceTitle} Appointment Pending`,
-          text: `Dear ${customerName},\n\nYou have successfully booked an appointment with ${siteConfig.title}!\n\nWhat: ${serviceTitle}\nWhen: ${new Date(dateTime).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date(dateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}\nWhere: ${location}\n\nPlease be on time. A late fee of $20 applies after 10 mins. Canceled after 15 mins.\n\nLooking forward to meeting you.\nEki Ajibade`,
+          text: `Dear ${customerName},\n\nYou have successfully booked an appointment with ${siteConfig.title}!\n\nWhat: ${serviceTitle}\nWhen: ${new Date(dateTime).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date(dateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}\nWhere: ${location}${
+            eventDate
+              ? `\nEvent Date: ${new Date(eventDate).toLocaleDateString(
+                  "en-US",
+                  {
+                    weekday: "long",
+                    year: "numeric",
+                    month: "long",
+                    day: "numeric",
+                  },
+                )}`
+              : ""
+          }${
+            budgetType || customBudget
+              ? `\nBudget: ${
+                  customBudget && customBudget.length > 0
+                    ? customBudget
+                    : budgetType
+                }`
+              : ""
+          }${
+            paymentMethod
+              ? `\nPayment Method: ${String(paymentMethod).toUpperCase()}`
+              : ""
+          }\n\nPlease be on time. A late fee of $20 applies after 10 mins. Canceled after 15 mins.\n\nLooking forward to meeting you.\nEki Ajibade`,
           html: customerHtml,
         });
         if (customerError) {
@@ -363,7 +421,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           items={emailItems}
           shippingAddress={address}
           orderId={order._id}
-          siteUrl={env.NEXT_PUBLIC_SITE_URL}
+          siteUrl={siteConfig.url}
           socialLinks={socialHandles || []}
         />,
       );
@@ -390,7 +448,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             customerEmail={customerEmail}
             totalAmount={(session.amount_total ?? 0) / 100}
             items={emailItems}
-            siteUrl={env.NEXT_PUBLIC_SITE_URL}
+            siteUrl={siteConfig.url}
             socialLinks={socialHandles || []}
           />,
         );
@@ -536,7 +594,7 @@ async function handlePaymentIntentSucceeded(
         items={emailItems}
         shippingAddress={address || undefined}
         orderId={order._id}
-        siteUrl={env.NEXT_PUBLIC_SITE_URL}
+        siteUrl={siteConfig.url}
         socialLinks={socialHandles || []}
       />,
     );
@@ -563,7 +621,7 @@ async function handlePaymentIntentSucceeded(
           customerEmail={customerEmail}
           totalAmount={(amountTotal ?? 0) / 100}
           items={emailItems}
-          siteUrl={env.NEXT_PUBLIC_SITE_URL}
+          siteUrl={siteConfig.url}
           socialLinks={socialHandles || []}
         />,
       );

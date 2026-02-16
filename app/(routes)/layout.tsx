@@ -18,7 +18,7 @@ export default function RoutesLayout(
       <CartProvider>
         <React.Fragment>
           <Header />
-          {props.children}
+          <main>{props.children}</main>
           <Footer />
         </React.Fragment>
         <Toaster position="bottom-center" />

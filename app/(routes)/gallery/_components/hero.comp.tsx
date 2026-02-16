@@ -30,20 +30,17 @@ export const HeroComp: React.FC<Props> = ({
   activeYear,
 }) => {
   return (
-    <header className="border-border/10 border-b pb-24 lg:pb-20">
-      <Container size="sm">
+    <div className="bg-foreground relative overflow-hidden py-24">
+      <Container className="pt-8 md:pt-16" size="sm">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="max-w-2xl"
+          transition={{ duration: 0.8 }}
+          className="relative z-10"
         >
-          <span className="text-muted-foreground mb-4 text-[10px] tracking-[0.4em] uppercase">
-            Archive
-          </span>
-          <h2 className="mt-4 mb-8 text-[12vw] leading-[0.9] tracking-tighter md:mb-12 md:text-[6vw]">
-            Gallery
-          </h2>
-
+          <h1 className="text-background mb-4 max-w-2xl font-serif text-5xl sm:text-6xl md:mb-8">
+            Our Gallery
+          </h1>
           <div className="grid w-full max-w-lg grid-cols-2 gap-6">
             <div className="flex flex-col gap-2">
               <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">
@@ -95,6 +92,72 @@ export const HeroComp: React.FC<Props> = ({
           </div>
         </motion.div>
       </Container>
-    </header>
+    </div>
+    // <header className="border-border/10 border-b pb-24 lg:pb-20">
+    //   <Container size="sm">
+    //     <motion.div
+    //       initial={{ opacity: 0, y: 20 }}
+    //       animate={{ opacity: 1, y: 0 }}
+    //       className="max-w-2xl"
+    //     >
+    //       <span className="text-muted-foreground mb-4 text-[10px] tracking-[0.4em] uppercase">
+    //         Archive
+    //       </span>
+    //       <h2 className="mt-4 mb-8 text-[12vw] leading-[0.9] tracking-tighter md:mb-12 md:text-[6vw]">
+    //         Gallery
+    //       </h2>
+
+    //       <div className="grid w-full max-w-lg grid-cols-2 gap-6">
+    //         <div className="flex flex-col gap-2">
+    //           <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">
+    //             Occasion
+    //           </span>
+
+    //           <Select
+    //             value={activeCategory}
+    //             onValueChange={(e) => setActiveCategory(e)}
+    //           >
+    //             <SelectTrigger className="w-full bg-transparent">
+    //               <SelectValue placeholder="Select a category" />
+    //             </SelectTrigger>
+    //             <SelectContent>
+    //               <SelectGroup>
+    //                 {categories.map((year) => (
+    //                   <SelectItem key={year._id} value={year.slug!}>
+    //                     {year.name}
+    //                   </SelectItem>
+    //                 ))}
+    //               </SelectGroup>
+    //             </SelectContent>
+    //           </Select>
+    //         </div>
+
+    //         <div className="flex flex-col gap-2">
+    //           <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">
+    //             Collection Year
+    //           </span>
+
+    //           <Select
+    //             value={activeYear}
+    //             onValueChange={(e) => setActiveYear(e)}
+    //           >
+    //             <SelectTrigger className="w-full bg-transparent">
+    //               <SelectValue placeholder="Select a year" />
+    //             </SelectTrigger>
+    //             <SelectContent>
+    //               <SelectGroup>
+    //                 {years.map((year) => (
+    //                   <SelectItem key={year} value={year}>
+    //                     {year}
+    //                   </SelectItem>
+    //                 ))}
+    //               </SelectGroup>
+    //             </SelectContent>
+    //           </Select>
+    //         </div>
+    //       </div>
+    //     </motion.div>
+    //   </Container>
+    // </header>
   );
 };

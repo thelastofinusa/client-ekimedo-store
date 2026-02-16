@@ -35,8 +35,6 @@ interface CustomOrderInquiryProps {
   siteUrl?: string;
 }
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "";
-
 export const CustomOrderInquiryEmail = ({
   fullName,
   email,
@@ -48,7 +46,7 @@ export const CustomOrderInquiryEmail = ({
   imageCount,
   inquiryId,
   socialLinks,
-  siteUrl = baseUrl,
+  siteUrl,
 }: CustomOrderInquiryProps) => (
   <Html>
     <Head />

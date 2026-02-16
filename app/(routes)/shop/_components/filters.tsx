@@ -149,7 +149,7 @@ export const Filters: React.FC<Props> = ({ categories, colors, products }) => {
   );
 
   const content = (
-    <div className="flex h-max w-full flex-col gap-8 md:sticky md:top-26 md:w-64 lg:top-32">
+    <div className="z-20 flex h-max w-full flex-col gap-8 md:sticky md:top-26 md:w-64 lg:top-32">
       <div className="flex flex-col gap-8">
         <FilterSection title="Price Range" className="gap-2">
           <span className="text-muted-foreground text-xs">

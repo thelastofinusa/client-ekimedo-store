@@ -117,7 +117,7 @@ export const Footer = async () => {
 
           {/* Collections */}
           <div className="space-y-6">
-            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
+            <h4 className="text-muted-foreground font-sans text-[11px] font-medium tracking-[0.3em] uppercase">
               Collections
             </h4>
             <nav className="flex flex-col gap-4">
@@ -135,7 +135,7 @@ export const Footer = async () => {
 
           {/* Explore */}
           <div className="space-y-6">
-            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
+            <h4 className="text-muted-foreground font-sans text-[11px] font-medium tracking-[0.3em] uppercase">
               Explore
             </h4>
             <nav className="flex flex-col gap-4">
@@ -168,7 +168,7 @@ export const Footer = async () => {
 
           {/* Connect */}
           <div className="space-y-6">
-            <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
+            <h4 className="text-muted-foreground font-sans text-[11px] font-medium tracking-[0.3em] uppercase">
               Services
             </h4>
             <nav className="flex flex-col gap-4">

@@ -16,6 +16,7 @@ import { StockBadge } from "@/components/shared/stock-badge";
 import { Icons } from "hugeicons-proxy";
 import { cn, formatPrice } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
+import { SizeChart } from "@/components/shared/size-chart";
 
 interface Props {
   product: PRODUCT_QUERYResult[number];
@@ -172,12 +173,12 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
           </span>
         </nav>
 
-        <div className="flex flex-col gap-3">
-          <h2 className="font-serif text-2xl md:text-3xl">{product.name}</h2>
-          <p className="flex items-center gap-3 text-base font-medium md:text-xl">
-            <span>
-              Price: <span>{formatPrice(product?.price)}</span>
-            </span>
+        <div className="flex flex-col gap-2">
+          <h2 className="font-serif text-2xl font-medium md:text-3xl">
+            {product.name}
+          </h2>
+          <p className="flex items-center gap-3 text-base font-normal md:text-2xl">
+            <span>{formatPrice(product?.price)}</span>
             {isOutOfStock ? (
               <Badge variant="destructive">Out of Stock</Badge>
             ) : (
@@ -185,7 +186,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
             )}
           </p>
 
-          <pre className="font-sans text-base leading-relaxed font-light whitespace-pre-wrap">
+          <pre className="mt-1 font-sans text-base leading-relaxed font-light whitespace-pre-wrap">
             {product.description}
           </pre>
         </div>
@@ -207,7 +208,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
                           key={color.name}
                           onClick={() => setSelectedColor(color.name || "")}
                           className={cn(
-                            "ring-ring size-7 cursor-pointer rounded-full ring-1 transition-all focus:outline-none",
+                            "ring-ring size-7 cursor-pointer rounded-full ring transition-all focus:outline-none",
                             {
                               "ring-ring ring-2 ring-offset-2":
                                 selectedColor === color.name,
@@ -231,9 +232,23 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
           {/* Sizes */}
           {product?.sizes && product?.sizes?.length > 0 && (
             <div className="flex flex-col gap-2">
-              <span className="text-xs tracking-wider uppercase">
-                Size: {selectedSize ?? "Select"}
-              </span>
+              <div className="flex items-end justify-between gap-4">
+                <span className="text-xs tracking-wider uppercase">
+                  Size: {selectedSize || "Select"}
+                </span>
+
+                <SizeChart>
+                  <div
+                    role="button"
+                    className="text-primary flex cursor-pointer items-center gap-2"
+                  >
+                    <Icons.TapeMeasureIcon className="size-5" />
+                    <span className="text-xs font-medium tracking-wider uppercase">
+                      Size Chart
+                    </span>
+                  </div>
+                </SizeChart>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {product?.sizes?.map((size) => (
                   <Button

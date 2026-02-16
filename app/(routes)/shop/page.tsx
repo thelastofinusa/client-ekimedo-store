@@ -9,6 +9,7 @@ import { Skeleton } from "@/ui/skeleton";
 import { PRODUCT_COLOR_QUERY } from "@/sanity/queries/color";
 import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
+import { PreMadeDresses } from "./_components/premade-dresses";
 
 export const dynamic = "force-dynamic";
 
@@ -47,78 +48,95 @@ export default async function ProductsPage() {
   const { data: colors } = await sanityFetch({ query: PRODUCT_COLOR_QUERY });
 
   return (
-    <div className="flex flex-col py-24 lg:py-32">
-      <Container className="relative flex flex-col gap-6 pt-6 md:flex-row md:gap-8">
-        <Suspense
-          fallback={
-            <div className="flex h-max w-full flex-col gap-10 md:sticky md:top-26 md:w-64 lg:top-32">
-              <div className="flex flex-col gap-8">
-                <div className="flex flex-col gap-3">
-                  <Skeleton className="h-4 w-20" />
-                  <Skeleton className="h-3 w-40" />
-                  <div className="relative mt-2 w-full">
-                    <Skeleton className="absolute top-1/2 left-0 size-4.5 -translate-y-1/2 rounded-full" />
-                    <Skeleton className="absolute top-1/2 right-0 size-4.5 -translate-y-1/2 rounded-full" />
-                    <Skeleton className="h-2 w-full" />
-                  </div>
-                </div>
-                {[3, 7, 4].map((item, idx) => (
-                  <div className="flex flex-col gap-6" key={idx}>
+    <div className="flex flex-col">
+      <div className="bg-foreground relative overflow-hidden py-24">
+        <div className="absolute inset-0 bg-[url('/shop.avif')] bg-cover bg-center opacity-20" />
+        <Container className="relative z-10 pt-8 md:pt-16" size="sm">
+          <h1 className="text-background mb-4 font-serif text-5xl leading-[1.2] sm:text-6xl md:mb-6 md:leading-[0.98]">
+            Pre-Made Dresses
+          </h1>
+          <p className="text-primary-foreground/60 max-w-xl">
+            Explore our curated selection of luxury fashion pieces, each crafted
+            with unparalleled attention to detail.
+          </p>
+        </Container>
+      </div>
+
+      <div className="py-24 lg:py-32">
+        <Container className="relative flex flex-col gap-6 md:flex-row md:gap-8">
+          <Suspense
+            fallback={
+              <div className="flex h-max w-full flex-col gap-10 md:sticky md:top-26 md:w-64 lg:top-32">
+                <div className="flex flex-col gap-8">
+                  <div className="flex flex-col gap-3">
                     <Skeleton className="h-4 w-20" />
-
-                    <div className="flex flex-col gap-3">
-                      {Array.from({ length: item }).map((_, idx) => {
-                        const randomWidth =
-                          Math.floor(Math.random() * (40 - 28 + 1)) + 28;
-
-                        return (
-                          <Skeleton
-                            key={idx}
-                            className="h-4"
-                            style={{ width: `${randomWidth * 0.25}rem` }}
-                          />
-                        );
-                      })}
+                    <Skeleton className="h-3 w-40" />
+                    <div className="relative mt-2 w-full">
+                      <Skeleton className="absolute top-1/2 left-0 size-4.5 -translate-y-1/2 rounded-full" />
+                      <Skeleton className="absolute top-1/2 right-0 size-4.5 -translate-y-1/2 rounded-full" />
+                      <Skeleton className="h-2 w-full" />
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          }
-        >
-          <Filters
-            categories={categories}
-            colors={colors}
-            products={products}
-          />
-        </Suspense>
-        <Suspense
-          fallback={
-            <div className="flex-1">
-              <div className="mb-6 flex items-center">
-                <Skeleton className="h-4 w-32" />
-              </div>
-              <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {Array.from({ length: 6 }).map((_, idx) => (
-                  <div key={idx} className="block">
-                    <Skeleton className="mb-4 aspect-3/4 w-full" />
+                  {[3, 7, 4].map((item, idx) => (
+                    <div className="flex flex-col gap-6" key={idx}>
+                      <Skeleton className="h-4 w-20" />
 
-                    <div className="flex flex-1 flex-col gap-2">
-                      <div className="flex items-center justify-between">
-                        <Skeleton className="h-4 w-10" />
-                        <Skeleton className="h-4 w-20" />
+                      <div className="flex flex-col gap-3">
+                        {Array.from({ length: item }).map((_, idx) => {
+                          const randomWidth =
+                            Math.floor(Math.random() * (40 - 28 + 1)) + 28;
+
+                          return (
+                            <Skeleton
+                              key={idx}
+                              className="h-4"
+                              style={{ width: `${randomWidth * 0.25}rem` }}
+                            />
+                          );
+                        })}
                       </div>
-                      <Skeleton className="h-5 w-40" />
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          }
-        >
-          <ProductGrid products={products} />
-        </Suspense>
-      </Container>
+            }
+          >
+            <Filters
+              categories={categories}
+              colors={colors}
+              products={products}
+            />
+          </Suspense>
+          <Suspense
+            fallback={
+              <div className="flex-1">
+                <div className="mb-6 flex items-center">
+                  <Skeleton className="h-4 w-32" />
+                </div>
+                <div className="grid w-full grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                  {Array.from({ length: 6 }).map((_, idx) => (
+                    <div key={idx} className="block">
+                      <Skeleton className="mb-4 aspect-3/4 w-full" />
+
+                      <div className="flex flex-1 flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <Skeleton className="h-4 w-10" />
+                          <Skeleton className="h-4 w-20" />
+                        </div>
+                        <Skeleton className="h-5 w-40" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            }
+          >
+            <ProductGrid products={products} />
+          </Suspense>
+        </Container>
+      </div>
+
+      <PreMadeDresses />
     </div>
   );
 }
