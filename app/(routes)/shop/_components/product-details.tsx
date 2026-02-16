@@ -22,52 +22,6 @@ interface Props {
   product: PRODUCT_QUERYResult[number];
 }
 
-interface SizeChart {
-  size: string;
-  numeric: string;
-  bust: string;
-  waist: string;
-  hip: string;
-}
-
-const sizeChart: SizeChart[] = [
-  {
-    size: "XS",
-    numeric: "0-2",
-    bust: "32-33 / 81-84",
-    waist: "24-25 / 61-64",
-    hip: "34-35 / 86-89",
-  },
-  {
-    size: "S",
-    numeric: "4-6",
-    bust: "34-35 / 86-89",
-    waist: "26-27 / 66-69",
-    hip: "36-37 / 91-94",
-  },
-  {
-    size: "M",
-    numeric: "8-10",
-    bust: "36-37 / 91-94",
-    waist: "28-29 / 71-74",
-    hip: "38-39 / 96-99",
-  },
-  {
-    size: "L",
-    numeric: "12-14",
-    bust: "38.5-40 / 98-101",
-    waist: "30.5-32 / 77-81",
-    hip: "40.5-42 / 103-107",
-  },
-  {
-    size: "XL",
-    numeric: "16-18",
-    bust: "41.5-43 / 105-109",
-    waist: "33.5-35 / 85-89",
-    hip: "44.5-46 / 113-117",
-  },
-];
-
 export const ProductDetails: React.FC<Props> = ({ product }) => {
   const { addItem } = useCartActions();
   const quantityInCart = useProductTotalQuantity(product._id);
@@ -165,7 +119,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
             href="/shop"
             className="transition-colors hover:text-neutral-900"
           >
-            Products
+            Pre-Made Dresses
           </Link>
           <Icons.ArrowRight01Icon className="mx-1 size-4" />
           <span className="truncate font-medium text-neutral-900">
@@ -182,7 +136,11 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
             {isOutOfStock ? (
               <Badge variant="destructive">Out of Stock</Badge>
             ) : (
-              <StockBadge productId={product._id} stock={stock} />
+              <StockBadge
+                productId={product._id}
+                stock={stock}
+                showRemainingStocks
+              />
             )}
           </p>
 
@@ -196,7 +154,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
           {product?.colors && product?.colors?.length > 0 && (
             <div className="flex flex-col gap-2">
               <span className="text-xs tracking-wider uppercase">
-                Color: {selectedColor || "Select"}
+                {selectedColor ? `Color: ${selectedColor}` : "Select a color"}
               </span>
               <div className="flex flex-wrap gap-2">
                 {product.colors.map((color) => {
@@ -234,7 +192,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
             <div className="flex flex-col gap-2">
               <div className="flex items-end justify-between gap-4">
                 <span className="text-xs tracking-wider uppercase">
-                  Size: {selectedSize || "Select"}
+                  {selectedSize ? `Size: ${selectedSize}` : "Select a size"}
                 </span>
 
                 <SizeChart>
@@ -289,9 +247,9 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
         </div>
 
         <div className="mt-6 border-t pt-6">
-          <p className="text-sm text-neutral-600">
-            Looking for custom modifications? Start a consultation with our
-            artisans to refine this design.
+          <p className="text-muted-foreground text-sm">
+            Looking for custom modifications? <br /> Start a consultation with
+            our artisans to refine this design.
           </p>
 
           <Link

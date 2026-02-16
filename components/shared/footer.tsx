@@ -8,14 +8,12 @@ import { Container } from "./container";
 import { siteConfig } from "@/site.config";
 import { client } from "@/sanity/lib/client";
 import { CATEGORIES_QUERY } from "@/sanity/queries/category";
-import { FilteredResponseQueryOptions } from "@sanity/client/stega";
 import { Icons } from "hugeicons-proxy";
 import { BUSINESS_HOUR_QUERY } from "@/sanity/queries/hours";
 import { SOCIAL_QUERY } from "@/sanity/queries/social";
-import { sanityFetch } from "@/sanity/lib/live";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 import { env } from "@/lib/env";
-import { cn } from "@/lib/utils";
+import { clientOptions, cn } from "@/lib/utils";
 
 export const getSocialIcon = (name: string) => {
   switch (name) {
@@ -38,10 +36,13 @@ export const getSocialIcon = (name: string) => {
 };
 
 export const Footer = async () => {
-  const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
-  const categories = await client.fetch(CATEGORIES_QUERY, {}, options);
-  const businessHours = await client.fetch(BUSINESS_HOUR_QUERY, {}, options);
-  const { data: socialHandles } = await sanityFetch({ query: SOCIAL_QUERY });
+  const categories = await client.fetch(CATEGORIES_QUERY, {}, clientOptions);
+  const businessHours = await client.fetch(
+    BUSINESS_HOUR_QUERY,
+    {},
+    clientOptions,
+  );
+  const socialHandles = await client.fetch(SOCIAL_QUERY, {}, clientOptions);
 
   // Utility to check if the day is "Today" for highlighting
   const isToday = (dayName: string) => {

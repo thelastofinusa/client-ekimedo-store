@@ -100,8 +100,8 @@ export default function About() {
       <div className="bg-foreground text-background py-24 lg:py-32">
         <Container size="sm">
           <div className="grid gap-6 md:grid-cols-2 md:gap-12">
-            <h2 className="font-sans text-4xl font-medium">
-              Designed with purpose. <br /> Made to endure.
+            <h2 className="font-serif text-4xl capitalize md:text-5xl">
+              Designed with purpose. Made to endure.
             </h2>
             <div className="space-y-6">
               <p>
@@ -137,7 +137,7 @@ export default function About() {
                 size: "sm",
               })}
             >
-              <h2 className="font-sans text-4xl font-medium">
+              <h2 className="font-serif text-4xl capitalize md:text-5xl">
                 A modern atelier grounded in craftsmanship.
               </h2>
               <div className="space-y-6">

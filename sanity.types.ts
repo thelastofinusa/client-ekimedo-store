@@ -13,6 +13,19 @@
  */
 
 // Source: schema.json
+export type PricingTier = {
+  _id: string;
+  _type: "pricingTier";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  price?: number;
+  description?: string;
+  features?: Array<string>;
+  order?: number;
+};
+
 export type Faq = {
   _id: string;
   _type: "faq";
@@ -510,6 +523,7 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | PricingTier
   | Faq
   | FormField
   | Inquiry
@@ -702,6 +716,17 @@ export type ORDER_BY_STRIPE_PAYMENT_ID_QUERYResult = {
   _id: string;
 } | null;
 
+// Source: ./sanity/queries/pricing.ts
+// Variable: PRICING_TIERS_QUERY
+// Query: *[_type == "pricingTier"] | order(order asc, _createdAt asc) {  _id,  name,  price,  description,  features}
+export type PRICING_TIERS_QUERYResult = Array<{
+  _id: string;
+  name: string | null;
+  price: number | null;
+  description: string | null;
+  features: Array<string> | null;
+}>;
+
 // Source: ./sanity/queries/product.ts
 // Variable: PRODUCT_QUERY
 // Query: *[_type == "product"] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, "value": value.hex},    description,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
@@ -809,6 +834,7 @@ declare module "@sanity/client" {
     '*[\n  _type == "order"\n  && _id == $id\n][0] {\n  _id,\n  orderNumber,\n  clerkUserId,\n  email,\n  items[]{\n    _key,\n    quantity,\n    priceAtPurchase,\n    product->{\n      _id,\n      name,\n      "slug": slug.current,\n      "image": images[0]{\n        asset->{\n          _id,\n          url\n        }\n      }\n    }\n  },\n  total,\n  status,\n  address{\n    name,\n    line1,\n    line2,\n    city,\n    postcode,\n    country\n  },\n  stripePaymentId,\n  createdAt\n}': ORDER_BY_ID_QUERYResult;
     '*[\n  _type == "order"\n] | order(createdAt desc) [0...$limit] {\n  _id,\n  orderNumber,\n  email,\n  total,\n  status,\n  createdAt\n}': RECENT_ORDERS_QUERYResult;
     '*[\n  _type == "order"\n  && stripePaymentId == $stripePaymentId\n][0]{ _id }': ORDER_BY_STRIPE_PAYMENT_ID_QUERYResult;
+    '\n*[_type == "pricingTier"] | order(order asc, _createdAt asc) {\n  _id,\n  name,\n  price,\n  description,\n  features\n}\n': PRICING_TIERS_QUERYResult;
     '\n*[_type == "product"] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_QUERYResult;
     '\n*[_type == "product" && slug.current == $slug] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_SLUG_QUERYResult;
     '\n*[_type == "product" && _id in $ids] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_IDS_QUERYResult;

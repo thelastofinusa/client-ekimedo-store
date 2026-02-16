@@ -32,4 +32,5 @@ export const structure: StructureResolver = (S) =>
       // Settings
       S.documentTypeListItem("businessHours").title("Business Hours"),
       S.documentTypeListItem("faq").title("Frequently Asked Questions"),
+      S.documentTypeListItem("pricingTier").title("Pricing Tiers"),
     ]);

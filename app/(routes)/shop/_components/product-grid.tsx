@@ -15,7 +15,6 @@ import { PRODUCT_QUERYResult } from "@/sanity.types";
 import {
   Pagination,
   PaginationContent,
-  PaginationEllipsis,
   PaginationItem,
   PaginationLink,
   PaginationNext,

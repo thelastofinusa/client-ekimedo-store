@@ -13,9 +13,6 @@ export const HeritageComp = () => {
           <div className="grid grid-cols-1 items-center gap-20 md:grid-cols-2">
             <div className="flex flex-col gap-6 md:gap-8">
               <header className="flex flex-col gap-2">
-                <span className="text-muted-foreground text-[10px] tracking-[0.4em] uppercase">
-                  Heritage & Vision
-                </span>
                 <h2 className="leading-[1.1]">
                   Dedicated to Creativity, Culture & Growth
                 </h2>
@@ -47,11 +44,13 @@ export const HeritageComp = () => {
               </div>
             </div>
 
-            <div className="relative aspect-4/5 overflow-hidden shadow-xs">
+            <div className="bg-card relative aspect-4/5 overflow-hidden shadow-xs">
               <Image
-                src="https://images.unsplash.com/photo-1558769132-cb1aea458c5e?q=80&w=1000&auto=format&fit=crop"
+                src="/heritage.avif"
                 alt="Atelier Craftsmanship"
                 fill
+                priority
+                quality={100}
                 className="object-cover"
               />
             </div>

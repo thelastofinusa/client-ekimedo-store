@@ -6,8 +6,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import {
   bookingLocation,
-  consultationsData,
   preferredPaymentMethod,
+  preMadeDrConData,
+  sizeFilters,
 } from "@/lib/constants/consultation";
 import {
   Form,
@@ -20,7 +21,6 @@ import {
 } from "@/ui/form";
 import { toast } from "sonner";
 import { Input } from "@/ui/input";
-import { Icons } from "hugeicons-proxy";
 import { isValidPhoneNumber } from "react-phone-number-input";
 import {
   Select,
@@ -36,29 +36,72 @@ import { PhoneInput } from "@/ui/phone-input";
 import { Notify } from "@/components/shared/notify";
 import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
 import Link from "next/link";
+import { Textarea } from "@/ui/textarea";
 
-const formSchema = z.object({
-  fName: z.string().min(2, "First name is required"),
-  lName: z.string().min(2, "Last name is required"),
-  email: z.email("Email is required").min(2, "Email must be more than 2 char."),
-  phone: z
-    .string()
-    .trim()
-    .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
-  eventDate: z.date(),
-  consultationDate: z.date(),
-  attendees: z.any(),
-  location: z.string("Location is required").min(1, "Location is required"),
+const budgetOptions = {
+  budget: {
+    id: "budget",
+    label: "Budget-Friendly",
+    description: "Affordable and stylish options",
+    priceRange: "Under $500",
+  },
+  "mid-range": {
+    id: "mid-range",
+    label: "Mid-Range",
+    description: "Quality designs with variety",
+    priceRange: "$500 - $1,500",
+  },
+  premium: {
+    id: "premium",
+    label: "Premium",
+    description: "Designer collections",
+    priceRange: "$1,500 - $3,000",
+  },
+  luxury: {
+    id: "luxury",
+    label: "Luxury",
+    description: "Haute couture and custom designs",
+    priceRange: "$3,000+",
+  },
+};
 
-  productionProcess: z.boolean().refine((val) => val === true, {
-    message: "We need to be sure you understand",
-  }),
-});
+const formSchema = z
+  .object({
+    fName: z.string().min(2, "First name is required"),
+    lName: z.string().min(2, "Last name is required"),
+    email: z
+      .email("Email is required")
+      .min(2, "Email must be more than 2 char."),
+    phone: z
+      .string()
+      .trim()
+      .refine(isValidPhoneNumber, { message: "Invalid phone number" }),
+    eventDate: z.date(),
+    consultationDate: z.date(),
+    attendees: z.any(),
+    location: z.string("Location is required").min(1, "Location is required"),
+    dressSize: z
+      .string("Dress size is required")
+      .min(1, "Dress size is required"),
+    dressColor: z
+      .string("Dress color is required")
+      .min(1, "Dress color is required"),
+    requirements: z.string().optional(),
+
+    budgetType: z.string().optional(),
+    productionProcess: z.boolean().refine((val) => val === true, {
+      message: "We need to be sure you understand",
+    }),
+  })
+  .refine((data) => data.budgetType && data.budgetType.length > 0, {
+    path: ["budgetType"],
+    message: "Select a budget",
+  });
 
 type FormDataType = z.infer<typeof formSchema>;
 
 interface Props {
-  config: (typeof consultationsData)[number];
+  config: typeof preMadeDrConData;
 }
 
 const formatDateTimeLocal = (date?: Date): string => {
@@ -81,7 +124,7 @@ const parseDateTimeLocal = (value: string): Date | undefined => {
   return date;
 };
 
-export const SpecialEventForm: React.FC<Props> = ({ config }) => {
+export const TryOnForm: React.FC<Props> = ({ config }) => {
   const form = useForm<FormDataType>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -93,13 +136,16 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
       consultationDate: new Date(),
       attendees: 1,
       location: bookingLocation[0].value,
+      budgetType: "",
       productionProcess: false,
+      dressSize: "",
+      dressColor: "",
+      requirements: "",
     },
+    shouldUnregister: false,
   });
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [inspirationPhotos, setInspirationPhotos] = React.useState<File[]>([]);
-  const [previewUrls, setPreviewUrls] = React.useState<string[]>([]);
   const [paymentMethod, setPaymentMethod] =
     React.useState<(typeof preferredPaymentMethod)[number]["id"]>("stripe");
   const [bookedDates, setBookedDates] = React.useState<Date[]>([]);
@@ -132,36 +178,6 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
     return bookedDates.some((booked) => booked.getTime() === date.getTime());
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files || []);
-    const validFiles = files.filter((file) => {
-      const isImage = file.type.startsWith("image/");
-      const isUnder10MB = file.size <= 10 * 1024 * 1024;
-      return isImage && isUnder10MB;
-    });
-
-    if (validFiles.length + inspirationPhotos.length > 5) {
-      toast.custom(() => (
-        <Notify
-          type="error"
-          title="Too many files"
-          description="You can upload a maximum of 5 inspiration photos"
-        />
-      ));
-      return;
-    }
-
-    const newPreviewUrls = validFiles.map((file) => URL.createObjectURL(file));
-    setInspirationPhotos((prev) => [...prev, ...validFiles]);
-    setPreviewUrls((prev) => [...prev, ...newPreviewUrls]);
-  };
-
-  const removePhoto = (index: number) => {
-    URL.revokeObjectURL(previewUrls[index]);
-    setInspirationPhotos((prev) => prev.filter((_, i) => i !== index));
-    setPreviewUrls((prev) => prev.filter((_, i) => i !== index));
-  };
-
   async function onSubmit(values: FormDataType) {
     setIsSubmitting(true);
 
@@ -179,10 +195,6 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
       }
 
       const formData = new FormData();
-      inspirationPhotos.forEach((file) => {
-        formData.append("inspirationPhotos", file);
-      });
-
       const fullName = `${values.fName} ${values.lName}`.trim();
 
       formData.append("serviceType", config.slug);
@@ -198,6 +210,22 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
         values.productionProcess ? "true" : "false",
       );
       formData.append("paymentMethod", paymentMethod);
+
+      if (values.budgetType) {
+        formData.append("budgetType", values.budgetType);
+      }
+
+      if (values.dressSize) {
+        formData.append("dressSize", values.dressSize);
+      }
+
+      if (values.dressColor) {
+        formData.append("dressColor", values.dressColor);
+      }
+
+      if (values.requirements) {
+        formData.append("requirements", values.requirements);
+      }
 
       const response = await fetch("/api/bookings", {
         method: "POST",
@@ -227,9 +255,6 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
       ));
 
       form.reset();
-      setInspirationPhotos([]);
-      previewUrls.forEach((url) => URL.revokeObjectURL(url));
-      setPreviewUrls([]);
     } catch (error) {
       toast.custom(() => (
         <Notify
@@ -374,8 +399,8 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
                         type="number"
                         min={1}
                         max={5}
-                        {...field}
                         disabled={isSubmitting}
+                        {...field}
                       />
                     </FormControl>
                     <FormMessage />
@@ -397,10 +422,7 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
                       disabled={isSubmitting}
                     >
                       <FormControl>
-                        <SelectTrigger
-                          className="w-full"
-                          disabled={isSubmitting}
-                        >
+                        <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select location preference" />
                         </SelectTrigger>
                       </FormControl>
@@ -457,11 +479,138 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
 
           <div className="bg-card border-border mb-5 h-auto space-y-5 overflow-hidden rounded-md border p-6 shadow-xs md:p-8 xl:p-12">
             <h2 className="mb-1 font-serif text-xl md:text-2xl">
-              Preparation & Inspiration
+              Dress Preferences
             </h2>
             <p className="text-muted-foreground mb-8 text-sm font-normal">
-              Confirm your readiness and share your style references.
+              Customize your bridal consultation experience
             </p>
+
+            <FormField
+              control={form.control}
+              name="dressSize"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Dress Size</FormLabel>
+                  <FormControl>
+                    <div className="flex flex-wrap gap-2">
+                      {sizeFilters.map((size) => {
+                        const isSelected = field.value === size.value;
+                        return (
+                          <Button
+                            key={size.value}
+                            size="sm"
+                            variant={isSelected ? "default" : "outline"}
+                            type="button"
+                            className={cn(
+                              "font-mono text-xs! font-normal tracking-normal",
+                            )}
+                            onClick={() => field.onChange(size.value)}
+                          >
+                            {size.name}
+                          </Button>
+                        );
+                      })}
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="dressColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Dress Color</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="e.g. Ivory, Champagne, Blush"
+                      disabled={isSubmitting}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="requirements"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Special Requirements (Optional)</FormLabel>
+                  <FormControl>
+                    <Textarea
+                      {...field}
+                      placeholder="Any special requirements or preference.."
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="bg-card border-border mb-5 h-auto space-y-5 overflow-hidden rounded-md border p-6 shadow-xs md:p-8 xl:p-12">
+            <h2 className="mb-1 font-serif text-xl md:text-2xl">
+              Consultation Details
+            </h2>
+            <p className="text-muted-foreground mb-8 text-sm font-normal">
+              Tell us about your vision and preferences
+            </p>
+
+            <FormField
+              control={form.control}
+              name="budgetType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Budget Tier</FormLabel>
+                  <FormControl>
+                    <RadioGroup
+                      onValueChange={(value) => field.onChange(value)}
+                      value={field.value}
+                      className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2"
+                      disabled={isSubmitting}
+                    >
+                      {Object.entries(budgetOptions).map(([key, item]) => (
+                        <FormLabel
+                          htmlFor={item.id}
+                          key={key}
+                          className={cn(
+                            "border-input has-data-[state=checked]:border-primary has-focus-visible:border-ring has-focus-visible:ring-ring relative flex w-full cursor-pointer items-start gap-3 rounded-md border p-3 shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-2",
+                            {
+                              "border-destructive":
+                                form.formState.errors.budgetType,
+                              "pointer-events-none opacity-50": isSubmitting,
+                            },
+                          )}
+                        >
+                          <RadioGroupItem
+                            value={key}
+                            id={item.id}
+                            disabled={isSubmitting}
+                          />
+
+                          <div className="text-foreground flex flex-1 flex-col items-start gap-2">
+                            <div className="flex w-full items-center justify-between">
+                              <span className="text-[11px]">{item.label}</span>
+                              <span className="text-muted-foreground text-[11px] font-medium">
+                                {item.priceRange}
+                              </span>
+                            </div>
+                            <p className="text-muted-foreground">
+                              {item.description}
+                            </p>
+                          </div>
+                        </FormLabel>
+                      ))}
+                    </RadioGroup>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}
@@ -511,68 +660,6 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
                 </FormItem>
               )}
             />
-
-            <div className="flex flex-col">
-              <FormLabel>Style Inspiration Photos</FormLabel>
-
-              <div className="border-border hover:border-accent/50 mt-1 rounded-lg border-2 border-dashed p-6 text-center transition-colors">
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleFileChange}
-                  className="hidden"
-                  disabled={isSubmitting}
-                  id="inspiration-photos"
-                />
-                <label
-                  htmlFor="inspiration-photos"
-                  className="flex cursor-pointer flex-col items-center gap-2"
-                >
-                  <Icons.ImageUploadIcon className="text-muted-foreground size-6" />
-                  <span className="text-muted-foreground text-sm">
-                    Click to upload or drag and drop
-                  </span>
-                </label>
-              </div>
-              <p className="text-muted-foreground mt-2 text-[10px] tracking-widest uppercase">
-                Upload up to 5 images that inspire your dream dress (max 10MB
-                each)
-              </p>
-
-              {/* Preview Grid */}
-              {previewUrls.length > 0 && (
-                <div
-                  className={cn("mt-4 grid grid-cols-3 gap-3 md:grid-cols-5", {
-                    "pointer-events-none opacity-50": isSubmitting,
-                  })}
-                >
-                  {previewUrls.map((url, index) => (
-                    <div
-                      key={index}
-                      className="group relative aspect-square overflow-hidden rounded-lg"
-                    >
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={url}
-                        alt={`Inspiration ${index + 1}`}
-                        className="h-full w-full object-cover"
-                      />
-                      <Button
-                        type="button"
-                        size="icon-xs"
-                        variant="destructive"
-                        onClick={() => removePhoto(index)}
-                        disabled={isSubmitting}
-                        className="absolute top-1 right-1 opacity-0 transition-opacity group-hover:opacity-100"
-                      >
-                        <Icons.Cancel01Icon className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
           </div>
 
           <div className="mb-5 flex flex-col gap-5">
@@ -590,6 +677,7 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
                   className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2"
                   value={paymentMethod}
                   onValueChange={(value) => setPaymentMethod(value)}
+                  disabled={isSubmitting}
                 >
                   {preferredPaymentMethod.map((method) => (
                     <FormLabel

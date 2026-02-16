@@ -20,14 +20,7 @@ import {
 } from "@/sanity.types";
 import { cn, formatPrice } from "@/lib/utils";
 import { Slider } from "@/ui/slider";
-
-const sizeFilters = [
-  { name: "0-2 (XS)", value: "0-2 (XS)" },
-  { name: "4-6 (S)", value: "4-6 (S)" },
-  { name: "8-10 (M)", value: "8-10 (M)" },
-  { name: "12-14 (L)", value: "12-14 (L)" },
-  { name: "16-18 (XL)", value: "16-18 (XL)" },
-];
+import { sizeFilters } from "@/lib/constants/consultation";
 
 interface Props {
   categories: CATEGORIES_QUERYResult;
