@@ -4,10 +4,10 @@ import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
 import { GallerySection } from "./_components/gallery.sec";
 import { SplashScreen } from "@/components/shared/splash-screen";
-import { sanityFetch } from "@/sanity/lib/live";
 import { GALLERY_QUERY } from "@/sanity/queries/gallery";
-import { CATEGORIES_QUERYResult, GALLERY_QUERYResult } from "@/sanity.types";
 import { CATEGORIES_QUERY } from "@/sanity/queries/category";
+import { client } from "@/sanity/lib/client";
+import { clientOptions } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -38,17 +38,8 @@ export const metadata: Metadata = {
 };
 
 export default async function GalleryPage() {
-  const galleryResult = await sanityFetch({
-    query: GALLERY_QUERY,
-  });
-  const categoryResult = await sanityFetch({
-    query: CATEGORIES_QUERY,
-  });
-
-  const gallery: GALLERY_QUERYResult =
-    galleryResult.data as GALLERY_QUERYResult;
-  const category: CATEGORIES_QUERYResult =
-    categoryResult.data as CATEGORIES_QUERYResult;
+  const gallery = await client.fetch(GALLERY_QUERY, {}, clientOptions);
+  const category = await client.fetch(CATEGORIES_QUERY, {}, clientOptions);
 
   return (
     <div className="flex-1 overflow-x-clip">

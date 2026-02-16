@@ -1,17 +1,15 @@
 import { Icons } from "hugeicons-proxy";
 import { client } from "@/sanity/lib/client";
 import { Container } from "@/components/shared/container";
-import { formatSanityDate, getInitials } from "@/lib/utils";
+import { clientOptions, formatSanityDate, getInitials } from "@/lib/utils";
 import { TESTIMONIAL_QUERY } from "@/sanity/queries/testimonial";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
-import { FilteredResponseQueryOptions } from "@sanity/client/stega";
 import Link from "next/link";
 import { buttonVariants } from "@/ui/button";
 import { ArrowRight } from "lucide-react";
 
 export const TestimonialComp = async () => {
-  const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
-  const testimonials = await client.fetch(TESTIMONIAL_QUERY, {}, options);
+  const testimonials = await client.fetch(TESTIMONIAL_QUERY, {}, clientOptions);
 
   if (!testimonials.length) return null;
 

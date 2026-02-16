@@ -6,7 +6,6 @@ import {
   ORDER_BY_ID_QUERY,
 } from "@/sanity/queries/orders";
 import { getOrCreateStripeCustomer } from "@/lib/services/customer";
-import { env } from "../env";
 import { stripe } from "@/lib/stripe";
 import { Product } from "@/sanity.types";
 import { paypalClient } from "@/lib/paypal";

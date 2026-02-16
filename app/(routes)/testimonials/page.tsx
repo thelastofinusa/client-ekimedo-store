@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 
-import { sanityFetch } from "@/sanity/lib/live";
 import { HeroComp } from "./_components/hero.comp";
 import { ReviewsComp } from "./_components/reviews.comp";
 import { TESTIMONIAL_QUERY } from "@/sanity/queries/testimonial";
@@ -9,6 +8,8 @@ import { Container } from "@/components/shared/container";
 import { TestimonialSheet } from "@/components/sheets/testimonial.sheet";
 import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 import { siteConfig } from "@/site.config";
+import { client } from "@/sanity/lib/client";
+import { clientOptions } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Testimonials",
@@ -38,12 +39,8 @@ export const metadata: Metadata = {
 
 export default async function TestimonialsPage() {
   const user = await currentUser();
-  const { data: testimonials } = await sanityFetch({
-    query: TESTIMONIAL_QUERY,
-  });
-  const { data: categories } = await sanityFetch({
-    query: CATEGORIES_QUERY,
-  });
+  const testimonials = await client.fetch(TESTIMONIAL_QUERY, {}, clientOptions);
+  const categories = await client.fetch(CATEGORIES_QUERY, {}, clientOptions);
 
   return (
     <div className="flex-1 overflow-x-clip">

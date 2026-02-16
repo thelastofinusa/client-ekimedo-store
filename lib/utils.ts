@@ -1,9 +1,14 @@
+import { FilteredResponseQueryOptions } from "@sanity/client/stega";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+export const clientOptions: FilteredResponseQueryOptions = {
+  next: { revalidate: 30 },
+};
 
 export function formatPrice(
   amount: number | null | undefined,

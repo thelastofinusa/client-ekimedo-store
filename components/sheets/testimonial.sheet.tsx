@@ -168,7 +168,11 @@ export function TestimonialSheet({ categories }: Props) {
         <Notify
           type="error"
           title="Something went wrong"
-          description="An error occurred. Please try again."
+          description={
+            error instanceof Error
+              ? error.message
+              : "An error occurred. Please try again."
+          }
         />
       ));
     } finally {

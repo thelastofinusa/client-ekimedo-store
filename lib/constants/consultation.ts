@@ -1,3 +1,22 @@
+import { Icons } from "hugeicons-proxy";
+
+export const preMadeDrConData = {
+  _id: "4b9e8005-7727-40ab-bcee-9ab3eb4a6609",
+  title: "Pre-made Dresses Try On",
+  slug: "try-on",
+  description:
+    "Visit our atelier to try on our curated selection of ready-to-wear gowns. Our stylists will help you find the perfect fit for your special occasion.",
+  duration: 30,
+  price: 100,
+  image: "/collections/pre-made-dresses.avif",
+  includes: [
+    "Personal styling consultation with an in-house stylist",
+    "Access to a curated selection of ready-to-wear gowns",
+    "Guided fitting to find the best size and silhouette",
+    "Basic alterations advice (length, fit, adjustments)",
+  ],
+} as const;
+
 export const consultationsData = [
   {
     _id: "4b9e8005-7727-40ab-bcee-9ab3eb4a6609",
@@ -47,4 +66,36 @@ export const consultationsData = [
       "Styling and fit recommendations",
     ],
   },
+  preMadeDrConData,
 ] as const;
+
+export const bookingLocation = [
+  {
+    value: "virtual",
+    label: "Virtual (Zoom/Google Meet)",
+  },
+  { value: "in-person", label: "In-Person (Showroom)" },
+];
+
+export const preferredPaymentMethod = [
+  {
+    id: "stripe",
+    label: "Stripe",
+    icon: Icons.StripeIcon,
+    description: "Fast, secure card payment.",
+  },
+  {
+    id: "paypal",
+    label: "PayPal",
+    icon: Icons.PaypalIcon,
+    description: "Quick checkout with PayPal.",
+  },
+];
+
+export const sizeFilters = [
+  { name: "0-2 (XS)", value: "0-2 (XS)" },
+  { name: "4-6 (S)", value: "4-6 (S)" },
+  { name: "8-10 (M)", value: "8-10 (M)" },
+  { name: "12-14 (L)", value: "12-14 (L)" },
+  { name: "16-18 (XL)", value: "16-18 (XL)" },
+];

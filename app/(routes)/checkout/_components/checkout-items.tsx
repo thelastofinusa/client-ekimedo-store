@@ -26,6 +26,9 @@ import { Notify, renderToastIcon } from "@/components/shared/notify";
 import Image from "next/image";
 import { toast } from "sonner";
 import { Skeleton } from "@/ui/skeleton";
+import { preferredPaymentMethod } from "@/lib/constants/consultation";
+import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
+import { Label } from "@/ui/label";
 
 export const CheckoutItems = () => {
   const { userId } = useAuth();
@@ -38,9 +41,8 @@ export const CheckoutItems = () => {
 
   const [isPending, startTransition] = React.useTransition();
   const [error, setError] = React.useState<string | null>(null);
-  const [paymentMethod, setPaymentMethod] = React.useState<"stripe" | "paypal">(
-    "stripe",
-  );
+  const [paymentMethod, setPaymentMethod] =
+    React.useState<(typeof preferredPaymentMethod)[number]["id"]>("stripe");
 
   const handleCheckout = () => {
     if (!isSignedIn) return;
@@ -127,186 +129,190 @@ export const CheckoutItems = () => {
 
       <div className="grid gap-6 lg:grid-cols-3 lg:gap-8">
         <div className="bg-card h-max w-full border shadow-xs lg:col-span-2">
-          <>
-            <div className="flex items-center justify-between border-b p-6">
-              <p className="flex items-center gap-1.5 text-[13px] font-semibold tracking-wide uppercase">
-                <span>Order Summary</span>{" "}
-                <span className="mb-px">[{totalItems} items]</span>
-              </p>
+          <div className="flex items-center justify-between border-b p-6">
+            <p className="flex items-center gap-1.5 text-[13px] font-semibold tracking-wide uppercase">
+              <span>Order Summary</span>{" "}
+              <span className="mb-px">[{totalItems} items]</span>
+            </p>
 
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={clearCart}
-                className="hidden md:inline-flex"
-              >
-                Clear Items
-              </Button>
-              <Button
-                size="icon-xs"
-                variant="outline"
-                onClick={clearCart}
-                className="md:hidden"
-              >
-                <Icons.Cancel01Icon />
-                <span className="sr-only">Clear Items</span>
-              </Button>
-            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={clearCart}
+              className="hidden md:inline-flex"
+            >
+              Clear Items
+            </Button>
+            <Button
+              size="icon-xs"
+              variant="outline"
+              onClick={clearCart}
+              className="md:hidden"
+            >
+              <Icons.Cancel01Icon />
+              <span className="sr-only">Clear Items</span>
+            </Button>
+          </div>
 
-            {/* Stock Issues Warning */}
-            {hasStockIssues && !isLoading && (
-              <Alert className="border-none bg-amber-600/10 text-amber-600 dark:bg-amber-400/10 dark:text-amber-400">
-                {renderToastIcon("warning")}
-                <AlertTitle>Stock Issues</AlertTitle>
-                <AlertDescription className="text-amber-600/80 dark:text-amber-400/80">
-                  Some items have stock issues. Please review before checkout.
-                </AlertDescription>
-              </Alert>
-            )}
+          {/* Stock Issues Warning */}
+          {hasStockIssues && !isLoading && (
+            <Alert className="border-none bg-amber-600/10 text-amber-600 dark:bg-amber-400/10 dark:text-amber-400">
+              {renderToastIcon("warning")}
+              <AlertTitle>Stock Issues</AlertTitle>
+              <AlertDescription className="text-amber-600/80 dark:text-amber-400/80">
+                Some items have stock issues. Please review before checkout.
+              </AlertDescription>
+            </Alert>
+          )}
 
-            {/* Items List */}
-            <div className="divide-border/50 divide-y">
-              {isLoading
-                ? Array.from({ length: 2 }).map((_, idx) => (
-                    <div key={idx} className="flex gap-4 p-6">
-                      <Skeleton className="h-20 w-20 shrink-0" />
+          {/* Items List */}
+          <div className="divide-border/50 divide-y">
+            {isLoading
+              ? Array.from({ length: 2 }).map((_, idx) => (
+                  <div key={idx} className="flex gap-4 p-6 md:p-8 xl:p-12">
+                    <Skeleton className="h-20 w-20 shrink-0" />
 
-                      <div className="flex flex-1 flex-col justify-between pt-2">
-                        <div className="flex flex-col gap-1">
-                          <Skeleton className="h-4 w-36" />
-                          <Skeleton className="h-3 w-28" />
-                          <Skeleton className="mt-1 h-4 w-10" />
-                        </div>
-                      </div>
-
-                      <div className="flex flex-col items-end gap-1 text-right">
-                        <Skeleton className="h-4 w-24" />
+                    <div className="flex flex-1 flex-col justify-between pt-2">
+                      <div className="flex flex-col gap-1">
+                        <Skeleton className="h-4 w-36" />
                         <Skeleton className="h-3 w-28" />
+                        <Skeleton className="mt-1 h-4 w-10" />
                       </div>
                     </div>
-                  ))
-                : items.map((item) => {
-                    const stockInfo = stockMap.get(item.productId);
-                    const hasIssue =
-                      stockInfo?.isOutOfStock || stockInfo?.exceedsStock;
 
-                    return (
-                      <div
-                        key={item.itemId}
-                        className={cn(
-                          "flex gap-4 p-6",
-                          hasIssue && "bg-red-50",
-                        )}
-                      >
-                        {/* Image */}
-                        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800">
-                          {item.image ? (
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              fill
-                              className="object-cover"
-                              sizes="80px"
-                            />
-                          ) : (
-                            <div className="flex h-full items-center justify-center text-xs text-zinc-400">
-                              No image
-                            </div>
-                          )}
-                        </div>
+                    <div className="flex flex-col items-end gap-1 text-right">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-3 w-28" />
+                    </div>
+                  </div>
+                ))
+              : items.map((item) => {
+                  const stockInfo = stockMap.get(item.productId);
+                  const hasIssue =
+                    stockInfo?.isOutOfStock || stockInfo?.exceedsStock;
 
-                        {/* Details */}
-                        <div className="flex flex-1 flex-col justify-between">
-                          <div>
-                            <p className="font-medium text-zinc-900 dark:text-zinc-100">
-                              {item.name}
-                            </p>
-                            {(item.selectedSize || item.selectedColor) && (
-                              <p className="text-muted-foreground text-xs">
-                                {item.selectedSize && (
-                                  <span>Size: {item.selectedSize}</span>
-                                )}
-                                {item.selectedSize && item.selectedColor && (
-                                  <span className="mx-1">|</span>
-                                )}
-                                {item.selectedColor && (
-                                  <span>Color: {item.selectedColor}</span>
-                                )}
-                              </p>
-                            )}
-                            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                              Qty: {item.quantity}
-                            </p>
-                            {stockInfo?.isOutOfStock && (
-                              <p className="mt-1 text-sm font-medium text-red-600">
-                                Out of stock
-                              </p>
-                            )}
-                            {stockInfo?.exceedsStock &&
-                              !stockInfo.isOutOfStock && (
-                                <p className="mt-1 text-sm font-medium text-amber-600">
-                                  Only {stockInfo.currentStock} available
-                                </p>
-                              )}
+                  return (
+                    <div
+                      key={item.itemId}
+                      className={cn("flex gap-4 p-6", hasIssue && "bg-red-50")}
+                    >
+                      {/* Image */}
+                      <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800">
+                        {item.image ? (
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            fill
+                            className="object-cover"
+                            sizes="80px"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center text-xs text-zinc-400">
+                            No image
                           </div>
-                        </div>
+                        )}
+                      </div>
 
-                        {/* Price */}
-                        <div className="text-right">
-                          <p className="font-mono font-medium text-zinc-900 dark:text-zinc-100">
-                            {formatPrice(item.price * item.quantity)}
+                      {/* Details */}
+                      <div className="flex flex-1 flex-col justify-between">
+                        <div>
+                          <p className="font-medium text-zinc-900 dark:text-zinc-100">
+                            {item.name}
                           </p>
-                          {item.quantity > 1 && (
-                            <p className="text-sm text-zinc-500">
-                              <span className="font-mono">
-                                {formatPrice(item.price)}
-                              </span>{" "}
-                              each
+                          {(item.selectedSize || item.selectedColor) && (
+                            <p className="text-muted-foreground text-xs">
+                              {item.selectedSize && (
+                                <span>Size: {item.selectedSize}</span>
+                              )}
+                              {item.selectedSize && item.selectedColor && (
+                                <span className="mx-1">|</span>
+                              )}
+                              {item.selectedColor && (
+                                <span>Color: {item.selectedColor}</span>
+                              )}
                             </p>
                           )}
+                          <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+                            Qty: {item.quantity}
+                          </p>
+                          {stockInfo?.isOutOfStock && (
+                            <p className="mt-1 text-sm font-medium text-red-600">
+                              Out of stock
+                            </p>
+                          )}
+                          {stockInfo?.exceedsStock &&
+                            !stockInfo.isOutOfStock && (
+                              <p className="mt-1 text-sm font-medium text-amber-600">
+                                Only {stockInfo.currentStock} available
+                              </p>
+                            )}
                         </div>
                       </div>
-                    );
-                  })}
-            </div>
 
-            {/* Payment Method Selection */}
-            <div className="border-t p-6">
-              <p className="mb-4 flex items-center gap-1.5 text-[13px] font-semibold tracking-wide uppercase">
-                Select Payment Method
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                {[
-                  { key: "stripe", name: "Stripe", icon: Icons.StripeIcon },
-                  { key: "paypal", name: "PayPal", icon: Icons.PaypalIcon },
-                ].map((method) => (
-                  <div
-                    key={method.key}
+                      {/* Price */}
+                      <div className="text-right">
+                        <p className="font-mono font-medium text-zinc-900 dark:text-zinc-100">
+                          {formatPrice(item.price * item.quantity)}
+                        </p>
+                        {item.quantity > 1 && (
+                          <p className="text-sm text-zinc-500">
+                            <span className="font-mono">
+                              {formatPrice(item.price)}
+                            </span>{" "}
+                            each
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+          </div>
+
+          {/* Payment Method Selection */}
+          <div className="border-t p-6 md:p-8 xl:p-12">
+            <p className="mb-4 flex items-center gap-1.5 text-[13px] font-semibold tracking-wide uppercase">
+              Select Payment Method
+            </p>
+
+            <div className="grid gap-1">
+              <RadioGroup
+                className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2"
+                value={paymentMethod}
+                onValueChange={(value) => setPaymentMethod(value)}
+              >
+                {preferredPaymentMethod.map((method) => (
+                  <Label
+                    htmlFor={method.id}
+                    key={method.id}
                     className={cn(
-                      "relative flex cursor-pointer items-center justify-center gap-2 rounded-md border px-4 py-6 transition-all",
-                      paymentMethod === method.key
-                        ? "border-primary bg-primary-foreground"
-                        : "bg-secondary/20 hover:bg-secondary/50 border-transparent",
+                      "border-input has-data-[state=checked]:border-primary text-muted-foreground has-focus-visible:border-ring has-focus-visible:ring-ring relative flex w-full cursor-pointer items-start gap-2 rounded-md border p-5 text-[10px] tracking-widest uppercase shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-2",
+                      {
+                        "border-destructive": !paymentMethod,
+                      },
                     )}
-                    onClick={() =>
-                      setPaymentMethod(method.key as typeof paymentMethod)
-                    }
                   >
-                    <method.icon className="size-5" />
-                    <span className="font-mono text-base font-medium">
-                      {method.name}
-                    </span>
-                    {paymentMethod === method.key && (
-                      <Icons.CheckmarkCircle01Icon className="text-primary absolute top-2 right-2 size-5" />
-                    )}
-                  </div>
+                    <RadioGroupItem
+                      value={method.id}
+                      id={method.id}
+                      className="sr-only"
+                    />
+                    <div className="text-foreground flex flex-col items-start gap-2">
+                      <div className="flex w-full items-center gap-2">
+                        <method.icon className="size-4" />
+                        <span className="text-[11px]">{method.label}</span>
+                      </div>
+                      <p className="text-muted-foreground">
+                        {method.description}
+                      </p>
+                    </div>
+                  </Label>
                 ))}
-              </div>
+              </RadioGroup>
             </div>
-          </>
+          </div>
         </div>
 
-        <div className="bg-card h-max w-full border p-6 shadow-xs lg:sticky lg:top-26 xl:top-32">
+        <div className="bg-card h-max w-full border p-6 shadow-xs md:p-8 lg:sticky lg:top-26 xl:top-32">
           <p className="text-[13px] font-semibold tracking-wide uppercase">
             Payment Summary
           </p>

@@ -9,12 +9,14 @@ interface Props {
   productId: string;
   stock: number;
   className?: string;
+  showRemainingStocks?: boolean;
 }
 
 export const StockBadge: React.FC<Props> = ({
   productId,
   stock,
   className,
+  showRemainingStocks = false,
 }) => {
   const cartItem = useCartItem(productId);
 
@@ -42,6 +44,10 @@ export const StockBadge: React.FC<Props> = ({
         Only {stock} left
       </Badge>
     );
+  }
+
+  if (showRemainingStocks) {
+    return <Badge>{stock} available in stock</Badge>;
   }
 
   return null;

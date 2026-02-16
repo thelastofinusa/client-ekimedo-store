@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import { ContactFormComp } from "./_components/contact-form.comp";
-import { FilteredResponseQueryOptions } from "@sanity/client/stega";
 import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 import { client } from "@/sanity/lib/client";
 import { siteConfig } from "@/site.config";
@@ -13,6 +12,8 @@ import {
 } from "@/ui/accordion";
 import { FAQ_QUERY } from "@/sanity/queries/faq";
 import { Icons } from "hugeicons-proxy";
+import { SOCIAL_QUERY } from "@/sanity/queries/social";
+import { clientOptions } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Contact Us",
@@ -89,14 +90,17 @@ const bookingProcess = [
 ];
 
 export default async function ContactPage() {
-  const options: FilteredResponseQueryOptions = { next: { revalidate: 30 } };
-  const categories = await client.fetch(CATEGORIES_QUERY, {}, options);
-  const faqs = await client.fetch(FAQ_QUERY, {}, options);
+  const faqs = await client.fetch(FAQ_QUERY, {}, clientOptions);
+  const categories = await client.fetch(CATEGORIES_QUERY, {}, clientOptions);
+  const socialHandles = await client.fetch(SOCIAL_QUERY, {}, clientOptions);
 
   return (
     <div className="flex-1 overflow-x-clip">
       <div className="from-secondary/80 via-secondary/30 to-background bg-linear-to-b py-24 lg:py-32">
-        <ContactFormComp categories={categories} />
+        <ContactFormComp
+          categories={categories}
+          socialHandles={socialHandles}
+        />
       </div>
 
       {faqs.length > 0 && (

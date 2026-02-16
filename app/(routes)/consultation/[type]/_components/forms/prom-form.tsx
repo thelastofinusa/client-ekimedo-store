@@ -4,7 +4,11 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { consultationsData } from "@/lib/constants/consultation";
+import {
+  bookingLocation,
+  consultationsData,
+  preferredPaymentMethod,
+} from "@/lib/constants/consultation";
 import {
   Form,
   FormControl,
@@ -39,14 +43,6 @@ import { Notify } from "@/components/shared/notify";
 import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
 import Link from "next/link";
 
-const bookingLocation = [
-  {
-    value: "virtual",
-    label: "Virtual (Zoom/Google Meet)",
-  },
-  { value: "in-person", label: "In-Person (Showroom)" },
-];
-
 const budgetOptions = {
   budget: {
     id: "budget",
@@ -61,21 +57,6 @@ const budgetOptions = {
     priceRange: "$1,500 - $3,000",
   },
 };
-
-const preferredPaymentMethod = [
-  {
-    id: "stripe",
-    label: "Credit Card (Stripe)",
-    icon: Icons.StripeIcon,
-    description: "Fast, secure card payment.",
-  },
-  {
-    id: "paypal",
-    label: "PayPal",
-    icon: Icons.PaypalIcon,
-    description: "Quick checkout with PayPal.",
-  },
-];
 
 const formSchema = z
   .object({
@@ -238,9 +219,10 @@ export const PromForm: React.FC<Props> = ({ config }) => {
       const data = await response.json();
 
       if (!response.ok || !data?.success) {
-        throw new Error(
-          data?.message || "Unable to process booking. Please try again.",
-        );
+        const errorMessage =
+          (data && (data.error || data.message)) ||
+          "Unable to process booking. Please try again.";
+        throw new Error(errorMessage);
       }
 
       if (data.url) {

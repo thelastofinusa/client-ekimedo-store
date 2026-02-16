@@ -28,6 +28,7 @@ import { buttonVariants, Button } from "@/ui/button";
 import { Notify, renderToastIcon } from "@/shared/notify";
 import { Alert, AlertTitle, AlertDescription } from "@/ui/alert";
 import { StockBadge } from "../shared/stock-badge";
+import { Badge } from "@/ui/badge";
 
 interface Props {
   children: React.ReactNode;
@@ -276,11 +277,7 @@ const AddToCartButton: React.FC<AddToCartButtonProps> = ({
 
   // Out of stock
   if (isOutOfStock) {
-    return (
-      <Button disabled size="xs" className={cn("w-max", className)}>
-        Out of Stock
-      </Button>
-    );
+    return <Badge variant="destructive">Out of Stock</Badge>;
   }
 
   // Not in cart - show Add to Basket button

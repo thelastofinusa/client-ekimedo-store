@@ -4,10 +4,10 @@ import Image from "next/image";
 import { auth } from "@clerk/nextjs/server";
 import { ArrowLeft, CreditCard, MapPin } from "lucide-react";
 import { Badge } from "@/ui/badge";
-import { sanityFetch } from "@/sanity/lib/live";
 import { ORDER_BY_ID_QUERY } from "@/sanity/queries/orders";
 import { getOrderStatus } from "@/constants/status";
-import { formatPrice, formatDate } from "@/lib/utils";
+import { formatPrice, formatDate, clientOptions } from "@/lib/utils";
+import { client } from "@/sanity/lib/client";
 
 export const metadata = {
   title: "Order Details | Furniture Shop",
@@ -22,15 +22,10 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
   const { id } = await params;
   const { userId } = await auth();
 
-  const { data: order } = await sanityFetch({
-    query: ORDER_BY_ID_QUERY,
-    params: { id },
-  });
+  const order = await client.fetch(ORDER_BY_ID_QUERY, { id }, clientOptions);
 
   // Verify order exists and belongs to current user
-  if (!order || order.clerkUserId !== userId) {
-    notFound();
-  }
+  if (!order || order.clerkUserId !== userId) return notFound();
 
   const status = getOrderStatus(order.status);
   const StatusIcon = status.icon;

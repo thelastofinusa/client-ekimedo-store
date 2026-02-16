@@ -1,14 +1,15 @@
 import React from "react";
 import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
-
 import { HeroComp } from "./_components/hero.comp";
 import { Container } from "@/components/shared/container";
 import { Card } from "@/ui/card";
 import { Icons } from "hugeicons-proxy";
-import { formatPrice } from "@/lib/utils";
+import { clientOptions, formatPrice } from "@/lib/utils";
 import Link from "next/link";
 import { buttonVariants } from "@/ui/button";
+import { PRICING_TIERS_QUERY } from "@/sanity/queries/pricing";
+import { client } from "@/sanity/lib/client";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -39,80 +40,13 @@ export const metadata: Metadata = {
   },
 };
 
-const pricingTiers = [
-  {
-    name: "Custom Wedding Dress",
-    price: 5000,
-    tag: "The Masterpiece",
-    description:
-      "A fully bespoke bridal gown designed exclusively for your wedding day.",
-    features: [
-      "In-depth bridal design consultation",
-      "Luxury couture fabric sourcing",
-      "Custom silhouette & structural tailoring",
-      "Handcrafted embellishments & 3D details",
-      "Multiple fittings for a perfect bridal fit",
-    ],
-  },
-  {
-    name: "Reception & Evening Gowns",
-    price: 3500,
-    tag: "Evening Elegance",
-    description:
-      "A show-stopping gown designed for wedding receptions or formal evenings.",
-    features: [
-      "Personalized design consultation",
-      "Premium or custom fabric selection",
-      "Elegant evening-wear silhouettes",
-      "Comfort-focused tailoring for movement",
-      "Modern, red-carpet–inspired finish",
-    ],
-  },
-  {
-    name: "Custom Bridal Robe",
-    price: 1200,
-    tag: "The Morning Of",
-    description:
-      "A luxurious custom robe designed for bridal prep and special moments.",
-    features: [
-      "Custom robe design consultation",
-      "Silk, satin, chiffon, or lace options",
-      "Lightweight & comfortable construction",
-      "Personalized detailing or embroidery",
-      "Perfect for getting-ready photos",
-    ],
-  },
-  {
-    name: "Custom Prom Dresses",
-    price: 1750,
-    tag: "Red Carpet Ready",
-    description:
-      "A unique, custom-made prom dress tailored to your personal style.",
-    features: [
-      "One-on-one design consultation",
-      "Essential to premium fabric options",
-      "Trend-forward or classic silhouettes",
-      "Flattering, body-conscious tailoring",
-      "Standout look not found in stores",
-    ],
-  },
-  {
-    name: "Special Event Couture",
-    price: 2000,
-    tag: "Milestone Celebration",
-    description:
-      "A custom outfit designed for galas, parties, or milestone celebrations.",
-    features: [
-      "Personalized design consultation",
-      "Fabric selection based on event type",
-      "Custom silhouette and styling",
-      "Optional embellishments",
-      "Versatile couture-level finish",
-    ],
-  },
-];
+export default async function PricingPage() {
+  const pricingTiers = await client.fetch(
+    PRICING_TIERS_QUERY,
+    {},
+    clientOptions,
+  );
 
-export default function PricingPage() {
   return (
     <div className="flex-1 overflow-x-clip">
       <HeroComp />
@@ -165,7 +99,7 @@ export default function PricingPage() {
 
             {/* Right Column: Pricing Tiers */}
             <div className="space-y-6 lg:col-span-8">
-              {pricingTiers.map((tier, idx) => (
+              {pricingTiers?.map((tier, idx: number) => (
                 <Card
                   key={idx}
                   className="p-8 transition-all duration-500 hover:-translate-y-1"
@@ -173,11 +107,6 @@ export default function PricingPage() {
                   <div className="flex flex-col justify-between gap-8 md:flex-row md:items-start">
                     {/* Tier Info */}
                     <div className="flex-1">
-                      <div className="mb-4 flex items-center gap-3">
-                        <span className="bg-primary-foreground text-primary rounded px-2 py-1 text-[9px] font-medium tracking-[0.2em] uppercase">
-                          {tier.tag}
-                        </span>
-                      </div>
                       <h2 className="group-hover:text-primary mb-3 font-serif text-3xl font-normal transition-colors">
                         {tier.name}
                       </h2>
@@ -187,7 +116,7 @@ export default function PricingPage() {
 
                       {/* Features Grid */}
                       <div className="grid grid-cols-1 gap-x-8 gap-y-3 md:grid-cols-2">
-                        {tier.features.map((feature, fIdx) => (
+                        {tier.features?.map((feature, fIdx: number) => (
                           <div
                             key={fIdx}
                             className="text-muted-foreground flex items-center gap-2 text-[13px]"
@@ -204,9 +133,11 @@ export default function PricingPage() {
 
                     {/* Price & Action */}
                     <div className="border-border/50 flex shrink-0 flex-col items-center justify-center border-t pt-6 md:items-end md:border-t-0 md:pt-0">
-                      <span className="text-muted-foreground mb-1 text-[10px] font-bold tracking-widest uppercase">
-                        Starts At
-                      </span>
+                      <div className="mb-2 flex items-center gap-3">
+                        <span className="bg-primary-foreground text-primary rounded px-2 py-1 text-[9px] font-medium tracking-[0.2em] uppercase">
+                          Starts At
+                        </span>
+                      </div>
                       <div className="text-primary mb-6 text-4xl">
                         {formatPrice(tier.price)}
                       </div>

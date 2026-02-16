@@ -3,7 +3,7 @@ import z from "zod";
 import React from "react";
 import { isValidPhoneNumber } from "react-phone-number-input";
 
-import { CATEGORIES_QUERYResult } from "@/sanity.types";
+import { CATEGORIES_QUERYResult, SOCIAL_QUERYResult } from "@/sanity.types";
 import { Container } from "@/components/shared/container";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +32,8 @@ import { Button } from "@/ui/button";
 import { Icons } from "hugeicons-proxy";
 import { env } from "@/lib/env";
 import Link from "next/link";
+import { getSocialIcon } from "@/components/shared/footer";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 
 export const contactFormSchema = z.object({
   fName: z
@@ -57,9 +59,13 @@ export type ContactFormSchemaType = z.infer<typeof contactFormSchema>;
 
 interface Props {
   categories: CATEGORIES_QUERYResult;
+  socialHandles: SOCIAL_QUERYResult;
 }
 
-export const ContactFormComp: React.FC<Props> = ({ categories }) => {
+export const ContactFormComp: React.FC<Props> = ({
+  categories,
+  socialHandles,
+}) => {
   const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
   const form = useForm<ContactFormSchemaType>({
@@ -134,7 +140,7 @@ export const ContactFormComp: React.FC<Props> = ({ categories }) => {
 
               <div className="flex flex-col gap-4">
                 <div className="flex items-start gap-3">
-                  <Icons.Mail01Icon className="text-background size-5" />
+                  <Icons.Mail01Icon className="text-background size-6" />
                   <Link
                     href={`mailto:${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}`}
                     target="_blank"
@@ -149,7 +155,7 @@ export const ContactFormComp: React.FC<Props> = ({ categories }) => {
                   </Link>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Icons.Contact02Icon className="text-background size-5" />
+                  <Icons.Contact02Icon className="text-background size-6" />
                   <Link
                     href="tel:+12029074865"
                     target="_blank"
@@ -166,10 +172,34 @@ export const ContactFormComp: React.FC<Props> = ({ categories }) => {
               </div>
             </div>
 
-            <div className="mt-auto flex flex-col gap-2">
-              <p className="text-background text-xs font-medium uppercase">
-                Location
-              </p>
+            <div className="mt-auto flex flex-col gap-3">
+              <div className="flex items-center gap-2.5">
+                {socialHandles &&
+                  socialHandles.map((social) => {
+                    const Icon = getSocialIcon(
+                      social.name?.toLowerCase() || "",
+                    );
+
+                    return (
+                      <Tooltip key={social._id}>
+                        <TooltipTrigger>
+                          <a
+                            href={social.url || "#"}
+                            target={social.url ? "_blank" : "_self"}
+                            title={social.name || "Follow us"}
+                            rel="noopener noreferrer"
+                            className="group"
+                          >
+                            <Icon className="text-background size-6" />
+                          </a>
+                        </TooltipTrigger>
+                        <TooltipContent theme="light" align="start" side="top">
+                          <p>{social.name}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
+              </div>
               <div className="map-container h-48 overflow-hidden border md:h-64">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d12424.290919500167!2d-76.9167386!3d38.8765778!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x89b7bf25fe8ebc8d%3A0x8fb5f2e243a74c7e!2sCapitol%20Heights%2C%20MD%2020743%2C%20USA!5e0!3m2!1sen!2sng!4v1771208827328!5m2!1sen!2sng"
