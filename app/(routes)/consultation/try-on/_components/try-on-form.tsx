@@ -3,6 +3,7 @@ import React from "react";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { AnimatePresence, motion } from "motion/react";
 
 import {
   bookingLocation,
@@ -37,6 +38,9 @@ import { Notify } from "@/components/shared/notify";
 import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
 import Link from "next/link";
 import { Textarea } from "@/ui/textarea";
+import Image from "next/image";
+import { Icons } from "hugeicons-proxy";
+import { Badge } from "@/ui/badge";
 
 const budgetOptions = {
   budget: {
@@ -44,6 +48,11 @@ const budgetOptions = {
     label: "Budget-Friendly",
     description: "Affordable and stylish options",
     priceRange: "Under $500",
+    images: [
+      "/collections/bridal.avif",
+      "/collections/prom.avif",
+      "/collections/special-events.avif",
+    ],
   },
   "mid-range": {
     id: "mid-range",
@@ -144,6 +153,12 @@ export const TryOnForm: React.FC<Props> = ({ config }) => {
     },
     shouldUnregister: false,
   });
+
+  const budgetOptionsArray = Object.values(budgetOptions);
+  const [selectedOptionIndex, setSelectedOptionIndex] = React.useState<
+    number | null
+  >(null);
+  const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [paymentMethod, setPaymentMethod] =
@@ -272,6 +287,48 @@ export const TryOnForm: React.FC<Props> = ({ config }) => {
       setIsSubmitting(false);
     }
   }
+
+  const handlePrevious = React.useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (selectedOptionIndex === null) return;
+
+      const images =
+        (budgetOptionsArray[selectedOptionIndex] as { images?: string[] })
+          .images ?? [];
+
+      if (!images.length) return;
+
+      setSelectedImageIndex((prev) =>
+        prev === 0 ? images.length - 1 : prev - 1,
+      );
+    },
+    [budgetOptionsArray, selectedOptionIndex],
+  );
+
+  const handleNext = React.useCallback(
+    (e?: React.MouseEvent) => {
+      e?.stopPropagation();
+      if (selectedOptionIndex === null) return;
+
+      const images =
+        (budgetOptionsArray[selectedOptionIndex] as { images?: string[] })
+          .images ?? [];
+
+      if (!images.length) return;
+
+      setSelectedImageIndex((prev) =>
+        prev === images.length - 1 ? 0 : prev + 1,
+      );
+    },
+    [budgetOptionsArray, selectedOptionIndex],
+  );
+
+  const images =
+    selectedOptionIndex !== null
+      ? ((budgetOptionsArray[selectedOptionIndex] as { images?: string[] })
+          .images ?? [])
+      : [];
 
   return (
     <Form {...form}>
@@ -570,41 +627,56 @@ export const TryOnForm: React.FC<Props> = ({ config }) => {
                     <RadioGroup
                       onValueChange={(value) => field.onChange(value)}
                       value={field.value}
-                      className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2"
+                      className="grid w-full grid-cols-1 gap-4"
                       disabled={isSubmitting}
                     >
-                      {Object.entries(budgetOptions).map(([key, item]) => (
-                        <FormLabel
-                          htmlFor={item.id}
-                          key={key}
-                          className={cn(
-                            "border-input has-data-[state=checked]:border-primary has-focus-visible:border-ring has-focus-visible:ring-ring relative flex w-full cursor-pointer items-start gap-3 rounded-md border p-3 shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-2",
-                            {
-                              "border-destructive":
-                                form.formState.errors.budgetType,
-                              "pointer-events-none opacity-50": isSubmitting,
-                            },
-                          )}
-                        >
-                          <RadioGroupItem
-                            value={key}
-                            id={item.id}
-                            disabled={isSubmitting}
-                          />
+                      {Object.entries(budgetOptions).map(
+                        ([key, item], index) => (
+                          <div key={index} className="flex items-start gap-3">
+                            <FormLabel
+                              htmlFor={item.id}
+                              className={cn(
+                                "border-input has-data-[state=checked]:border-primary has-focus-visible:border-ring has-focus-visible:ring-ring relative flex w-full cursor-pointer items-center justify-between gap-3 rounded-md border p-4 shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-2",
+                                {
+                                  "border-destructive":
+                                    form.formState.errors.budgetType,
+                                  "pointer-events-none opacity-50":
+                                    isSubmitting,
+                                },
+                              )}
+                            >
+                              <div className="flex flex-col gap-1">
+                                <p className="text-foreground text-sm font-medium capitalize">
+                                  {item.label}
+                                </p>
+                                <p>{item.description}</p>
+                                <Badge className="mt-2 w-max capitalize">
+                                  {item.priceRange}
+                                </Badge>
+                              </div>
+                              <RadioGroupItem
+                                value={key}
+                                id={item.id}
+                                disabled={isSubmitting}
+                              />
+                            </FormLabel>
 
-                          <div className="text-foreground flex flex-1 flex-col items-start gap-2">
-                            <div className="flex w-full items-center justify-between">
-                              <span className="text-[11px]">{item.label}</span>
-                              <span className="text-muted-foreground text-[11px] font-medium">
-                                {item.priceRange}
-                              </span>
-                            </div>
-                            <p className="text-muted-foreground">
-                              {item.description}
-                            </p>
+                            {"images" in item && item.images?.length && (
+                              <Button
+                                size="icon-xs"
+                                type="button"
+                                variant="outline"
+                                onClick={() => {
+                                  setSelectedOptionIndex(index);
+                                  setSelectedImageIndex(0);
+                                }}
+                              >
+                                <Icons.ViewIcon />
+                              </Button>
+                            )}
                           </div>
-                        </FormLabel>
-                      ))}
+                        ),
+                      )}
                     </RadioGroup>
                   </FormControl>
                   <FormMessage />
@@ -722,6 +794,76 @@ export const TryOnForm: React.FC<Props> = ({ config }) => {
           </div>
         </div>
       </form>
+
+      <AnimatePresence>
+        {selectedOptionIndex !== null && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="bg-foreground/95 fixed inset-0 z-100 flex items-center justify-center p-4 backdrop-blur-sm md:p-12"
+            onClick={() => setSelectedOptionIndex(null)}
+          >
+            <Button
+              size="icon-sm"
+              variant="secondary"
+              onClick={() => setSelectedOptionIndex(null)}
+              className="absolute top-6 right-5 z-50 md:top-8 md:right-8"
+            >
+              <Icons.Cancel01Icon className="size-4.5" />
+            </Button>
+
+            {images.length > 1 && (
+              <Button
+                size="icon"
+                variant="outline"
+                className="hover:bg-background/80 absolute left-4 z-50 md:left-8"
+                onClick={handlePrevious}
+              >
+                <Icons.ArrowLeft01Icon className="size-4" />
+              </Button>
+            )}
+
+            {images.length > 1 && (
+              <Button
+                size="icon"
+                variant="outline"
+                className="hover:bg-background/80 absolute right-4 z-50 md:right-8"
+                onClick={handleNext}
+              >
+                <Icons.ArrowRight01Icon className="size-4" />
+              </Button>
+            )}
+
+            <motion.div
+              key={selectedImageIndex}
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative flex h-[80vh] w-full max-w-6xl items-center justify-center"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="relative h-full w-full">
+                <Image
+                  src={images[selectedImageIndex]}
+                  alt={budgetOptionsArray[selectedOptionIndex!].label}
+                  fill
+                  className="object-contain"
+                  priority
+                  quality={100}
+                />
+              </div>
+
+              <div className="absolute right-0 -bottom-16 left-0 text-center">
+                <h2 className="font-sans text-lg text-white md:text-xl">
+                  {budgetOptionsArray[selectedOptionIndex!].priceRange}
+                </h2>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </Form>
   );
 };

@@ -42,6 +42,7 @@ import { PhoneInput } from "@/ui/phone-input";
 import { Notify } from "@/components/shared/notify";
 import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
 import Link from "next/link";
+import { Badge } from "@/ui/badge";
 
 const budgetOptions = {
   budget: {
@@ -727,20 +728,57 @@ export const BridalForm: React.FC<Props> = ({ config }) => {
                     <FormLabel>Budget Tier</FormLabel>
                     <FormControl>
                       <RadioGroup
-                        className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2"
                         onValueChange={(value) => {
                           field.onChange(value);
                           setShowCustomBudget(value === "custom");
                         }}
-                        disabled={isSubmitting}
                         value={field.value}
+                        className="flex flex-col gap-4"
+                        disabled={isSubmitting}
                       >
-                        {Object.entries(budgetOptions).map(([key, item]) => (
+                        <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-1 lg:grid-cols-2">
+                          {Object.entries(budgetOptions).map(
+                            ([key, item], index) => (
+                              <div
+                                key={index}
+                                className="flex items-start gap-3"
+                              >
+                                <FormLabel
+                                  htmlFor={item.id}
+                                  className={cn(
+                                    "border-input has-data-[state=checked]:border-primary has-focus-visible:border-ring has-focus-visible:ring-ring relative flex w-full cursor-pointer items-center justify-between gap-3 rounded-md border p-4 shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-2",
+                                    {
+                                      "border-destructive":
+                                        form.formState.errors.budgetType,
+                                      "pointer-events-none opacity-50":
+                                        isSubmitting,
+                                    },
+                                  )}
+                                >
+                                  <div className="flex flex-col gap-1">
+                                    <p className="text-foreground text-sm font-medium capitalize">
+                                      {item.label}
+                                    </p>
+                                    <p>{item.description}</p>
+                                    <Badge className="mt-2 w-max capitalize">
+                                      {item.priceRange}
+                                    </Badge>
+                                  </div>
+                                  <RadioGroupItem
+                                    value={key}
+                                    id={item.id}
+                                    disabled={isSubmitting}
+                                  />
+                                </FormLabel>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                        <div className="flex items-start gap-3">
                           <FormLabel
-                            htmlFor={item.id}
-                            key={key}
+                            htmlFor="budget-custom"
                             className={cn(
-                              "border-input has-data-[state=checked]:border-primary has-focus-visible:border-ring has-focus-visible:ring-ring relative flex w-full cursor-pointer items-start gap-3 rounded-md border p-3 shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-2",
+                              "border-input has-data-[state=checked]:border-primary has-focus-visible:border-ring has-focus-visible:ring-ring relative flex w-full cursor-pointer items-center justify-between gap-3 rounded-md border p-4 shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-2",
                               {
                                 "border-destructive":
                                   form.formState.errors.budgetType,
@@ -748,53 +786,21 @@ export const BridalForm: React.FC<Props> = ({ config }) => {
                               },
                             )}
                           >
-                            <RadioGroupItem
-                              value={key}
-                              id={item.id}
-                              disabled={isSubmitting}
-                            />
-
-                            <div className="text-foreground flex flex-1 flex-col items-start gap-2">
-                              <div className="flex w-full items-center justify-between">
-                                <span className="text-[11px]">
-                                  {item.label}
-                                </span>
-                                <span className="text-muted-foreground text-[11px] font-medium">
-                                  {item.priceRange}
-                                </span>
-                              </div>
-                              <p className="text-muted-foreground">
-                                {item.description}
+                            <div className="flex flex-col gap-1">
+                              <p className="text-foreground text-sm font-medium capitalize">
+                                Custom Budget
+                              </p>
+                              <p>
+                                Custom budget let&apos;s you add your own budget
                               </p>
                             </div>
+                            <RadioGroupItem
+                              value="custom"
+                              id="budget-custom"
+                              disabled={isSubmitting}
+                            />
                           </FormLabel>
-                        ))}
-                        <FormLabel
-                          htmlFor={`budget-custom`}
-                          className={cn(
-                            "border-input has-data-[state=checked]:border-primary has-focus-visible:border-ring has-focus-visible:ring-ring relative flex w-full cursor-pointer items-start gap-3 rounded-md border p-3 shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-2 sm:col-span-2 md:col-span-1 lg:col-span-2",
-                            {
-                              "border-destructive":
-                                form.formState.errors.budgetType,
-                              "pointer-events-none opacity-50": isSubmitting,
-                            },
-                          )}
-                        >
-                          <RadioGroupItem
-                            value="custom"
-                            id={`budget-custom`}
-                            disabled={isSubmitting}
-                          />
-
-                          <div className="text-foreground flex flex-1 flex-col items-start gap-2">
-                            <div className="flex w-full items-center justify-between">
-                              <span className="text-[11px]">Custom</span>
-                            </div>
-                            <p className="text-muted-foreground">
-                              Custom budget let&apos;s you add your own budget
-                            </p>
-                          </div>
-                        </FormLabel>
+                        </div>
                       </RadioGroup>
                     </FormControl>
                     <FormMessage />
