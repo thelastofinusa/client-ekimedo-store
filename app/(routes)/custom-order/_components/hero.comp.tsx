@@ -16,7 +16,7 @@ export const HeroComp = () => {
           className="relative z-10"
         >
           <h1 className="text-background mb-4 max-w-2xl font-serif text-5xl sm:text-6xl md:mb-6">
-            Custom Orders
+            Book An Inquire
           </h1>
           <p className="text-primary-foreground/60 max-w-[600px]">
             Bring your dream dress to life. Our bespoke service creates

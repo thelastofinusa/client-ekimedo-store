@@ -476,7 +476,7 @@ export const BridalForm: React.FC<Props> = ({ config }) => {
                 name="attendees"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bringing anyone with you?</FormLabel>
+                    <FormLabel>Number of expected guests</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="1 Person"
@@ -685,7 +685,7 @@ export const BridalForm: React.FC<Props> = ({ config }) => {
                 name="customBudget"
                 render={({ field: customField }) => (
                   <FormItem>
-                    <FormLabel>Custom Budget Tier</FormLabel>
+                    <FormLabel>Custom Price Range</FormLabel>
                     <FormControl>
                       <InputGroup
                         className={cn("h-12!", {
@@ -725,7 +725,7 @@ export const BridalForm: React.FC<Props> = ({ config }) => {
                 name="budgetType"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Budget Tier</FormLabel>
+                    <FormLabel>Price Range</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={(value) => {

@@ -57,9 +57,9 @@ export const Services: React.FC<Props> = ({ services, messageType }) => {
       <div className="py-24 lg:py-32">
         <Container>
           <div className="grid grid-cols-1 gap-12 md:gap-16 lg:gap-24">
-            {services.map((service) => (
+            {services.map((service, index) => (
               <div
-                key={service._id}
+                key={index}
                 className="flex flex-col items-center justify-start gap-4 md:gap-6 lg:flex-row lg:gap-8 lg:even:flex-row-reverse xl:gap-10"
               >
                 <div className="bg-secondary relative aspect-[1.3] w-full flex-1 shadow-xs">

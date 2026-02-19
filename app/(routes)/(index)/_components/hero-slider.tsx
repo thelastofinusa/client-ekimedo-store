@@ -78,7 +78,7 @@ export const HeroSlider = ({ images }: { images: string[] }) => {
             transition={{ delay: 0.3, duration: 1 }}
             className="mt-2 max-w-md font-mono text-xs leading-relaxed tracking-wider uppercase md:mt-0"
           >
-            Bridal · Reception · Prom · Special Occasion
+            Bridal · Reception · Prom · Special Events
           </motion.p>
 
           <motion.div
@@ -96,7 +96,7 @@ export const HeroSlider = ({ images }: { images: string[] }) => {
                   className: "w-full md:w-max md:flex-1",
                 })}
               >
-                Shop Pre-made Dresses
+                Shop Pre-made Designs
               </Link>
               <Link
                 href={"/consultation" as Route}
@@ -106,14 +106,18 @@ export const HeroSlider = ({ images }: { images: string[] }) => {
                   className: "hover:text-card w-full md:w-max md:flex-1",
                 })}
               >
-                Book a Consultation
+                Start your custom dress
               </Link>
             </div>
             <Link
               href={"/custom-order" as Route}
-              className="group flex items-center gap-1.5 font-mono text-[11px] tracking-[0.3em] uppercase transition"
+              className={buttonVariants({
+                variant: "outline",
+                size: "xl",
+                className: "hover:text-card",
+              })}
             >
-              Custom Order
+              Fill Out Inquiry form
               <span className="transition-transform duration-300 group-hover:translate-x-1">
                 <Icons.ArrowRight01Icon className="size-4" />
               </span>

@@ -242,14 +242,14 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
 
         <div className="mt-6 mb-6">
           <p className="text-sm font-semibold">
-            Estimate delivery: 4-6 weeks. Complementary alteration is included.
+            Estimated delivery: 4-6 weeks. Complementary alteration is included.
           </p>
         </div>
 
         <div className="mt-6 border-t pt-6">
           <p className="text-muted-foreground text-sm">
-            Looking for custom modifications? <br /> Start a consultation with
-            our artisans to refine this design.
+            Want to go custom? Book a consultation with our designer to refine
+            this design to your desired taste.
           </p>
 
           <Link
