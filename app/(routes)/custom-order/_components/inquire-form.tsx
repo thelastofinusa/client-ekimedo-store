@@ -40,9 +40,7 @@ const EVENT_TYPES = [
 ];
 
 const BUDGET_RANGES = [
-  { value: "under-500", label: "Under $500" },
-  { value: "500-1000", label: "$500 - $1,000" },
-  { value: "1000-2500", label: "$1,000 - $2,500" },
+  { value: "1500-2500", label: "$1,500 - $2,500" },
   { value: "2500-5000", label: "$2,500 - $5,000" },
   { value: "over-5000", label: "$5,000+" },
 ];

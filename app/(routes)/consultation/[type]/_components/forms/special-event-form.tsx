@@ -367,7 +367,7 @@ export const SpecialEventForm: React.FC<Props> = ({ config }) => {
                 name="attendees"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Bringing anyone with you?</FormLabel>
+                    <FormLabel>Number of expected guests</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="1 Person"
