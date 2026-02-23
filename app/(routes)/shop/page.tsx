@@ -9,7 +9,8 @@ import { Skeleton } from "@/ui/skeleton";
 import { PRODUCT_COLOR_QUERY } from "@/sanity/queries/color";
 import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
-import { PreMadeDresses } from "./_components/premade-dresses";
+import { consultationsData } from "@/lib/constants/consultation";
+import { ConsultationCard } from "@/components/shared/consultation-card";
 
 export const dynamic = "force-dynamic";
 
@@ -136,7 +137,15 @@ export default async function ProductsPage() {
         </Container>
       </div>
 
-      <PreMadeDresses />
+      <div className="bg-secondary/30 py-24 lg:py-32">
+        <Container>
+          {consultationsData
+            .filter((item) => item.slug === "try-on")
+            .map((service, index) => (
+              <ConsultationCard key={index} data={service} />
+            ))}
+        </Container>
+      </div>
     </div>
   );
 }

@@ -3,28 +3,45 @@ import { env } from "../env";
 
 export const headerRoutes = [
   {
-    label: "About Us",
-    path: "/about",
-  },
-  {
-    label: "Inquiry",
-    path: "/custom-order",
+    label: "Home",
+    path: "/",
   },
   {
     label: "Pre-made Dresses",
     path: "/shop",
   },
   {
-    label: "Pricing",
-    path: "/pricing",
+    label: "Inquiry",
+    path: "/custom-order",
   },
   {
     label: "Consultation",
     path: "/consultation",
   },
   {
-    label: "Let's Talk",
-    path: "/contact",
+    label: "Pricing",
+    path: "/pricing",
+  },
+  {
+    label: "Discover",
+    subroutes: [
+      {
+        label: "About Us",
+        path: "/about",
+      },
+      {
+        label: "Gallery",
+        path: "/gallery",
+      },
+      {
+        label: "Testimonials",
+        path: "/testimonials",
+      },
+      {
+        label: "Let's Talk",
+        path: "/contact",
+      },
+    ],
   },
 ];
 

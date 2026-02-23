@@ -77,7 +77,7 @@ export default function About() {
                     started as practice became purpose.
                   </p>
                   <p>
-                    Eki was born from a love for detail, movement, and quiet
+                    Ekimedo was born from a love for detail, movement, and quiet
                     elegance. Not just gowns but moments made to last.
                   </p>
                 </div>

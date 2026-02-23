@@ -195,17 +195,7 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
                   {selectedSize ? `Size: ${selectedSize}` : "Select a size"}
                 </span>
 
-                <SizeChart>
-                  <div
-                    role="button"
-                    className="text-primary flex cursor-pointer items-center gap-2"
-                  >
-                    <Icons.TapeMeasureIcon className="size-5" />
-                    <span className="text-xs font-medium tracking-wider uppercase">
-                      Size Chart
-                    </span>
-                  </div>
-                </SizeChart>
+                <SizeChart />
               </div>
               <div className="flex flex-wrap gap-2">
                 {product?.sizes?.map((size) => (

@@ -153,6 +153,12 @@ export const Footer = async () => {
                 About Us
               </Link>
               <Link
+                href="/policies"
+                className="text-sm opacity-70 transition-opacity hover:opacity-100"
+              >
+                Cancellation Policy
+              </Link>
+              <Link
                 href="/testimonials"
                 className="text-sm opacity-70 transition-opacity hover:opacity-100"
               >
@@ -188,10 +194,10 @@ export const Footer = async () => {
               </a>
               <a
                 target="_blank"
-                href="https://maps.app.goo.gl/8d2LfPehk2PMqN5Q8"
+                href="https://maps.app.goo.gl/GPmSTjbNLuXrPMZ59"
                 className="flex items-center gap-2 text-sm opacity-70 transition-opacity hover:opacity-100"
               >
-                Capitol Heights, Maryland
+                Capitol Heights, MD 20743, USA
               </a>
             </nav>
           </div>
