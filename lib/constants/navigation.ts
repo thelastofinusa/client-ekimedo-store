@@ -1,7 +1,20 @@
-import { siteConfig } from "@/site.config";
 import { env } from "../env";
 
-export const headerRoutes = [
+type Route = {
+  label: string;
+  path: string;
+  newTab?: boolean;
+};
+
+type HeaderRoute =
+  | (Route & { subroutes?: Route[] })
+  | {
+      label: string;
+      path?: string;
+      subroutes: Route[];
+    };
+
+export const headerRoutes: HeaderRoute[] = [
   {
     label: "Home",
     path: "/",
@@ -15,7 +28,7 @@ export const headerRoutes = [
     path: "/custom-order",
   },
   {
-    label: "Consultation",
+    label: "Book Consultation",
     path: "/consultation",
   },
   {
@@ -30,7 +43,7 @@ export const headerRoutes = [
         path: "/about",
       },
       {
-        label: "Gallery",
+        label: "Our Gallery",
         path: "/gallery",
       },
       {
@@ -45,48 +58,41 @@ export const headerRoutes = [
   },
 ];
 
+const discoverRoute = headerRoutes.find(
+  (item): item is { label: string; subroutes: Route[] } => "subroutes" in item,
+);
+
 export const footerRoutes = [
   {
-    title: "Maison",
+    title: "Shop & Services",
+    routes: headerRoutes.filter((item): item is Route => "path" in item),
+  },
+  {
+    title: discoverRoute?.label ?? "About the Brand",
     routes: [
+      ...(discoverRoute?.subroutes ?? []),
       {
-        label: "About Us",
-        path: "/about",
-      },
-      {
-        label: "Our Gallery",
-        path: "/gallery",
-      },
-      {
-        label: "Consultation",
-        path: "/consultation",
-      },
-      {
-        label: "Clients Review",
-        path: "/testimonials",
-      },
-      {
-        label: "Let's Talk",
-        path: "/contact",
+        label: "Cancellation Policy",
+        path: "/policies",
       },
     ],
   },
   {
-    title: "Inquiries",
+    title: "Get in Touch",
     routes: [
       {
-        label: `${siteConfig.title} <${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}>`,
+        label: "(+1) 202-907-4865",
+        path: `tel:+12029074865`,
+        newTab: true,
+      },
+      {
+        label: env.NEXT_PUBLIC_RESEND_INFO_EMAIL,
         path: `mailto:${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}`,
         newTab: true,
       },
       {
-        label: "202-907-4865",
-        path: "tel:202-907-4865",
-        newTab: true,
-      },
-      {
-        label: "Capitol Heights, Maryland",
-        path: "https://maps.app.goo.gl/8d2LfPehk2PMqN5Q8",
+        label: "Capitol Heights, MD 20743, USA",
+        path: "https://maps.app.goo.gl/GPmSTjbNLuXrPMZ59",
         newTab: true,
       },
     ],

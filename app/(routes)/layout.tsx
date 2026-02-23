@@ -8,6 +8,7 @@ import { Header } from "@/components/shared/header";
 import { CartProvider } from "@/components/providers/cart.provider";
 import { Footer } from "@/components/shared/footer";
 import { SanityLive } from "@/sanity/lib/live";
+import { AdminButton } from "@/components/shared/admin-button";
 
 export default function RoutesLayout(
   props: Readonly<{ children: React.ReactNode }>,
@@ -25,6 +26,7 @@ export default function RoutesLayout(
       </CartProvider>
       <Analytics />
       <SanityLive />
+      <AdminButton />
     </ClerkProvider>
   );
 }

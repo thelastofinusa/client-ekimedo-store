@@ -7,13 +7,13 @@ import { Button } from "@/ui/button";
 import { Container } from "./container";
 import { siteConfig } from "@/site.config";
 import { client } from "@/sanity/lib/client";
-import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 import { Icons } from "hugeicons-proxy";
 import { BUSINESS_HOUR_QUERY } from "@/sanity/queries/hours";
 import { SOCIAL_QUERY } from "@/sanity/queries/social";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
-import { env } from "@/lib/env";
 import { clientOptions, cn } from "@/lib/utils";
+import { footerRoutes } from "@/lib/constants/navigation";
+import { Route } from "next";
 
 export const getSocialIcon = (name: string) => {
   switch (name) {
@@ -36,7 +36,6 @@ export const getSocialIcon = (name: string) => {
 };
 
 export const Footer = async () => {
-  const categories = await client.fetch(CATEGORIES_QUERY, {}, clientOptions);
   const businessHours = await client.fetch(
     BUSINESS_HOUR_QUERY,
     {},
@@ -116,91 +115,25 @@ export const Footer = async () => {
             </div>
           </div>
 
-          {/* Collections */}
-          <div className="space-y-6">
-            <h4 className="text-muted-foreground font-sans text-[11px] font-medium tracking-[0.3em] uppercase">
-              Collections
-            </h4>
-            <nav className="flex flex-col gap-4">
-              {categories.map((cat) => (
-                <Link
-                  key={cat._id}
-                  href={`/shop?category=${cat.slug}`}
-                  className="text-sm opacity-70 transition-opacity hover:opacity-100"
-                >
-                  {cat.name}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
-          {/* Explore */}
-          <div className="space-y-6">
-            <h4 className="text-muted-foreground font-sans text-[11px] font-medium tracking-[0.3em] uppercase">
-              Explore
-            </h4>
-            <nav className="flex flex-col gap-4">
-              <Link
-                href="/gallery"
-                className="text-sm opacity-70 transition-opacity hover:opacity-100"
-              >
-                Our Gallery
-              </Link>
-              <Link
-                href="/about"
-                className="text-sm opacity-70 transition-opacity hover:opacity-100"
-              >
-                About Us
-              </Link>
-              <Link
-                href="/policies"
-                className="text-sm opacity-70 transition-opacity hover:opacity-100"
-              >
-                Cancellation Policy
-              </Link>
-              <Link
-                href="/testimonials"
-                className="text-sm opacity-70 transition-opacity hover:opacity-100"
-              >
-                Testimonials
-              </Link>
-              <Link
-                href="/contact"
-                className="text-sm opacity-70 transition-opacity hover:opacity-100"
-              >
-                Let&apos;s Talk
-              </Link>
-            </nav>
-          </div>
-
-          {/* Connect */}
-          <div className="space-y-6">
-            <h4 className="text-muted-foreground font-sans text-[11px] font-medium tracking-[0.3em] uppercase">
-              Services
-            </h4>
-            <nav className="flex flex-col gap-4">
-              <Link
-                href="/consultation"
-                className="text-sm opacity-70 transition-opacity hover:opacity-100"
-              >
-                Book Consultation
-              </Link>
-              <a
-                target="_blank"
-                href={`mailto:${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}`}
-                className="flex items-center gap-2 text-sm opacity-70 transition-opacity hover:opacity-100"
-              >
-                {env.NEXT_PUBLIC_RESEND_INFO_EMAIL}
-              </a>
-              <a
-                target="_blank"
-                href="https://maps.app.goo.gl/GPmSTjbNLuXrPMZ59"
-                className="flex items-center gap-2 text-sm opacity-70 transition-opacity hover:opacity-100"
-              >
-                Capitol Heights, MD 20743, USA
-              </a>
-            </nav>
-          </div>
+          {footerRoutes.map((item) => (
+            <div className="space-y-6" key={item.title}>
+              <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
+                {item.title}
+              </h4>
+              <nav className="flex flex-col gap-4">
+                {item.routes.map((route) => (
+                  <Link
+                    key={route.path}
+                    href={route.path as Route}
+                    target={route.newTab ? "_blank" : "_parent"}
+                    className="text-sm opacity-70 transition-opacity hover:opacity-100"
+                  >
+                    {route.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          ))}
         </div>
 
         {businessHours?.hours && businessHours.hours.length > 0 && (
@@ -215,46 +148,66 @@ export const Footer = async () => {
                     className={cn(
                       "relative flex flex-col gap-1 p-4 transition-all duration-500 last-of-type:col-span-2 lg:last-of-type:col-span-1",
                       {
-                        "bg-background/10 ring-background/20 shadow-sm ring-1":
+                        "bg-green-500/10 shadow-sm ring-1 ring-green-500/20":
                           active,
+                        "bg-red-500/15 shadow-xs ring-1 ring-red-500/25":
+                          active && !item.isOpen,
                       },
                     )}
                   >
-                    {/* Active Indicator Dot */}
-                    {active && (
-                      <div className="absolute top-3 right-3">
-                        <span className="relative flex h-2 w-2">
-                          <span className="bg-secondary absolute inline-flex h-full w-full animate-ping rounded-full opacity-75"></span>
-                          <span className="bg-secondary relative inline-flex h-2 w-2 rounded-full"></span>
-                        </span>
-                      </div>
-                    )}
+                    <div className="flex items-center justify-between gap-4">
+                      <span
+                        className={cn(
+                          "text-background text-[11px] font-medium tracking-widest uppercase",
+                          {
+                            "text-muted-foreground": !active,
+                          },
+                        )}
+                      >
+                        {item.day ? item.day : ""}
+                      </span>
 
-                    <span
+                      {active && (
+                        <span className="relative flex size-2.5">
+                          <span
+                            className={cn(
+                              "absolute inline-flex h-full w-full animate-ping rounded-full bg-green-500 opacity-75",
+                              {
+                                "bg-red-500": !item.isOpen,
+                              },
+                            )}
+                          />
+                          <span
+                            className={cn(
+                              "relative inline-flex size-2.5 rounded-full bg-green-500",
+                              {
+                                "bg-red-500": !item.isOpen,
+                              },
+                            )}
+                          />
+                        </span>
+                      )}
+                    </div>
+
+                    <div
                       className={cn(
-                        "text-background text-[11px] font-bold tracking-wide uppercase",
+                        "text-background/80 mt-1 text-xs font-medium",
                         {
-                          "text-muted-foreground": !active,
+                          "text-red-400": !item.isOpen && active,
+                          "text-green-500": item.isOpen && active,
                         },
                       )}
                     >
-                      {item.day ? item.day : ""}
-                    </span>
-
-                    <div className="flex flex-col">
-                      {item.isOpen ? (
-                        <span className="text-muted-foreground mt-1 text-xs font-normal">
-                          {item.startTime
-                            ? item.startTime.replace(":00", "")
-                            : ""}{" "}
-                          to{" "}
-                          {item.endTime ? item.endTime.replace(":00", "") : ""}
-                        </span>
-                      ) : (
-                        <span className="text-muted-foreground/80 mt-1 text-xs font-normal italic">
-                          Closed
-                        </span>
-                      )}
+                      {item.isOpen
+                        ? `${
+                            item.startTime
+                              ? item.startTime.replace(":00", "")
+                              : ""
+                          } to
+                          ${item.endTime ? item.endTime.replace(":00", "") : ""}`
+                        : active
+                          ? "Not available today"
+                          : "Unavailable"}
                     </div>
                   </div>
                 );

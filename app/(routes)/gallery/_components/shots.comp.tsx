@@ -83,12 +83,12 @@ export const ShotsComp: React.FC<Props> = ({ shots }) => {
             animate={{ opacity: 1 }}
             className="flex flex-col items-center justify-center space-y-6 py-10 text-center"
           >
-            <div className="border-ivory/10 flex h-20 w-20 items-center justify-center rounded-full border opacity-20">
+            <div className="flex h-20 w-20 items-center justify-center rounded-full border">
               <Icons.DeliveryBox02Icon className="h-8 w-8" />
             </div>
             <div className="space-y-2">
               <h3 className="font-serif text-2xl">No Archive Found</h3>
-              <p className="max-w-xs text-xs leading-relaxed tracking-widest uppercase opacity-40">
+              <p className="max-w-xs text-sm leading-relaxed tracking-wider opacity-40">
                 We have no curated selections for this specific criteria in our
                 historical archives.
               </p>

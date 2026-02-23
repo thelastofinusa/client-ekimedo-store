@@ -106,9 +106,7 @@ export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
                     <Icons.StarIcon
                       key={i}
                       fill={i < testimonial.rating! ? "currentColor" : "none"}
-                      className={cn("text-muted-foreground size-4", {
-                        "text-foreground": i < testimonial.rating!,
-                      })}
+                      className="text-primary size-4"
                     />
                   ))}
                 </div>

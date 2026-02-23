@@ -8,6 +8,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/ui/form";
 import { Input } from "@/ui/input";
 import { Textarea } from "@/ui/textarea";
@@ -53,9 +54,7 @@ const formatDateTimeLocal = (date?: Date): string => {
   const year = date.getFullYear();
   const month = pad(date.getMonth() + 1);
   const day = pad(date.getDate());
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
+  return `${year}-${month}-${day}`;
 };
 
 const parseDateTimeLocal = (value: string): Date | undefined => {
@@ -293,7 +292,7 @@ export const InquireForm = () => {
                       <FormLabel>Event Date</FormLabel>
                       <FormControl>
                         <Input
-                          type="datetime-local"
+                          type="date"
                           disabled={isSubmitting}
                           min={formatDateTimeLocal(new Date())}
                           value={formatDateTimeLocal(field.value)}
@@ -420,11 +419,15 @@ export const InquireForm = () => {
                     <FormControl>
                       <Textarea
                         disabled={isSubmitting}
-                        placeholder="Tell us about your dream dress... Include details like style, silhouette, fabric preferences, neckline, embellishments, and any other specifics you have in mind."
+                        placeholder="Tell us about your dream dress..."
                         {...field}
                       />
                     </FormControl>
                     <FormMessage />
+                    <FormDescription className="mt-1">
+                      Include details like style, silhouette, fabric, e.t.c and
+                      any other specifics you have in mind.
+                    </FormDescription>
                   </FormItem>
                 )}
               />

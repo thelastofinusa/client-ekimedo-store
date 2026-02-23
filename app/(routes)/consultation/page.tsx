@@ -2,7 +2,6 @@ import { Metadata } from "next";
 import { HeroComp } from "./_components/hero.comp";
 
 import { Services } from "./_components/services";
-import { CTA } from "@/components/shared/cta";
 import { siteConfig } from "@/site.config";
 import { consultationsData } from "@/lib/constants/consultation";
 
@@ -47,15 +46,6 @@ export default async function ConsultationPage(
     <div className="flex-1 overflow-x-clip">
       <HeroComp />
       <Services services={consultationsData} messageType={messageType} />
-      <CTA
-        mode="dark"
-        title="Ready to Begin?"
-        description="Let's create a style that's uniquely you. Contact us to discuss your needs and book your first consultation."
-        route={{
-          txt: "Get in touch",
-          path: "/contact",
-        }}
-      />
     </div>
   );
 }
