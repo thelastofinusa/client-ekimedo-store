@@ -79,7 +79,7 @@ export const CartSheet: React.FC<Props> = ({
                   href="/shop"
                   className={buttonVariants({ variant: "outline" })}
                 >
-                  Browse Collection
+                  Shop Pre-Made Dresses
                 </Link>
               </SheetClose>
             </div>

@@ -15,7 +15,7 @@ export const ServicesComp = async () => {
           <div className="grid grid-cols-1 gap-6 md:gap-8 lg:grid-cols-2">
             {consultationsData.slice(0, 2).map((service) => (
               <Link
-                key={service._id}
+                key={service.slug}
                 href={`/consultation/${service.slug}`}
                 className="group hover-lift relative aspect-square overflow-hidden md:aspect-auto md:h-[500px]"
               >

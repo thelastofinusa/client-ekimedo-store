@@ -79,7 +79,7 @@ export default async function ProductsDetailPage({
   const otherProducts = allProducts.filter((p) => p.slug !== slug);
 
   return (
-    <div className="py-28">
+    <div className="py-28 md:py-36">
       <Container>
         <ProductDetails product={product} />
 

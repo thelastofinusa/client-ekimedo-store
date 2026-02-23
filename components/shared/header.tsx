@@ -1,6 +1,13 @@
 "use client";
-import * as React from "react";
+
+import React from "react";
+import { containerVariants } from "./container";
+import { cn } from "@/lib/utils";
+import { Logo } from "./logo";
+import { CartSheet } from "../sheets/cart.sheet";
+import { Button } from "@/ui/button";
 import { Icons } from "hugeicons-proxy";
+import { MenuSheet } from "../sheets/menu.sheet";
 import {
   SignedIn,
   SignedOut,
@@ -8,54 +15,155 @@ import {
   UserButton,
   useUser,
 } from "@clerk/nextjs";
-
-import { Logo } from "./logo";
-import { Button } from "@/ui/button";
-import { Container } from "./container";
 import { Separator } from "@/ui/separator";
-import { MenuSheet } from "@/sheets/menu.sheet";
-import { CartSheet } from "@/sheets/cart.sheet";
-import { useTotalItems } from "@/providers/cart.provider";
-import { env } from "@/lib/env";
 import { PiPackageDuotone } from "react-icons/pi";
 import { RiAdminLine } from "react-icons/ri";
-import { headerRoutes } from "@/lib/constants/navigation";
+import { useTotalItems } from "../providers/cart.provider";
+import { env } from "@/lib/env";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+} from "@/ui/navigation-menu";
 import Link from "next/link";
+import { Route } from "next";
+import { usePathname } from "next/navigation";
+import { headerRoutes } from "@/lib/constants/navigation";
 
 export const Header = () => {
+  const pathname = usePathname();
   const { user } = useUser();
   const isAdmin =
     user?.primaryEmailAddress?.emailAddress ===
     env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
 
-  const totalItems = useTotalItems();
-  const [openMenu, setOpenMenu] = React.useState(false);
-  const [openCart, setOpenCart] = React.useState(false);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const forceActiveRoutes = [
+    "/about",
+    "/contact",
+    "/shop/",
+    "/checkout",
+    "/orders",
+  ];
+  const isDynamicShopRoute =
+    pathname.startsWith("/shop/") && pathname !== "/shop";
+
+  const totalItems: number = useTotalItems();
+  const lastScrollY = React.useRef<number>(0);
+  const [openMenu, setOpenMenu] = React.useState<boolean>(false);
+  const [openCart, setOpenCart] = React.useState<boolean>(false);
+  const [isActive, setIsActive] = React.useState<boolean>(false);
+
+  const forceActive = React.useMemo(
+    () => isDynamicShopRoute || forceActiveRoutes.includes(pathname),
+    [forceActiveRoutes, isDynamicShopRoute, pathname],
+  );
+
+  React.useEffect(() => {
+    // 🧠 Route forces header active
+    if (forceActive) {
+      setIsActive(true);
+      return;
+    }
+
+    // 🔁 Route no longer forces active → reset immediately
+    setIsActive(false);
+    lastScrollY.current = window.scrollY;
+
+    const onScroll = () => {
+      const currentY = window.scrollY;
+
+      if (currentY < lastScrollY.current || currentY < 80) {
+        setIsActive(false);
+      } else {
+        setIsActive(true);
+      }
+
+      lastScrollY.current = currentY;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [forceActive]);
 
   return (
-    <header className="pointer-events-none fixed top-0 left-0 z-50 w-full mix-blend-difference">
-      <Container className="flex h-20 w-full items-center justify-between gap-6 lg:h-24">
+    <NavigationMenu
+      viewport={false}
+      className={cn(
+        "pointer-events-none fixed top-0 left-0 z-50 w-full max-w-full transition-all duration-300",
+        {
+          "bg-card md:bg-card/80 md:backdrop-blur-md": isActive,
+        },
+      )}
+    >
+      <header
+        className={containerVariants({
+          className:
+            "flex h-20 w-full items-center justify-between gap-6 lg:h-24",
+        })}
+      >
         <div className="flex w-full max-w-[150px] justify-start">
           <Logo
             href="/"
             srcDesktop="horizontal"
-            color="bone"
+            color={isActive ? "charcoal" : "bone"}
             className="pointer-events-auto"
           />
         </div>
 
         <div className="hidden flex-1 items-center justify-center gap-6 lg:flex">
-          {headerRoutes.map((item) => {
-            return (
-              <Link
-                key={item.path}
-                href={{ pathname: item.path }}
-                className="text-background pointer-events-auto text-xs font-medium tracking-wide uppercase transition-colors"
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+          <NavigationMenuList className="flex items-center justify-center gap-6">
+            {headerRoutes.map((item) => {
+              const LinkRefactored =
+                item.subroutes && item.subroutes?.length > 0 ? "p" : Link;
+
+              return (
+                <NavigationMenuItem
+                  key={item.label}
+                  className="pointer-events-auto"
+                >
+                  {item.subroutes && item.subroutes.length > 0 ? (
+                    <NavigationMenuTrigger
+                      className={cn("mt-1", !isActive && "text-secondary")}
+                    >
+                      <span>{item.label}</span>
+                    </NavigationMenuTrigger>
+                  ) : (
+                    <LinkRefactored
+                      key={item.path}
+                      href={item.path as Route}
+                      className={cn(
+                        "pointer-events-auto text-xs font-medium tracking-wider uppercase transition-colors",
+                        !isActive && "text-secondary",
+                      )}
+                    >
+                      <span>{item.label}</span>
+                    </LinkRefactored>
+                  )}
+                  {item.subroutes && item.subroutes.length > 0 && (
+                    <NavigationMenuContent>
+                      <ul className="pointer-events-auto w-60">
+                        {item.subroutes.map((route) => (
+                          <NavigationMenuLink key={route.path} asChild>
+                            <Link
+                              href={route.path as Route}
+                              className="pointer-events-auto text-xs font-medium tracking-wider uppercase transition-colors"
+                            >
+                              <span>{route.label}</span>
+                            </Link>
+                          </NavigationMenuLink>
+                        ))}
+                      </ul>
+                    </NavigationMenuContent>
+                  )}
+                </NavigationMenuItem>
+              );
+            })}
+          </NavigationMenuList>
         </div>
 
         <div className="flex w-full max-w-[150px] justify-end">
@@ -63,7 +171,7 @@ export const Header = () => {
             <CartSheet openCart={openCart} setOpenCart={setOpenCart}>
               <Button
                 size={totalItems > 0 ? "sm" : "icon-sm"}
-                variant="secondary"
+                variant={isActive ? "default" : "secondary"}
               >
                 <Icons.ShoppingCart02Icon className="size-4.5" />
                 {totalItems > 0 && (
@@ -79,8 +187,8 @@ export const Header = () => {
               <Button
                 size="icon-sm"
                 onClick={() => setOpenMenu(true)}
+                variant={isActive ? "default" : "secondary"}
                 className="lg:hidden"
-                variant="secondary"
               >
                 <Icons.Menu09Icon className="size-4.5" />
                 <span className="sr-only">Open menu</span>
@@ -92,8 +200,7 @@ export const Header = () => {
                   <Separator orientation="vertical" className="h-3! w-px" />
                   <Button
                     size="icon-sm"
-                    className="isolate mix-blend-normal"
-                    variant="secondary"
+                    variant={isActive ? "default" : "secondary"}
                   >
                     <UserButton
                       afterSwitchSessionUrl="/"
@@ -127,7 +234,10 @@ export const Header = () => {
                 <React.Fragment>
                   <Separator orientation="vertical" className="h-3! w-px" />
                   <SignInButton mode="modal">
-                    <Button size="icon-sm" variant="secondary">
+                    <Button
+                      size="icon-sm"
+                      variant={isActive ? "default" : "secondary"}
+                    >
                       <Icons.UserCircleIcon className="size-4.5" />
                       <span className="sr-only">Sign in</span>
                     </Button>
@@ -137,7 +247,7 @@ export const Header = () => {
             </div>
           </div>
         </div>
-      </Container>
-    </header>
+      </header>
+    </NavigationMenu>
   );
 };

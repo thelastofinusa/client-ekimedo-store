@@ -10,53 +10,31 @@ import {
 } from "@/ui/dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
+import { Icons } from "hugeicons-proxy";
+import { sizeChart } from "@/lib/constants/consultation";
 
 interface Props {
-  children: React.ReactNode;
+  className?: string;
 }
 
-const sizeChart = [
-  {
-    size: "XS",
-    numeric: "0—2",
-    bust: "32—33 / 81—84",
-    waist: "24—25 / 61—64",
-    hip: "34—35 / 86—89",
-  },
-  {
-    size: "S",
-    numeric: "4—6",
-    bust: "34—35 / 86—89",
-    waist: "26—27 / 66—69",
-    hip: "36—37 / 91—94",
-  },
-  {
-    size: "M",
-    numeric: "8—10",
-    bust: "36—37 / 91—94",
-    waist: "28—29 / 71—74",
-    hip: "38—39 / 96—99",
-  },
-  {
-    size: "L",
-    numeric: "12—14",
-    bust: "38.5—40 / 98—101",
-    waist: "30.5—32 / 77—81",
-    hip: "40.5—42 / 103—107",
-  },
-  {
-    size: "XL",
-    numeric: "16—18",
-    bust: "41.5—43 / 105—109",
-    waist: "33.5—35 / 85—89",
-    hip: "44.5—46 / 113—117",
-  },
-];
-
-export const SizeChart: React.FC<Props> = ({ children }) => {
+export const SizeChart: React.FC<Props> = ({ className }) => {
   return (
     <Dialog>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+      <DialogTrigger asChild>
+        <div
+          role="button"
+          className={cn(
+            "text-primary flex cursor-pointer items-center gap-2",
+            className,
+          )}
+        >
+          <Icons.TapeMeasureIcon className="size-5" />
+          <span className="text-xs font-medium tracking-wider uppercase">
+            Size Chart
+          </span>
+        </div>
+      </DialogTrigger>
       <DialogContent className="bg-card top-0 mt-6 max-w-5xl translate-y-0 p-6 md:p-8 lg:p-12">
         <VisuallyHidden>
           <DialogHeader>

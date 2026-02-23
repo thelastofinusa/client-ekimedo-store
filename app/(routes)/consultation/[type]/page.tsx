@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { siteConfig } from "@/site.config";
 import { HeroComp } from "./_components/hero.comp";
@@ -53,7 +53,6 @@ export default async function ConsultationDetailsPage(
   const config = consultationsData.find((item) => item.slug === type);
 
   if (!config) return notFound();
-  if (type === "try-on") return redirect("/consultation/try-on");
 
   return (
     <div className="flex-1 overflow-x-clip">
@@ -62,10 +61,7 @@ export default async function ConsultationDetailsPage(
         title={config.title}
         description={config.description}
       />
-      <BookingForm
-        config={config}
-        type={type as (typeof consultationsData)[number]["slug"]}
-      />
+      <BookingForm config={config} />
     </div>
   );
 }

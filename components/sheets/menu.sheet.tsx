@@ -23,6 +23,23 @@ interface Props {
   setOpenMenu: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
+type SubRoute = {
+  label: string;
+  path: string;
+};
+
+type RouteItem =
+  | {
+      label: string;
+      path: string;
+      subroutes?: never;
+    }
+  | {
+      label: string;
+      subroutes: SubRoute[];
+      path?: never;
+    };
+
 export const MenuSheet: React.FC<Props> = ({
   children,
   openMenu,
@@ -32,6 +49,23 @@ export const MenuSheet: React.FC<Props> = ({
   const isAdmin =
     user?.primaryEmailAddress?.emailAddress ===
     env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
+
+  const flattenedRoutes: SubRoute[] = headerRoutes.flatMap((route) => {
+    if ("subroutes" in route && route.subroutes) {
+      return route.subroutes;
+    }
+
+    if ("path" in route && route.path) {
+      return [
+        {
+          label: route.label,
+          path: route.path,
+        },
+      ];
+    }
+
+    return [];
+  });
 
   return (
     <Sheet open={openMenu} onOpenChange={setOpenMenu}>
@@ -43,26 +77,24 @@ export const MenuSheet: React.FC<Props> = ({
 
         <div className="flex flex-1 flex-col justify-center p-8 md:px-12">
           <nav className="flex flex-col gap-4">
-            {headerRoutes.map((item, index) => {
-              return (
-                <motion.div
-                  key={item.path}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.1 + index * 0.05 }}
-                  onClick={() => setOpenMenu(false)}
+            {flattenedRoutes.map((item, index) => (
+              <motion.div
+                key={item.path}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.1 + index * 0.05 }}
+                onClick={() => setOpenMenu(false)}
+              >
+                <Link
+                  href={item.path as Route}
+                  className="group flex w-fit items-baseline gap-4"
                 >
-                  <Link
-                    href={{ pathname: item.path }}
-                    className="group flex w-fit items-baseline gap-4"
-                  >
-                    <span className="font-serif text-2xl transition-all duration-500 md:text-3xl">
-                      {item.label}
-                    </span>
-                  </Link>
-                </motion.div>
-              );
-            })}
+                  <span className="font-serif text-2xl transition-all duration-500 md:text-3xl">
+                    {item.label}
+                  </span>
+                </Link>
+              </motion.div>
+            ))}
           </nav>
         </div>
 
