@@ -96,7 +96,7 @@ export default async function ContactPage() {
 
   return (
     <div className="flex-1 overflow-x-clip">
-      <div className="from-secondary/80 via-secondary/30 to-background bg-linear-to-b py-24 lg:py-32">
+      <div className="from-secondary/80 via-secondary/30 to-background flex flex-col gap-10 bg-linear-to-b py-24 lg:py-32">
         <ContactFormComp
           categories={categories}
           socialHandles={socialHandles}
@@ -131,7 +131,7 @@ export default async function ContactPage() {
                         <p className="font-sans text-base">{item.question}</p>
                       </AccordionTrigger>
                       <AccordionContent className="pb-5">
-                        <div className="px-9">
+                        <div className="bg-card text-foreground p-4">
                           <pre className="font-sans text-sm whitespace-pre-wrap">
                             {item.answer}
                           </pre>

@@ -123,7 +123,7 @@ export const consultationsData = [
               start: {
                 icon: "UserMultiple02Icon",
               },
-              end: { value: "Person(s)" },
+              end: { value: "Guests" },
             },
             group: "third",
           },
@@ -381,7 +381,7 @@ export const consultationsData = [
               start: {
                 icon: "UserMultiple02Icon",
               },
-              end: { value: "Person(s)" },
+              end: { value: "Guests" },
             },
             group: "third",
           },
@@ -557,7 +557,7 @@ export const consultationsData = [
               start: {
                 icon: "UserMultiple02Icon",
               },
-              end: { value: "Person(s)" },
+              end: { value: "Guests" },
             },
             group: "third",
           },
@@ -770,7 +770,7 @@ export const consultationsData = [
               start: {
                 icon: "UserMultiple02Icon",
               },
-              end: { value: "Person(s)" },
+              end: { value: "Guests" },
             },
             errMsg: "This field is required",
             group: "third",
