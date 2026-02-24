@@ -26,51 +26,57 @@ export const TestimonialComp = async () => {
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-          {testimonials.slice(0, 3).map((testimonial) => (
-            <div
-              key={testimonial._id}
-              className="bg-primary-foreground/5 border-primary-foreground/10 flex h-max flex-col gap-6 border p-6 shadow-xs"
-            >
-              <blockquote>
-                <p className="text-charcoal/90 text-base leading-[1.7] font-light italic">
-                  &quot;{testimonial.review}&quot;
-                </p>
-              </blockquote>
+          {testimonials.slice(0, 3).map((testimonial) => {
+            const clientName = testimonial.clerkUser?.name || testimonial.name;
+            const clientAvatar =
+              testimonial.clerkUser?.avatarUrl || testimonial.avatar;
 
-              {/* Author Profile */}
-              <div className="flex flex-wrap items-end justify-between gap-6">
-                <div className="flex items-center gap-2">
-                  <Avatar className="size-10">
-                    <AvatarImage
-                      src={testimonial.avatar || "/placeholder.svg"}
-                      alt={testimonial.name!}
-                      className="object-cover"
-                    />
-                    <AvatarFallback>
-                      {getInitials(testimonial.name!)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium">{testimonial.name}</p>
-                    <p className="text-muted-foreground mt-0.5 text-[11px] font-medium tracking-widest uppercase">
-                      {testimonial.date
-                        ? formatSanityDate(testimonial.date)
-                        : testimonial.category?.name}
-                    </p>
+            return (
+              <div
+                key={testimonial._id}
+                className="bg-primary-foreground/5 border-primary-foreground/10 flex h-max flex-col gap-6 border p-6 shadow-xs"
+              >
+                <blockquote>
+                  <p className="text-charcoal/90 text-base leading-[1.7] font-light italic">
+                    &quot;{testimonial.review}&quot;
+                  </p>
+                </blockquote>
+
+                {/* Author Profile */}
+                <div className="flex flex-wrap items-end justify-between gap-6">
+                  <div className="flex items-center gap-2">
+                    <Avatar className="size-10">
+                      <AvatarImage
+                        src={clientAvatar || "/placeholder.svg"}
+                        alt={clientName!}
+                        className="object-cover"
+                      />
+                      <AvatarFallback>
+                        {getInitials(clientName!)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">{clientName}</p>
+                      <p className="text-muted-foreground mt-0.5 text-[11px] font-medium tracking-widest uppercase">
+                        {testimonial.date
+                          ? formatSanityDate(testimonial.date)
+                          : testimonial.category?.name}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-px">
+                    {[...Array(5)].map((_, i) => (
+                      <Icons.StarIcon
+                        key={i}
+                        fill={i < testimonial.rating! ? "currentColor" : "none"}
+                        className="text-background size-4"
+                      />
+                    ))}
                   </div>
                 </div>
-                <div className="flex gap-px">
-                  {[...Array(5)].map((_, i) => (
-                    <Icons.StarIcon
-                      key={i}
-                      fill={i < testimonial.rating! ? "currentColor" : "none"}
-                      className="text-background size-4"
-                    />
-                  ))}
-                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="mt-12 text-center">

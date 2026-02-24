@@ -333,6 +333,71 @@ export const BookingForm: React.FC<Props> = ({ config }) => {
     shouldUnregister: false,
   });
 
+  // Load saved data from localStorage on mount
+  React.useEffect(() => {
+    const STORAGE_KEY = `booking-form-${config.slug}`;
+    const savedData = localStorage.getItem(STORAGE_KEY);
+
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        // Revive date strings to Date objects if they look like dates
+        const revived = Object.entries(parsed).reduce(
+          (acc, [key, value]) => {
+            if (
+              typeof value === "string" &&
+              /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(value)
+            ) {
+              acc[key] = new Date(value);
+            } else {
+              acc[key] = value;
+            }
+            return acc;
+          },
+          {} as Record<string, unknown>,
+        );
+
+        form.reset(revived);
+
+        if (parsed.paymentMethod) {
+          setPaymentMethod(parsed.paymentMethod);
+        }
+      } catch (e) {
+        console.error("Failed to load saved form data", e);
+      }
+    }
+  }, [config.slug, form]);
+
+  // Save form data to localStorage on changes
+  const watchedValues = form.watch();
+  React.useEffect(() => {
+    const STORAGE_KEY = `booking-form-${config.slug}`;
+    const dataToSave = {
+      ...watchedValues,
+      paymentMethod,
+    };
+
+    // Filter out File objects as they can't be serialized
+    const serializableData = Object.entries(dataToSave).reduce(
+      (acc, [key, value]) => {
+        const isFile = (v: unknown): v is File =>
+          v instanceof File ||
+          (typeof v === "object" && v !== null && "name" in v && "size" in v);
+
+        if (isFile(value)) return acc;
+        if (Array.isArray(value)) {
+          acc[key] = value.filter((v) => !isFile(v));
+        } else {
+          acc[key] = value;
+        }
+        return acc;
+      },
+      {} as Record<string, unknown>,
+    );
+
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializableData));
+  }, [watchedValues, paymentMethod, config.slug]);
+
   React.useEffect(() => {
     let isMounted = true;
     fetch("/api/bookings/dates")
@@ -376,7 +441,54 @@ export const BookingForm: React.FC<Props> = ({ config }) => {
         setIsSubmitting(false);
         return;
       }
-      console.log(values);
+
+      const formData = new FormData();
+      formData.append("serviceType", config.slug);
+      formData.append("paymentMethod", paymentMethod);
+
+      Object.entries(values).forEach(([key, value]) => {
+        if (value === undefined || value === null) return;
+
+        if (Array.isArray(value)) {
+          value.forEach((v) => {
+            if (v instanceof File) {
+              formData.append(key, v);
+            } else {
+              formData.append(key, String(v));
+            }
+          });
+        } else if (value instanceof Date) {
+          formData.append(key, value.toISOString());
+        } else {
+          formData.append(key, String(value));
+        }
+      });
+
+      const response = await fetch("/api/bookings", {
+        method: "POST",
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(result.error || "Failed to create booking");
+      }
+
+      // Clear saved data on successful submission
+      localStorage.removeItem(`booking-form-${config.slug}`);
+
+      if (result.url) {
+        window.location.href = result.url;
+      } else {
+        toast.custom(() => (
+          <Notify
+            type="success"
+            title="Booking successful"
+            description="Your consultation has been booked successfully."
+          />
+        ));
+      }
     } catch (error) {
       toast.custom(() => (
         <Notify
@@ -562,6 +674,14 @@ export const BookingForm: React.FC<Props> = ({ config }) => {
                       <p className="text-muted-foreground mb-8 text-sm font-normal">
                         {item.description}
                       </p>
+
+                      {item.info && (
+                        <Alert className="mb-8 w-full border-blue-500/80 bg-blue-500/5 text-blue-500">
+                          <AlertTitle className="tracking-wider">
+                            <span>{item.info}</span>
+                          </AlertTitle>
+                        </Alert>
+                      )}
 
                       {renderFieldsWithGroups(
                         [...(item.fields as unknown[])],

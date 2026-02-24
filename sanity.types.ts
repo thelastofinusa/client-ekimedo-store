@@ -160,20 +160,22 @@ export type Booking = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  customerName?: string;
-  customerEmail?: string;
-  customerPhone?: string;
+  fName?: string;
+  lName?: string;
+  email?: string;
+  phone?: string;
   service?: string;
-  bookingDate?: string;
+  consultationDate?: string;
   endTime?: string;
   status?: "pending" | "confirmed" | "cancelled" | "completed";
   location?: "virtual" | "in-person";
-  groupSize?: number;
+  guests?: number;
   eventDate?: string;
-  budgetType?: string;
+  budget?: string;
   customBudget?: string;
+  priceRange?: string;
   paymentMethod?: "stripe" | "paypal";
-  styleInspiration?: Array<{
+  inspiration?: Array<{
     asset?: {
       _ref: string;
       _type: "reference";
@@ -186,13 +188,19 @@ export type Booking = {
     _type: "image";
     _key: string;
   }>;
+  interests?: Array<string>;
+  referBy?: string;
+  timeline?: boolean;
+  cancellationPolicy?: boolean;
+  dressSize?: string;
+  dressColor?: string;
+  specialRequirements?: string;
   responses?: Array<{
     key?: string;
     label?: string;
     value?: string;
     _key: string;
   }>;
-  understoodProductionProcess?: boolean;
 };
 
 export type ProductColor = {
@@ -328,6 +336,7 @@ export type Product = {
   slug?: Slug;
   price?: number;
   description?: string;
+  delivery?: string;
   images?: Array<{
     asset?: {
       _ref: string;
@@ -556,7 +565,7 @@ export type AllSanitySchemaTypes =
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./sanity/queries/booking.ts
 // Variable: BOOKED_DATES_QUERY
-// Query: *[_type == "booking" && bookingDate > now() && status != "cancelled"] {    bookingDate  }
+// Query: *[_type == "booking" && consultationDate > now() && status != "cancelled"] {    consultationDate  }
 export type BOOKED_DATES_QUERYResult = Array<never>;
 
 // Source: ./sanity/queries/category.ts
@@ -729,7 +738,7 @@ export type PRICING_TIERS_QUERYResult = Array<{
 
 // Source: ./sanity/queries/product.ts
 // Variable: PRODUCT_QUERY
-// Query: *[_type == "product"] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, "value": value.hex},    description,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
+// Query: *[_type == "product"] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, "value": value.hex},    description,    delivery,    "images": images[].asset->url,    sizes,    stock,    delivery,    category -> {        _id,        name,        "slug": slug.current    },}
 export type PRODUCT_QUERYResult = Array<{
   _id: string;
   name: string | null;
@@ -740,6 +749,7 @@ export type PRODUCT_QUERYResult = Array<{
     value: string | null;
   }> | null;
   description: string | null;
+  delivery: string | null;
   images: Array<string | null> | null;
   sizes: Array<string> | null;
   stock: number | null;
@@ -750,7 +760,7 @@ export type PRODUCT_QUERYResult = Array<{
   } | null;
 }>;
 // Variable: PRODUCT_BY_SLUG_QUERY
-// Query: *[_type == "product" && slug.current == $slug] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, "value": value.hex},    description,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
+// Query: *[_type == "product" && slug.current == $slug] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, "value": value.hex},    description,    "images": images[].asset->url,    sizes,    stock,    delivery,    category -> {        _id,        name,        "slug": slug.current    },}
 export type PRODUCT_BY_SLUG_QUERYResult = Array<{
   _id: string;
   name: string | null;
@@ -764,6 +774,7 @@ export type PRODUCT_BY_SLUG_QUERYResult = Array<{
   images: Array<string | null> | null;
   sizes: Array<string> | null;
   stock: number | null;
+  delivery: string | null;
   category: {
     _id: string;
     name: string | null;
@@ -771,7 +782,7 @@ export type PRODUCT_BY_SLUG_QUERYResult = Array<{
   } | null;
 }>;
 // Variable: PRODUCT_BY_IDS_QUERY
-// Query: *[_type == "product" && _id in $ids] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, "value": value.hex},    description,    "images": images[].asset->url,    sizes,    stock,    category -> {        _id,        name,        "slug": slug.current    },}
+// Query: *[_type == "product" && _id in $ids] | order(_createdAt desc) {    _id,    name,    "slug": slug.current,    price,    colors[]->{name, "value": value.hex},    description,    "images": images[].asset->url,    sizes,    stock,    delivery,    category -> {        _id,        name,        "slug": slug.current    },}
 export type PRODUCT_BY_IDS_QUERYResult = Array<{
   _id: string;
   name: string | null;
@@ -785,6 +796,7 @@ export type PRODUCT_BY_IDS_QUERYResult = Array<{
   images: Array<string | null> | null;
   sizes: Array<string> | null;
   stock: number | null;
+  delivery: string | null;
   category: {
     _id: string;
     name: string | null;
@@ -803,10 +815,16 @@ export type SOCIAL_QUERYResult = Array<{
 
 // Source: ./sanity/queries/testimonial.ts
 // Variable: TESTIMONIAL_QUERY
-// Query: *[_type == "testimonial" && status == "approved"] | order(date desc) {    _id,    "avatar": avatar.asset->url,    category -> { name },    date,    name,    rating,    review,    "workAssets": workAssets[].asset->url}
+// Query: *[_type == "testimonial" && status == "approved"] | order(date desc) {    _id,    "avatar": avatar.asset->url,    clerkUser,    category -> { name },    date,    name,    rating,    review,    "workAssets": workAssets[].asset->url}
 export type TESTIMONIAL_QUERYResult = Array<{
   _id: string;
   avatar: string | null;
+  clerkUser: {
+    name?: string;
+    email?: string;
+    avatarUrl?: string;
+    clerkId?: string;
+  } | null;
   category: {
     name: string | null;
   } | null;
@@ -821,7 +839,7 @@ export type TESTIMONIAL_QUERYResult = Array<{
 import "@sanity/client";
 declare module "@sanity/client" {
   interface SanityQueries {
-    '\n  *[_type == "booking" && bookingDate > now() && status != "cancelled"] {\n    bookingDate\n  }\n': BOOKED_DATES_QUERYResult;
+    '\n  *[_type == "booking" && consultationDate > now() && status != "cancelled"] {\n    consultationDate\n  }\n': BOOKED_DATES_QUERYResult;
     '\n    *[_type == "category"] | order(_createdAt desc) {\n        _id,\n        name,\n        "slug": slug.current\n    }\n': CATEGORIES_QUERYResult;
     '\n*[_type == "productColor"]{\n  name,\n  "hex": value.hex\n}\n': PRODUCT_COLOR_QUERYResult;
     '*[\n  _type == "customer"\n  && email == $email\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_EMAIL_QUERYResult;
@@ -835,10 +853,10 @@ declare module "@sanity/client" {
     '*[\n  _type == "order"\n] | order(createdAt desc) [0...$limit] {\n  _id,\n  orderNumber,\n  email,\n  total,\n  status,\n  createdAt\n}': RECENT_ORDERS_QUERYResult;
     '*[\n  _type == "order"\n  && stripePaymentId == $stripePaymentId\n][0]{ _id }': ORDER_BY_STRIPE_PAYMENT_ID_QUERYResult;
     '\n*[_type == "pricingTier"] | order(order asc, _createdAt asc) {\n  _id,\n  name,\n  price,\n  description,\n  features\n}\n': PRICING_TIERS_QUERYResult;
-    '\n*[_type == "product"] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_QUERYResult;
-    '\n*[_type == "product" && slug.current == $slug] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_SLUG_QUERYResult;
-    '\n*[_type == "product" && _id in $ids] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_IDS_QUERYResult;
+    '\n*[_type == "product"] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    delivery,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    delivery,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_QUERYResult;
+    '\n*[_type == "product" && slug.current == $slug] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    delivery,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_SLUG_QUERYResult;
+    '\n*[_type == "product" && _id in $ids] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    delivery,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_IDS_QUERYResult;
     '\n    *[_type == "social"] | order(_createdAt desc) {\n        _id,\n        name,\n        url\n    }\n': SOCIAL_QUERYResult;
-    '\n*[_type == "testimonial" && status == "approved"] | order(date desc) {\n    _id,\n    "avatar": avatar.asset->url,\n    category -> { name },\n    date,\n    name,\n    rating,\n    review,\n    "workAssets": workAssets[].asset->url\n}\n': TESTIMONIAL_QUERYResult;
+    '\n*[_type == "testimonial" && status == "approved"] | order(date desc) {\n    _id,\n    "avatar": avatar.asset->url,\n    clerkUser,\n    category -> { name },\n    date,\n    name,\n    rating,\n    review,\n    "workAssets": workAssets[].asset->url\n}\n': TESTIMONIAL_QUERYResult;
   }
 }

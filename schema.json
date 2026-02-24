@@ -877,21 +877,28 @@
           "type": "string"
         }
       },
-      "customerName": {
+      "fName": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
         "optional": true
       },
-      "customerEmail": {
+      "lName": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
         },
         "optional": true
       },
-      "customerPhone": {
+      "email": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "phone": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
@@ -905,7 +912,7 @@
         },
         "optional": true
       },
-      "bookingDate": {
+      "consultationDate": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
@@ -961,7 +968,7 @@
         },
         "optional": true
       },
-      "groupSize": {
+      "guests": {
         "type": "objectAttribute",
         "value": {
           "type": "number"
@@ -975,7 +982,7 @@
         },
         "optional": true
       },
-      "budgetType": {
+      "budget": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
@@ -983,6 +990,13 @@
         "optional": true
       },
       "customBudget": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "priceRange": {
         "type": "objectAttribute",
         "value": {
           "type": "string"
@@ -1006,7 +1020,7 @@
         },
         "optional": true
       },
-      "styleInspiration": {
+      "inspiration": {
         "type": "objectAttribute",
         "value": {
           "type": "array",
@@ -1089,6 +1103,58 @@
         },
         "optional": true
       },
+      "interests": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "array",
+          "of": {
+            "type": "string"
+          }
+        },
+        "optional": true
+      },
+      "referBy": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "timeline": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
+      "cancellationPolicy": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "boolean"
+        },
+        "optional": true
+      },
+      "dressSize": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "dressColor": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "specialRequirements": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
       "responses": {
         "type": "objectAttribute",
         "value": {
@@ -1130,13 +1196,6 @@
               }
             }
           }
-        },
-        "optional": true
-      },
-      "understoodProductionProcess": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "boolean"
         },
         "optional": true
       }
@@ -1946,6 +2005,13 @@
         "optional": true
       },
       "description": {
+        "type": "objectAttribute",
+        "value": {
+          "type": "string"
+        },
+        "optional": true
+      },
+      "delivery": {
         "type": "objectAttribute",
         "value": {
           "type": "string"

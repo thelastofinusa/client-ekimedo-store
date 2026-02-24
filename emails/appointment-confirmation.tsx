@@ -107,34 +107,41 @@ export const AppointmentConfirmationEmail = ({
 
             <Section style={detailsBox}>
               <Row style={row}>
-                <Column style={labelColumn}>What</Column>
+                <Column style={labelColumn}>Service</Column>
                 <Column style={valueColumn}>{serviceTitle}</Column>
               </Row>
               {eventDateStr && (
                 <Row style={row}>
-                  <Column style={labelColumn}>Event</Column>
+                  <Column style={labelColumn}>Event Date</Column>
                   <Column style={valueColumn}>{eventDateStr}</Column>
                 </Row>
               )}
               <Row style={row}>
-                <Column style={labelColumn}>When</Column>
+                <Column style={labelColumn}>Appointment Date & Time</Column>
                 <Column style={valueColumn}>
                   {dateStr} at {timeStr}
                 </Column>
               </Row>
               <Row style={row}>
-                <Column style={labelColumn}>Where</Column>
-                <Column style={valueColumn}>{location}</Column>
+                <Column style={labelColumn}>Location</Column>
+                <Column style={valueColumn}>
+                  {location === "in-person" &&
+                  serviceTitle === "Pre-made Dresses Try On"
+                    ? "In-Person (Showroom) - 1211 Marblewood Ave, Capitol Heights, MD 20743, USA"
+                    : location === "in-person"
+                      ? "In-Person (Showroom)"
+                      : "Virtual (Zoom/Google Meet)"}
+                </Column>
               </Row>
               {budgetLabel && (
                 <Row style={row}>
-                  <Column style={labelColumn}>Budget</Column>
+                  <Column style={labelColumn}>Estimated Budget</Column>
                   <Column style={valueColumn}>{budgetLabel}</Column>
                 </Row>
               )}
               {paymentMethodLabel && (
                 <Row style={row}>
-                  <Column style={labelColumn}>Payment</Column>
+                  <Column style={labelColumn}>Payment Method</Column>
                   <Column style={valueColumn}>{paymentMethodLabel}</Column>
                 </Row>
               )}

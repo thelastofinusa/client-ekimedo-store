@@ -119,6 +119,23 @@ export const AdminBookingNotificationEmail = ({
                 <Column style={valueColumn}>{eventDateStr}</Column>
               </Row>
             )}
+            <Row style={row}>
+              <Column style={labelColumn}>Appointment</Column>
+              <Column style={valueColumn}>
+                {dateStr} at {timeStr}
+              </Column>
+            </Row>
+            <Row style={row}>
+              <Column style={labelColumn}>Location</Column>
+              <Column style={valueColumn}>
+                {location === "in-person" &&
+                serviceTitle === "Pre-made Dresses Try On"
+                  ? "In-Person (Showroom) - 1211 Marblewood Ave, Capitol Heights, MD 20743, USA"
+                  : location === "in-person"
+                    ? "In-Person (Showroom)"
+                    : "Virtual (Zoom/Google Meet)"}
+              </Column>
+            </Row>
             {budgetLabel && (
               <Row style={row}>
                 <Column style={labelColumn}>Budget</Column>
@@ -127,7 +144,7 @@ export const AdminBookingNotificationEmail = ({
             )}
             {paymentMethodLabel && (
               <Row style={row}>
-                <Column style={labelColumn}>Payment</Column>
+                <Column style={labelColumn}>Payment Method</Column>
                 <Column style={valueColumn}>{paymentMethodLabel}</Column>
               </Row>
             )}

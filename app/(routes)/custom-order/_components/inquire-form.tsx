@@ -184,8 +184,8 @@ export const InquireForm = () => {
             Tell Us About Your Vision
           </h2>
           <p className="text-muted-foreground mb-8 text-center text-sm font-normal">
-            Fill out the form below and we&apos;ll be in touch to discuss your
-            custom creation.
+            Fill out the form below and you&apos;ll get a response email withing
+            24-48 hours
           </p>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

@@ -19,12 +19,13 @@ export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
   const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
 
   const allImages = React.useMemo(() => {
-    return testimonials.flatMap((t) =>
-      (t.workAssets || []).map((asset) => ({
+    return testimonials.flatMap((t) => {
+      const clientName = t.clerkUser?.name || t.name;
+      return (t.workAssets || []).map((asset) => ({
         url: asset,
-        title: t.name,
-      })),
-    );
+        title: clientName,
+      }));
+    });
   }, [testimonials]);
 
   const offsets = React.useMemo(() => {
@@ -63,76 +64,83 @@ export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
     <div className="py-24 lg:py-32">
       <Container size="sm">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-2">
-          {testimonials.map((testimonial, index) => (
-            <motion.div
-              key={testimonial._id}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-100px" }}
-              transition={{ delay: index * 0.1, duration: 0.8 }}
-              className="flex flex-col gap-6"
-            >
-              {/* Testimonial Quote */}
-              <blockquote>
-                <p className="text-charcoal/90 text-base leading-[1.7] font-light italic md:text-lg">
-                  &quot;{testimonial.review}&quot;
-                </p>
-              </blockquote>
+          {testimonials.map((testimonial, index) => {
+            const clientName = testimonial.clerkUser?.name || testimonial.name;
+            const clientAvatar =
+              testimonial.clerkUser?.avatarUrl || testimonial.avatar;
 
-              {/* Author Profile */}
-              <div className="flex flex-wrap items-end justify-between gap-6">
-                <div className="flex items-center gap-4">
-                  <Avatar className="size-10">
-                    <AvatarImage
-                      src={testimonial.avatar || "/placeholder.svg"}
-                      alt={testimonial.name!}
-                      className="object-cover"
-                    />
-                    <AvatarFallback>
-                      {getInitials(testimonial.name!)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium">{testimonial.name}</p>
-                    <p className="text-muted-foreground mt-0.5 text-[10px] tracking-widest uppercase">
-                      {testimonial.category?.name}{" "}
-                      {testimonial.date &&
-                        `— ${formatSanityDate(testimonial.date)}`}
-                    </p>
+            return (
+              <motion.div
+                key={testimonial._id}
+                initial={{ opacity: 0, y: 40 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-100px" }}
+                transition={{ delay: index * 0.1, duration: 0.8 }}
+                className="flex flex-col gap-6"
+              >
+                {/* Testimonial Quote */}
+                <blockquote>
+                  <p className="text-charcoal/90 text-base leading-[1.7] font-light italic md:text-lg">
+                    &quot;{testimonial.review}&quot;
+                  </p>
+                </blockquote>
+
+                {/* Author Profile */}
+                <div className="flex flex-wrap items-end justify-between gap-6">
+                  <div className="flex items-center gap-4">
+                    <Avatar className="size-10">
+                      <AvatarImage
+                        src={clientAvatar || "/placeholder.svg"}
+                        alt={clientName!}
+                        className="object-cover"
+                      />
+                      <AvatarFallback>
+                        {getInitials(clientName!)}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">{clientName}</p>
+                      <p className="text-muted-foreground mt-0.5 text-[10px] tracking-widest uppercase">
+                        {testimonial.category?.name}{" "}
+                        {testimonial.date &&
+                          `— ${formatSanityDate(testimonial.date)}`}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex gap-px">
+                    {[...Array(5)].map((_, i) => (
+                      <Icons.StarIcon
+                        key={i}
+                        fill={i < testimonial.rating! ? "currentColor" : "none"}
+                        className="text-primary size-4"
+                      />
+                    ))}
                   </div>
                 </div>
-                <div className="flex gap-px">
-                  {[...Array(5)].map((_, i) => (
-                    <Icons.StarIcon
-                      key={i}
-                      fill={i < testimonial.rating! ? "currentColor" : "none"}
-                      className="text-primary size-4"
-                    />
-                  ))}
-                </div>
-              </div>
 
-              {/* Work Assets Grid */}
-              {testimonial.workAssets && testimonial.workAssets?.length > 0 && (
-                <div className="border-border/50 grid grid-cols-4 gap-2 border-t pt-6">
-                  {testimonial.workAssets?.slice(0, 4).map((asset, i) => (
-                    <div
-                      key={i}
-                      className="bg-secondary group relative aspect-[0.8] w-full cursor-pointer overflow-hidden"
-                      onClick={() => setSelectedIndex(offsets[index] + i)}
-                    >
-                      <Image
-                        src={asset || "/placeholder.svg"}
-                        alt={`Work ${i + 1}`}
-                        fill
-                        className="origin-top object-cover transition-transform duration-500 ease-out group-hover:scale-110"
-                      />
+                {/* Work Assets Grid */}
+                {testimonial.workAssets &&
+                  testimonial.workAssets?.length > 0 && (
+                    <div className="border-border/50 grid grid-cols-4 gap-2 border-t pt-6">
+                      {testimonial.workAssets?.slice(0, 4).map((asset, i) => (
+                        <div
+                          key={i}
+                          className="bg-secondary group relative aspect-[0.8] w-full cursor-pointer overflow-hidden"
+                          onClick={() => setSelectedIndex(offsets[index] + i)}
+                        >
+                          <Image
+                            src={asset || "/placeholder.svg"}
+                            alt={`Work ${i + 1}`}
+                            fill
+                            className="origin-top object-cover transition-transform duration-500 ease-out group-hover:scale-110"
+                          />
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          ))}
+                  )}
+              </motion.div>
+            );
+          })}
         </div>
       </Container>
 

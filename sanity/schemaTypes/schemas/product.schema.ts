@@ -53,6 +53,16 @@ export const productType = defineType({
     }),
 
     defineField({
+      name: "delivery",
+      title: "Delivery Information",
+      type: "text",
+      rows: 3,
+      group: "details",
+      description:
+        "Default: Estimated delivery: 4-6 weeks. Complementary alteration is included.",
+    }),
+
+    defineField({
       name: "images",
       title: "Snapshots",
       type: "array",

@@ -53,9 +53,11 @@ export const Header = () => {
 
   const totalItems: number = useTotalItems();
   const lastScrollY = React.useRef<number>(0);
+  const scrollTimeout = React.useRef<NodeJS.Timeout | null>(null);
   const [openMenu, setOpenMenu] = React.useState<boolean>(false);
   const [openCart, setOpenCart] = React.useState<boolean>(false);
   const [isActive, setIsActive] = React.useState<boolean>(false);
+  const [isScrolling, setIsScrolling] = React.useState<boolean>(false);
 
   const forceActive = React.useMemo(
     () => isDynamicShopRoute || forceActiveRoutes.includes(pathname),
@@ -63,19 +65,32 @@ export const Header = () => {
   );
 
   React.useEffect(() => {
-    // 🧠 Route forces header active
     if (forceActive) {
       setIsActive(true);
+      setIsScrolling(false);
       return;
     }
 
-    // 🔁 Route no longer forces active → reset immediately
     setIsActive(false);
     lastScrollY.current = window.scrollY;
 
     const onScroll = () => {
       const currentY = window.scrollY;
 
+      // mark scrolling
+      setIsScrolling(true);
+
+      // clear previous stop timer
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current);
+      }
+
+      // scrolling stopped after 120ms
+      scrollTimeout.current = setTimeout(() => {
+        setIsScrolling(false);
+      }, 120);
+
+      // direction logic
       if (currentY < lastScrollY.current || currentY < 80) {
         setIsActive(false);
       } else {
@@ -87,7 +102,10 @@ export const Header = () => {
 
     window.addEventListener("scroll", onScroll, { passive: true });
 
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
+    };
   }, [forceActive]);
 
   return (
@@ -97,6 +115,7 @@ export const Header = () => {
         "pointer-events-none fixed top-0 left-0 z-50 w-full max-w-full transition-all duration-300",
         {
           "bg-card md:bg-card/80 md:backdrop-blur-md": isActive,
+          "mix-blend-difference": !isActive && isScrolling,
         },
       )}
     >
