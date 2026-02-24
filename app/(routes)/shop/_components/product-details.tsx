@@ -232,7 +232,8 @@ export const ProductDetails: React.FC<Props> = ({ product }) => {
 
         <div className="mt-6 mb-6">
           <p className="text-sm font-semibold">
-            Estimated delivery: 4-6 weeks. Complementary alteration is included.
+            {product.delivery ||
+              "Estimated delivery: 4-6 weeks. Complementary alteration is included."}
           </p>
         </div>
 

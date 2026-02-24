@@ -6,45 +6,64 @@ export const bookingType = defineType({
   title: "Bookings",
   type: "document",
   icon: RiCalendarCheckLine,
+  groups: [
+    { name: "general", title: "General Info", default: true },
+    { name: "bridal", title: "Bridal" },
+    { name: "special-events", title: "Special Events" },
+    { name: "prom", title: "Prom" },
+    { name: "try-on", title: "Try-On" },
+  ],
   fields: [
     defineField({
-      name: "customerName",
-      title: "Customer Name",
+      name: "fName",
+      title: "First Name",
       type: "string",
-      validation: (rule) => rule.required(),
+      group: ["general", "bridal", "special-events", "prom", "try-on"],
     }),
     defineField({
-      name: "customerEmail",
-      title: "Customer Email",
+      name: "lName",
+      title: "Last Name",
       type: "string",
-      validation: (rule) => rule.required().email(),
+      group: ["general", "bridal", "special-events", "prom", "try-on"],
     }),
     defineField({
-      name: "customerPhone",
-      title: "Customer Phone",
+      name: "email",
+      title: "Email",
       type: "string",
+      group: ["general", "bridal", "special-events", "prom", "try-on"],
+      validation: (rule) => rule.email(),
+    }),
+    defineField({
+      name: "phone",
+      title: "Phone",
+      type: "string",
+      group: ["general", "bridal", "special-events", "prom", "try-on"],
     }),
     defineField({
       name: "service",
       title: "Service",
       type: "string",
+      group: ["general", "bridal", "special-events", "prom", "try-on"],
       validation: (rule) => rule.required(),
     }),
     defineField({
-      name: "bookingDate",
-      title: "Booking Date",
+      name: "consultationDate",
+      title: "Consultation Date",
       type: "datetime",
+      group: ["general", "bridal", "special-events", "prom", "try-on"],
       validation: (rule) => rule.required(),
     }),
     defineField({
       name: "endTime",
       title: "End Time",
       type: "datetime",
+      group: ["general", "bridal", "special-events", "prom", "try-on"],
     }),
     defineField({
       name: "status",
       title: "Status",
       type: "string",
+      group: "general",
       options: {
         list: [
           { title: "Pending", value: "pending" },
@@ -60,6 +79,7 @@ export const bookingType = defineType({
       name: "location",
       title: "Location",
       type: "string",
+      group: ["general", "bridal", "special-events", "prom", "try-on"],
       options: {
         list: [
           { title: "Virtual", value: "virtual" },
@@ -68,29 +88,40 @@ export const bookingType = defineType({
       },
     }),
     defineField({
-      name: "groupSize",
-      title: "Group Size",
+      name: "guests",
+      title: "Number of Guests",
       type: "number",
+      group: ["general", "bridal", "special-events", "prom", "try-on"],
     }),
     defineField({
       name: "eventDate",
       title: "Event Date",
       type: "datetime",
+      group: ["bridal", "special-events", "prom"],
     }),
     defineField({
-      name: "budgetType",
-      title: "Budget Tier",
+      name: "budget",
+      title: "Budget",
       type: "string",
+      group: "bridal",
     }),
     defineField({
       name: "customBudget",
       title: "Custom Budget",
       type: "string",
+      group: "bridal",
+    }),
+    defineField({
+      name: "priceRange",
+      title: "Budget Range",
+      type: "string",
+      group: "prom",
     }),
     defineField({
       name: "paymentMethod",
       title: "Payment Method",
       type: "string",
+      group: "general",
       options: {
         list: [
           { title: "Stripe", value: "stripe" },
@@ -99,15 +130,60 @@ export const bookingType = defineType({
       },
     }),
     defineField({
-      name: "styleInspiration",
+      name: "inspiration",
       title: "Style Inspiration",
       type: "array",
+      group: ["bridal", "special-events"],
       of: [{ type: "image", options: { hotspot: true } }],
+    }),
+    defineField({
+      name: "interests",
+      title: "Interests",
+      type: "array",
+      group: "bridal",
+      of: [{ type: "string" }],
+    }),
+    defineField({
+      name: "referBy",
+      title: "Referred By",
+      type: "string",
+      group: "bridal",
+    }),
+    defineField({
+      name: "timeline",
+      title: "Timeline Acknowledged",
+      type: "boolean",
+      group: ["bridal", "special-events", "prom"],
+    }),
+    defineField({
+      name: "cancellationPolicy",
+      title: "Cancellation Policy Accepted",
+      type: "boolean",
+      group: ["bridal", "special-events", "prom"],
+    }),
+    defineField({
+      name: "dressSize",
+      title: "Dress Size",
+      type: "string",
+      group: "prom",
+    }),
+    defineField({
+      name: "dressColor",
+      title: "Dress Color",
+      type: "string",
+      group: "prom",
+    }),
+    defineField({
+      name: "specialRequirements",
+      title: "Special Requirements",
+      type: "text",
+      group: "prom",
     }),
     defineField({
       name: "responses",
       title: "Form Responses",
       type: "array",
+      group: "general",
       of: [
         {
           type: "object",
@@ -125,21 +201,17 @@ export const bookingType = defineType({
         },
       ],
     }),
-    defineField({
-      name: "understoodProductionProcess",
-      title: "Understood Production Process",
-      type: "boolean",
-    }),
   ],
   preview: {
     select: {
-      title: "customerName",
-      subtitle: "bookingDate",
-      media: "styleInspiration.0",
+      fName: "fName",
+      lName: "lName",
+      subtitle: "consultationDate",
+      media: "inspiration.0",
     },
-    prepare({ title, subtitle, media }) {
+    prepare({ fName, lName, subtitle, media }) {
       return {
-        title,
+        title: `${fName || ""} ${lName || ""}`.trim() || "Unknown Customer",
         subtitle: subtitle
           ? new Date(subtitle).toLocaleString()
           : "No date set",

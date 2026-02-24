@@ -8,9 +8,11 @@ export const PRODUCT_QUERY = defineQuery(`
     price,
     colors[]->{name, "value": value.hex},
     description,
+    delivery,
     "images": images[].asset->url,
     sizes,
     stock,
+    delivery,
     category -> {
         _id,
         name,
@@ -30,6 +32,7 @@ export const PRODUCT_BY_SLUG_QUERY = defineQuery(`
     "images": images[].asset->url,
     sizes,
     stock,
+    delivery,
     category -> {
         _id,
         name,
@@ -49,6 +52,7 @@ export const PRODUCT_BY_IDS_QUERY = defineQuery(`
     "images": images[].asset->url,
     sizes,
     stock,
+    delivery,
     category -> {
         _id,
         name,

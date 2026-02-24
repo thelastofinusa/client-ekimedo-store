@@ -1,7 +1,7 @@
 import { defineQuery } from "next-sanity";
 
 export const BOOKED_DATES_QUERY = defineQuery(`
-  *[_type == "booking" && bookingDate > now() && status != "cancelled"] {
-    bookingDate
+  *[_type == "booking" && consultationDate > now() && status != "cancelled"] {
+    consultationDate
   }
 `);

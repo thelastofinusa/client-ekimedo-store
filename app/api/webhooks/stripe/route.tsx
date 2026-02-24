@@ -150,9 +150,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           to: adminTo,
           replyTo: metadataCustomerEmail || undefined,
           subject: `New Appointment: ${serviceTitle}`,
-          text: `New appointment confirmed.\nService: ${serviceTitle}\nCustomer: ${customerName}\nDate: ${new Date(dateTime).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date(dateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}\nLocation: ${location}${
+          text: `New appointment confirmed.\nService: ${serviceTitle}\nCustomer: ${customerName}\nDate: ${new Date(dateTime).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date(dateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}\nLocation: ${
+            location === "in-person" &&
+            serviceTitle === "Pre-made Dresses Try On"
+              ? "In-Person (Showroom) - 1211 Marblewood Ave, Capitol Heights, MD 20743, USA"
+              : location === "in-person"
+                ? "In-Person (Showroom)"
+                : "Virtual (Zoom/Google Meet)"
+          }${
             eventDate
-              ? `\nEvent Date: ${new Date(eventDate).toLocaleDateString(
+              ? `\nWedding/Event Date: ${new Date(eventDate).toLocaleDateString(
                   "en-US",
                   {
                     weekday: "long",
@@ -164,7 +171,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
               : ""
           }${
             budgetType || customBudget
-              ? `\nBudget: ${
+              ? `\nEstimated Budget: ${
                   customBudget && customBudget.length > 0
                     ? customBudget
                     : budgetType
@@ -221,9 +228,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           to: customerTo,
           replyTo: adminTo,
           subject: `${serviceTitle} Appointment Pending`,
-          text: `Dear ${customerName},\n\nYou have successfully booked an appointment with ${siteConfig.title}!\n\nWhat: ${serviceTitle}\nWhen: ${new Date(dateTime).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date(dateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}\nWhere: ${location}${
+          text: `Dear ${customerName},\n\nYou have successfully booked an appointment with ${siteConfig.title}!\n\nService: ${serviceTitle}\nAppointment Date & Time: ${new Date(dateTime).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date(dateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}\nLocation: ${
+            location === "in-person" &&
+            serviceTitle === "Pre-made Dresses Try On"
+              ? "In-Person (Showroom) - 1211 Marblewood Ave, Capitol Heights, MD 20743, USA"
+              : location === "in-person"
+                ? "In-Person (Showroom)"
+                : "Virtual (Zoom/Google Meet)"
+          }${
             eventDate
-              ? `\nEvent Date: ${new Date(eventDate).toLocaleDateString(
+              ? `\nWedding/Event Date: ${new Date(eventDate).toLocaleDateString(
                   "en-US",
                   {
                     weekday: "long",
@@ -235,7 +249,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
               : ""
           }${
             budgetType || customBudget
-              ? `\nBudget: ${
+              ? `\nEstimated Budget: ${
                   customBudget && customBudget.length > 0
                     ? customBudget
                     : budgetType

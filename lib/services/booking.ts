@@ -10,35 +10,40 @@ import { consultationsData } from "../constants/consultation";
 export async function getBookedDatesService() {
   const bookings = await client.fetch(BOOKED_DATES_QUERY);
   return bookings.map(
-    (booking: { bookingDate: string }) => new Date(booking.bookingDate),
+    (booking: { consultationDate: string }) =>
+      new Date(booking.consultationDate),
   );
 }
 
 export async function createBookingService(formData: FormData) {
   try {
     const serviceSlug = formData.get("serviceType") as string;
-    const groupSizeRaw = formData.get("groupSize") as string | null;
-    const groupSize =
-      groupSizeRaw && !Number.isNaN(parseInt(groupSizeRaw))
-        ? parseInt(groupSizeRaw)
-        : 1;
-    const dateTime = formData.get("dateTime") as string;
+    const guestsRaw = formData.get("guests") as string | null;
+    const guests =
+      guestsRaw && !Number.isNaN(parseInt(guestsRaw)) ? parseInt(guestsRaw) : 1;
+    const dateTime = formData.get("consultationDate") as string;
     let endTime = formData.get("endTime") as string | null;
     const eventDate = formData.get("eventDate") as string | null;
-    const customerName = formData.get("customerName") as string;
-    const customerEmail = formData.get("customerEmail") as string;
-    const customerPhone = formData.get("customerPhone") as string;
+    const fName = formData.get("fName") as string;
+    const lName = formData.get("lName") as string;
+    const email = formData.get("email") as string;
+    const phone = formData.get("phone") as string;
     const location = formData.get("location") as string;
-    const socialMediaHandles = formData.getAll("socialMediaHandle") as string[];
-    const budgetType = formData.get("budgetType") as string | null;
+    const budget = formData.get("budget") as string | null;
     const customBudget = formData.get("customBudget") as string | null;
-    const understoodProductionProcess =
-      formData.get("understoodProductionProcess") === "true";
+    const timeline = formData.get("timeline") === "true";
+    const referBy = formData.get("referBy") as string | null;
+    const cancellationPolicy = formData.get("cancellationPolicy") === "true";
+    const dressSize = formData.get("dressSize") as string | null;
+    const dressColor = formData.get("dressColor") as string | null;
+    const specialRequirements = formData.get("specialRequirements") as string | null;
+    const priceRange = formData.get("priceRange") as string | null;
+
+    const interests = formData.getAll("interests") as string[];
 
     // Handle multiple files
-    const styleInspirationFiles = [
-      ...(formData.getAll("styleInspiration") as File[]),
-      ...(formData.getAll("inspirationPhotos") as File[]),
+    const inspirationFiles = [
+      ...(formData.getAll("inspiration") as File[]),
     ];
 
     if (!serviceSlug) {
@@ -58,9 +63,9 @@ export async function createBookingService(formData: FormData) {
     const imageAssetIds: string[] = [];
     const imageUrls: string[] = [];
 
-    if (styleInspirationFiles && styleInspirationFiles.length > 0) {
+    if (inspirationFiles && inspirationFiles.length > 0) {
       // Upload images to Sanity
-      for (const file of styleInspirationFiles) {
+      for (const file of inspirationFiles) {
         if (file.size > 0) {
           const arrayBuffer = await file.arrayBuffer();
           const buffer = Buffer.from(arrayBuffer);
@@ -82,21 +87,29 @@ export async function createBookingService(formData: FormData) {
     // Create Booking in Sanity
     const bookingDoc = {
       _type: "booking",
-      customerName,
-      customerEmail,
-      customerPhone,
+      fName,
+      lName,
+      email,
+      phone,
       service: service.title || serviceSlug,
-      bookingDate: new Date(dateTime).toISOString(),
+      consultationDate: new Date(dateTime).toISOString(),
       endTime: endTime ? new Date(endTime).toISOString() : undefined,
       eventDate: eventDate ? new Date(eventDate).toISOString() : undefined,
       status: "pending",
       location,
-      groupSize,
-      budgetType: budgetType || undefined,
+      guests,
+      budget: budget || undefined,
       customBudget: customBudget || undefined,
-      socialMediaHandles,
+      priceRange: priceRange || undefined,
+      interests,
+      referBy: referBy || undefined,
+      timeline,
+      cancellationPolicy,
+      dressSize: dressSize || undefined,
+      dressColor: dressColor || undefined,
+      specialRequirements: specialRequirements || undefined,
       responses,
-      styleInspiration: imageAssetIds.map((id) => ({
+      inspiration: imageAssetIds.map((id) => ({
         _key: randomUUID(),
         _type: "image",
         asset: {
@@ -104,7 +117,6 @@ export async function createBookingService(formData: FormData) {
           _ref: id,
         },
       })),
-      understoodProductionProcess,
     };
 
     const createdBooking = await writeClient.create(bookingDoc);
@@ -139,14 +151,14 @@ export async function createBookingService(formData: FormData) {
         metadata: {
           type: "consultation_booking",
           bookingId: createdBooking._id,
-          customerEmail,
-          customerName,
+          customerEmail: email,
+          customerName: `${fName} ${lName}`.trim(),
           serviceTitle: service.title || "Consultation",
           dateTime,
           endTime,
           location,
           eventDate,
-          budgetType: budgetType || "",
+          budgetType: budget || "",
           customBudget: customBudget || "",
           paymentMethod,
         },

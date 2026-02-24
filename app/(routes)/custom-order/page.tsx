@@ -5,7 +5,7 @@ import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
 
 export const metadata: Metadata = {
-  title: "Custom Orders",
+  title: "Make An Inquiry",
   description:
     "Bring your dream dress to life. Our bespoke service creates one-of-a-kind pieces tailored perfectly to your vision and measurements.",
   openGraph: {

@@ -486,6 +486,7 @@ export const consultationsData = [
         title: "Personal Information",
         description:
           "We need your contact details to reach you about your consultation",
+        info: "Accompanied by an adult 23 years and above",
         fields: [
           {
             name: "fName",
@@ -703,7 +704,8 @@ export const consultationsData = [
     slug: "try-on",
     description:
       "Visit our atelier to try on our curated selection of ready-to-wear gowns. Our stylists will help you find the perfect fit for your special occasion.",
-    duration: 30,
+    duration: 60,
+    dresses: 3,
     price: 100,
     image: "/collections/pre-made-dresses.avif",
     includes: [
@@ -718,6 +720,7 @@ export const consultationsData = [
         title: "Personal Information",
         description:
           "We need your contact details to reach you about your consultation",
+        info: "Accompanied by an adult 23 years and above",
         fields: [
           {
             name: "fName",
