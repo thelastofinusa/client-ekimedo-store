@@ -11,6 +11,9 @@ import { OrderConfirmationEmail } from "@/emails/order-confirmation";
 import { render } from "@react-email/render";
 // import { notFound } from "next/navigation";
 
+import { consultationsData } from "@/lib/constants/consultation";
+import { siteConfig } from "@/site.config";
+
 const testSocialLinks = [
   { name: "Instagram", url: "https://instagram.com/ekieajibade" },
   { name: "Facebook", url: "https://facebook.com" },
@@ -40,10 +43,67 @@ const testAddress = {
   country: "USA",
 };
 
-const emails = [
+// Generate dynamic consultation emails
+const consultationEmails = consultationsData.flatMap((consultation) => {
+  // Determine available locations for this consultation type
+  const locationField = consultation.formCards
+    .flatMap((card) => card.fields as readonly any[])
+    .find((field) => field.name === "location");
+
+  const locations = (locationField as any)?.options?.map(
+    (opt: any) => opt.value,
+  ) || ["in-person"];
+
+  return locations.map((loc: string) => {
+    const isVirtual = loc === "virtual";
+    const locationLabel = isVirtual ? "Virtual" : "In-Person";
+
+    return {
+      id: `${consultation.slug}-${loc}`,
+      name: `${consultation.title} (${locationLabel})`,
+      category: consultation.title,
+      component: (
+        <AppointmentConfirmationEmail
+          customerName="Alice Smith"
+          serviceTitle={consultation.title}
+          serviceSlug={consultation.slug}
+          dateTime={new Date()}
+          location={loc as "in-person" | "virtual"}
+          calendarUrl="https://calendar.google.com"
+          siteUrl={siteConfig.url}
+          socialLinks={testSocialLinks}
+          eventDate={new Date(Date.now() + 1000 * 60 * 60 * 24 * 90)}
+          budgetType="2000-5000"
+          paymentMethod="stripe"
+          rushOrder="no"
+          interests={["Modern", "Classic"]}
+        />
+      ),
+      adminComponent: (
+        <AdminBookingNotificationEmail
+          customerName="Alice Smith"
+          serviceTitle={consultation.title}
+          dateTime={new Date()}
+          location={loc as "in-person" | "virtual"}
+          bookingId="booking_123"
+          siteUrl={siteConfig.url}
+          socialLinks={testSocialLinks}
+          eventDate={new Date(Date.now() + 1000 * 60 * 60 * 24 * 90)}
+          budgetType="2000-5000"
+          paymentMethod="stripe"
+          rushOrder="no"
+          interests={["Modern", "Classic"]}
+        />
+      ),
+    };
+  });
+});
+
+const otherEmails = [
   {
     id: "admin-order",
     name: "Admin Order Notification",
+    category: "Store",
     component: (
       <AdminOrderNotificationEmail
         orderNumber="ORD-12345"
@@ -52,32 +112,15 @@ const emails = [
         items={testOrderItems}
         shippingAddress={testAddress}
         orderId="order_123"
-        siteUrl=""
+        siteUrl={siteConfig.url}
         socialLinks={testSocialLinks}
-      />
-    ),
-  },
-  {
-    id: "admin-booking",
-    name: "Admin Booking Notification",
-    component: (
-      <AdminBookingNotificationEmail
-        customerName="Alice Smith"
-        serviceTitle="Pre-Made Dresses Try-On"
-        dateTime={new Date()}
-        location="in-person"
-        bookingId="booking_456"
-        siteUrl=""
-        socialLinks={testSocialLinks}
-        eventDate={new Date(Date.now() + 1000 * 60 * 60 * 24 * 90)} // 90 days out
-        budgetType="2000-5000"
-        paymentMethod="stripe"
       />
     ),
   },
   {
     id: "contact-inquiry",
     name: "Contact Inquiry",
+    category: "Forms",
     component: (
       <ContactInquiryEmail
         fullName="Bob Johnson"
@@ -86,13 +129,14 @@ const emails = [
         inquiryType="General Question"
         message="I'm interested in your upcoming collection. When will it be released?"
         socialLinks={testSocialLinks}
-        siteUrl=""
+        siteUrl={siteConfig.url}
       />
     ),
   },
   {
     id: "custom-order-inquiry",
     name: "Custom Order Inquiry",
+    category: "Forms",
     component: (
       <CustomOrderInquiryEmail
         fullName="Sarah Williams"
@@ -105,59 +149,84 @@ const emails = [
         imageCount={3}
         inquiryId="inq_789"
         socialLinks={testSocialLinks}
-        siteUrl=""
+        siteUrl={siteConfig.url}
       />
     ),
   },
   {
     id: "order-confirmation",
     name: "Order Confirmation (Customer)",
+    category: "Store",
     component: (
       <OrderConfirmationEmail
         orderNumber="ORD-12345"
         customerEmail="jane@example.com"
         totalAmount={1350}
         items={testOrderItems}
-        siteUrl=""
+        siteUrl={siteConfig.url}
         socialLinks={testSocialLinks}
-      />
-    ),
-  },
-  {
-    id: "appointment-confirmation",
-    name: "Appointment Confirmation (Customer)",
-    component: (
-      <AppointmentConfirmationEmail
-        customerName="Alice Smith"
-        serviceTitle="Pre-Made Dresses Try-On"
-        serviceSlug="try-on"
-        dateTime={new Date()}
-        location="in-person"
-        calendarUrl="https://calendar.google.com"
-        siteUrl=""
-        socialLinks={testSocialLinks}
-        eventDate={new Date(Date.now() + 1000 * 60 * 60 * 24 * 90)}
-        budgetType="2000-5000"
-        paymentMethod="stripe"
       />
     ),
   },
 ];
 
 export default function EmailPreview() {
-  // if (process.env.NODE_ENV === "production") return notFound();
+  // Group consultation emails by category
+  const groupedConsultations = consultationEmails.reduce(
+    (acc, email) => {
+      if (!acc[email.category]) {
+        acc[email.category] = [];
+      }
+      acc[email.category].push(email);
+      return acc;
+    },
+    {} as Record<string, typeof consultationEmails>,
+  );
 
   return (
     <div className="min-h-screen bg-neutral-50 py-32 md:py-40">
       <Container size="lg">
-        <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-          {emails.map((email) => (
-            <EmailCard
-              key={email.id}
-              name={email.name}
-              component={email.component}
-            />
+        <div className="mb-20">
+          <h1 className="mb-12 font-serif text-4xl text-neutral-900">
+            Email Previews
+          </h1>
+
+          {Object.entries(groupedConsultations).map(([category, items]) => (
+            <div key={category} className="mb-20">
+              <h2 className="mb-8 border-b pb-4 font-mono text-xs tracking-[0.3em] text-neutral-500 uppercase">
+                {category}
+              </h2>
+              <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2">
+                {(items as typeof consultationEmails).map((item) => (
+                  <React.Fragment key={item.id}>
+                    <EmailCard
+                      name={`${item.name} - Customer`}
+                      component={item.component}
+                    />
+                    <EmailCard
+                      name={`${item.name} - Admin`}
+                      component={item.adminComponent as React.ReactElement}
+                    />
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
           ))}
+
+          <div className="mb-20">
+            <h2 className="mb-8 border-b pb-4 font-mono text-xs tracking-[0.3em] text-neutral-500 uppercase">
+              Other Notifications
+            </h2>
+            <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
+              {otherEmails.map((email) => (
+                <EmailCard
+                  key={email.id}
+                  name={email.name}
+                  component={email.component}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </Container>
     </div>

@@ -162,6 +162,12 @@ export const bookingType = defineType({
       group: ["bridal", "special-events", "prom"],
     }),
     defineField({
+      name: "rushOrder",
+      title: "Rush Order",
+      type: "boolean",
+      group: ["bridal", "special-events", "prom"],
+    }),
+    defineField({
       name: "dressSize",
       title: "Dress Size",
       type: "string",
@@ -200,6 +206,14 @@ export const bookingType = defineType({
           },
         },
       ],
+    }),
+    defineField({
+      name: "confirmationEmailSent",
+      title: "Confirmation Email Sent",
+      type: "boolean",
+      group: "general",
+      initialValue: false,
+      readOnly: true,
     }),
   ],
   preview: {

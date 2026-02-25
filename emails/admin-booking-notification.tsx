@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { siteConfig } from "@/site.config";
 import {
   Body,
@@ -53,6 +52,11 @@ interface AdminBookingNotificationProps {
   budgetType?: string | null;
   customBudget?: string | null;
   paymentMethod?: string | null;
+  rushOrder?: string | null;
+  interests?: string[];
+  dressSize?: string | null;
+  dressColor?: string | null;
+  specialRequirements?: string | null;
 }
 
 export const AdminBookingNotificationEmail = ({
@@ -67,6 +71,11 @@ export const AdminBookingNotificationEmail = ({
   budgetType,
   customBudget,
   paymentMethod,
+  rushOrder,
+  interests,
+  dressSize,
+  dressColor,
+  specialRequirements,
 }: AdminBookingNotificationProps) => {
   const dateObj = new Date(dateTime);
   const dateStr = dateObj.toLocaleDateString("en-US", {
@@ -127,7 +136,7 @@ export const AdminBookingNotificationEmail = ({
 
           {/* Main Content */}
           <Section style={content}>
-            <Heading style={heading}>New consultation scheduled</Heading>
+            <Heading style={heading}>New {serviceTitle} Booking</Heading>
 
             <Text style={paragraph}>Hello Eki,</Text>
             <Text style={paragraph}>
@@ -187,6 +196,38 @@ export const AdminBookingNotificationEmail = ({
                     <td style={infoLabel}>Payment</td>
                     <td style={infoValue}>{paymentMethodLabel}</td>
                   </tr>
+                  {rushOrder && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Rush Order</td>
+                      <td style={infoValue}>
+                        {rushOrder === "yes" ? "Yes" : "No"}
+                      </td>
+                    </tr>
+                  )}
+                  {interests && interests.length > 0 && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Interests</td>
+                      <td style={infoValue}>{interests.join(", ")}</td>
+                    </tr>
+                  )}
+                  {dressSize && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Dress Size</td>
+                      <td style={infoValue}>{dressSize}</td>
+                    </tr>
+                  )}
+                  {dressColor && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Preferred Color</td>
+                      <td style={infoValue}>{dressColor}</td>
+                    </tr>
+                  )}
+                  {specialRequirements && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Special Requirements</td>
+                      <td style={infoValue}>{specialRequirements}</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </Section>

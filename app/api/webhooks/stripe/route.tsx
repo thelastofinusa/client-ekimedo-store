@@ -110,6 +110,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       budgetType,
       customBudget,
       paymentMethod,
+      rushOrder,
     } = metadata;
 
     if (!bookingId) {
@@ -118,7 +119,23 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     }
 
     try {
-      await writeClient.patch(bookingId).set({ status: "confirmed" }).commit();
+      // Check if the booking is already confirmed to prevent duplicate emails
+      const existingBooking = await client.fetch(
+        `*[_type == "booking" && _id == $bookingId][0]{status}`,
+        { bookingId },
+      );
+
+      if (existingBooking?.status === "confirmed") {
+        console.log(
+          `Booking ${bookingId} is already confirmed, skipping email sending`,
+        );
+        return;
+      }
+
+      await writeClient
+        .patch(bookingId)
+        .set({ status: "confirmed", confirmationEmailSent: true })
+        .commit();
 
       console.log(`Booking ${bookingId} confirmed`);
 
@@ -142,6 +159,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             budgetType={budgetType}
             customBudget={customBudget}
             paymentMethod={paymentMethod}
+            rushOrder={rushOrder}
           />,
         );
 
@@ -178,6 +196,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
                 }`
               : ""
           }${
+            rushOrder
+              ? `\nRush Order: ${rushOrder === "yes" ? "Yes" : "No"}`
+              : ""
+          }${
             paymentMethod
               ? `\nPayment Method: ${String(paymentMethod).toUpperCase()}`
               : ""
@@ -198,7 +220,11 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         serviceTitle,
       )}&dates=${start}/${end}&details=${encodeURIComponent(
         `Consultation with ${customerName}`,
-      )}&location=${encodeURIComponent(location)}`;
+      )}&location=${encodeURIComponent(
+        location === "in-person"
+          ? "https://maps.app.goo.gl/bpVmXDswvhJ9Y72K7"
+          : location,
+      )}`;
 
       const customerTo = String(metadataCustomerEmail ?? "").trim() || adminTo;
 
@@ -207,6 +233,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           "Consultation webhook: No valid customer or admin email found, skipping customer confirmation",
         );
       } else {
+        // Add a small delay to avoid Resend rate limits (2 requests per second)
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         const customerHtml = await render(
           <AppointmentConfirmationEmail
             customerName={customerName}
@@ -220,6 +249,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             budgetType={budgetType}
             customBudget={customBudget}
             paymentMethod={paymentMethod}
+            rushOrder={rushOrder}
           />,
         );
 
@@ -227,7 +257,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           from: `${siteConfig.title} <${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}>`,
           to: customerTo,
           replyTo: adminTo,
-          subject: `${serviceTitle} Appointment Pending`,
+          subject: `${serviceTitle} Appointment`,
           text: `Dear ${customerName},\n\nYou have successfully booked an appointment with ${siteConfig.title}!\n\nService: ${serviceTitle}\nAppointment Date & Time: ${new Date(dateTime).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date(dateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}\nLocation: ${
             location === "in-person" &&
             serviceTitle === "Pre-made Dresses Try On"
@@ -254,6 +284,10 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
                     ? customBudget
                     : budgetType
                 }`
+              : ""
+          }${
+            rushOrder
+              ? `\nRush Order: ${rushOrder === "yes" ? "Yes" : "No"}`
               : ""
           }${
             paymentMethod
@@ -454,6 +488,9 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
     // Email to customer
     if (customerEmail) {
       try {
+        // Add a small delay to avoid Resend rate limits (2 requests per second)
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         const customerHtml = await render(
           <OrderConfirmationEmail
             orderNumber={orderNumber}
@@ -625,6 +662,9 @@ async function handlePaymentIntentSucceeded(
   // Email to customer
   if (customerEmail) {
     try {
+      // Add a small delay to avoid Resend rate limits (2 requests per second)
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const customerHtml = await render(
         <OrderConfirmationEmail
           orderNumber={orderNumber || "Unknown"}

@@ -31,13 +31,18 @@ export async function createBookingService(formData: FormData) {
     const location = formData.get("location") as string;
     const budget = formData.get("budget") as string | null;
     const customBudget = formData.get("customBudget") as string | null;
-    const timeline = formData.get("timeline") === "true";
     const referBy = formData.get("referBy") as string | null;
-    const cancellationPolicy = formData.get("cancellationPolicy") === "true";
     const dressSize = formData.get("dressSize") as string | null;
     const dressColor = formData.get("dressColor") as string | null;
     const specialRequirements = formData.get("specialRequirements") as string | null;
     const priceRange = formData.get("priceRange") as string | null;
+
+    const timelineValues = formData.getAll("timeline") as string[];
+    const timeline = timelineValues.includes("timeline-acknowledged");
+    const rushOrder = timelineValues.includes("rush-required");
+
+    const cancellationPolicyValues = formData.getAll("cancellationPolicy") as string[];
+    const cancellationPolicy = cancellationPolicyValues.includes("cancellation-accepted");
 
     const interests = formData.getAll("interests") as string[];
 
@@ -104,6 +109,7 @@ export async function createBookingService(formData: FormData) {
       interests,
       referBy: referBy || undefined,
       timeline,
+      rushOrder,
       cancellationPolicy,
       dressSize: dressSize || undefined,
       dressColor: dressColor || undefined,
@@ -161,6 +167,7 @@ export async function createBookingService(formData: FormData) {
           budgetType: budget || "",
           customBudget: customBudget || "",
           paymentMethod,
+          rushOrder: rushOrder ? "yes" : "no",
         },
       });
 
