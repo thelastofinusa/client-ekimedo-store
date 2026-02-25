@@ -1,19 +1,56 @@
+/* eslint-disable @next/next/no-img-element */
 import { siteConfig } from "@/site.config";
 import {
   Body,
   Container,
   Head,
-  Heading,
   Html,
   Img,
+  Link,
   Preview,
   Section,
   Text,
-  Link,
+  Heading,
   Row,
   Column,
+  Hr,
+  Button,
 } from "@react-email/components";
 import * as React from "react";
+import {
+  main,
+  container,
+  header,
+  logo,
+  content,
+  heading,
+  paragraph,
+  detailsCard,
+  infoGrid,
+  infoRow,
+  infoLabel,
+  infoValue,
+  buttonContainer,
+  button,
+  footer,
+  footerBrand,
+  footerText,
+  socialContainer,
+  socialLink,
+  itemRow,
+  itemImage,
+  itemName,
+  itemMeta,
+  totalSection,
+  totalLabel,
+  totalValue,
+  signatureSection,
+  signatureText,
+  policyText,
+  policyTitle,
+  policyBox,
+  link,
+} from "./styles";
 
 interface SocialLink {
   name: string | null;
@@ -23,14 +60,14 @@ interface SocialLink {
 interface OrderItem {
   name: string;
   quantity: number;
-  price: string | number;
+  price: number;
   imageUrl?: string;
 }
 
 interface OrderConfirmationProps {
   orderNumber: string;
   customerEmail: string;
-  totalAmount: string | number;
+  totalAmount: number;
   items: OrderItem[];
   siteUrl?: string;
   socialLinks?: SocialLink[];
@@ -38,6 +75,7 @@ interface OrderConfirmationProps {
 
 export const OrderConfirmationEmail = ({
   orderNumber,
+  customerEmail,
   totalAmount,
   items,
   siteUrl,
@@ -45,133 +83,143 @@ export const OrderConfirmationEmail = ({
 }: OrderConfirmationProps) => {
   return (
     <Html>
-      <Head />
-      <Preview>Order Confirmation: {orderNumber}</Preview>
+      <Head>
+        <style>
+          {`
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+          `}
+        </style>
+      </Head>
+      <Preview>
+        Order Confirmed: {orderNumber} - ${totalAmount.toFixed(2)}
+      </Preview>
       <Body style={main}>
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <Heading style={brandName}>{siteConfig.title}</Heading>
-            <Text style={receiptLabel}>Order Confirmed</Text>
+            <Section style={logo}>
+              <Img
+                src={`${siteUrl}/logo/logo-charcoal.svg`}
+                alt={siteConfig.title}
+                width="80"
+                height="auto"
+              />
+            </Section>
           </Section>
 
-          {/* Intro */}
-          <Section style={section}>
-            <Heading as="h2" style={subHeading}>
-              Thank You!
-            </Heading>
+          {/* Main Content */}
+          <Section style={content}>
+            <Heading style={heading}>Thank you for your order</Heading>
+
             <Text style={paragraph}>
-              Thank you for your purchase! Your order has been received and
-              payment has been confirmed. We&apos;re currently preparing your
-              items for delivery.
+              Hello, we&apos;ve received your order{" "}
+              <strong>{orderNumber}</strong> and we&apos;re getting it ready for
+              you.
             </Text>
-          </Section>
 
-          {/* Order Summary */}
-          <Section style={section}>
-            <Heading as="h2" style={sectionTitle}>
-              Order Confirmation
-            </Heading>
+            {/* Order Summary */}
+            <Section style={detailsCard}>
+              <Text
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  color: "#111",
+                  marginBottom: "20px",
+                }}
+              >
+                Items Ordered
+              </Text>
+              {items.map((item, index) => (
+                <Section key={index} style={itemRow}>
+                  <Row>
+                    <Column style={{ width: "64px" }}>
+                      <Img
+                        src={
+                          item.imageUrl || `${siteUrl}/placeholder-product.jpg`
+                        }
+                        alt={item.name}
+                        width="64"
+                        height="64"
+                        style={itemImage}
+                      />
+                    </Column>
+                    <Column style={{ paddingLeft: "20px" }}>
+                      <Text style={itemName}>{item.name}</Text>
+                      <Text style={itemMeta}>Quantity: {item.quantity}</Text>
+                    </Column>
+                    <Column align="right">
+                      <Text style={itemName}>
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </Text>
+                    </Column>
+                  </Row>
+                </Section>
+              ))}
 
-            <Row style={summaryRow}>
-              <Column style={labelColumn}>Order Number</Column>
-              <Column style={valueColumnRight}>{orderNumber}</Column>
-            </Row>
-            <Row style={summaryRow}>
-              <Column style={labelColumn}>Items</Column>
-              <Column style={valueColumnRight}>
-                {items.reduce((acc, item) => acc + item.quantity, 0)} item(s)
-              </Column>
-            </Row>
-            <Row style={summaryRow}>
-              <Column style={labelColumn}>Payment Status</Column>
-              <Column style={valueColumnRight}>✓ Confirmed</Column>
-            </Row>
-            <Row style={totalRow}>
-              <Column style={totalLabel}>Total Amount</Column>
-              <Column style={totalValue}>
-                ${Number(totalAmount).toFixed(2)}
-              </Column>
-            </Row>
-          </Section>
+              <Section style={totalSection}>
+                <table style={{ width: "100%" }}>
+                  <tbody>
+                    <tr>
+                      <td style={totalLabel}>Total Amount</td>
+                      <td align="right" style={totalValue}>
+                        ${totalAmount.toFixed(2)}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </Section>
+            </Section>
 
-          {/* Items List */}
-          <Section style={section}>
-            {items.map((item, index) => (
-              <Row key={index} style={itemRow}>
-                {item.imageUrl && (
-                  <Column style={imageColumn}>
-                    <Img
-                      src={item.imageUrl}
-                      alt={item.name}
-                      width="80"
-                      height="80"
-                      style={itemImage}
-                    />
-                  </Column>
-                )}
-                <Column style={itemDetailsColumn}>
-                  <Text style={itemName}>{item.name}</Text>
-                  <Text style={itemQuantity}>Quantity: {item.quantity}</Text>
-                </Column>
-                <Column style={itemPriceColumn}>
-                  ${Number(item.price).toFixed(2)}
-                </Column>
-              </Row>
-            ))}
-          </Section>
+            {/* Policy Section */}
+            <Section style={policyBox}>
+              <Text style={policyText}>
+                When your order ships, you will receive another email from us.
+                Or click{" "}
+                <Link href={`${siteUrl}/orders`} style={link}>
+                  this link
+                </Link>{" "}
+                to see the progress of your order.
+              </Text>
+            </Section>
 
-          {/* Next Steps */}
-          <Section style={infoBox}>
-            <Heading as="h3" style={infoBoxTitle}>
-              What&apos;s next?
-            </Heading>
-            <Text style={infoBoxText}>
-              Our team is now processing your order. You will receive a
-              notification email as soon as your items have been dispatched.
-            </Text>
-          </Section>
+            {/* CTA */}
+            <Section style={buttonContainer}>
+              <Button href={`${siteUrl}/shop`} style={button}>
+                Continue Shopping
+              </Button>
+            </Section>
 
-          {/* Questions */}
-          <Section style={section}>
-            <Heading as="h3" style={smallHeading}>
-              Questions?
-            </Heading>
-            <Text style={paragraphSmall}>
-              If you have any questions about your order, please don&apos;t
-              hesitate to reach out to our customer service team.
-            </Text>
-          </Section>
-
-          {/* Action */}
-          <Section style={btnContainer}>
-            <Link href={siteUrl} style={button}>
-              Visit Our Website
-            </Link>
+            <Section style={signatureSection}>
+              <Text style={{ ...paragraph, marginBottom: "10px" }}>
+                Best regards,
+              </Text>
+              <Text style={signatureText}>{siteConfig.author.fullName}</Text>
+            </Section>
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
-            <Text style={footerBrand}>{siteConfig.title}</Text>
-            <Text style={footerText}>
-              Discover our latest collections and exclusive designs.
-              <br />
-              &copy; {new Date().getFullYear()} {siteConfig.title}. ALL RIGHTS
-              RESERVED.
-            </Text>
+            <Link href={siteUrl} style={footerBrand}>
+              {siteConfig.title}
+            </Link>
 
-            {/* Social Links */}
-            {socialLinks.length > 0 && (
-              <Section style={socialContainer}>
-                {socialLinks.map((social, index) =>
-                  social.name && social.url ? (
-                    <Link key={index} href={social.url} style={socialLink}>
-                      {social.name}
-                    </Link>
-                  ) : null,
-                )}
-              </Section>
-            )}
+            <Section style={socialContainer}>
+              {socialLinks.map((social, index) => (
+                <Link key={index} href={social.url || "#"} style={socialLink}>
+                  {social.name}
+                </Link>
+              ))}
+            </Section>
+
+            <Text style={footerText}>
+              Please email us at{" "}
+              <Link href="mailto:info@ekimedo.com">info@ekimedo.com</Link> if
+              you have any questions.
+              <br />© {new Date().getFullYear()} {siteConfig.title}. All rights
+              reserved.
+            </Text>
           </Section>
         </Container>
       </Body>
@@ -180,230 +228,3 @@ export const OrderConfirmationEmail = ({
 };
 
 export default OrderConfirmationEmail;
-
-const main = {
-  backgroundColor: "#ffffff",
-  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-  color: "#000000",
-};
-
-const container = {
-  maxWidth: "600px",
-  margin: "0 auto",
-  padding: "40px 20px",
-};
-
-const header = {
-  borderBottom: "2px solid #000000",
-  paddingBottom: "20px",
-  marginBottom: "40px",
-};
-
-const brandName = {
-  margin: "0",
-  fontSize: "24px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  letterSpacing: "2px",
-};
-
-const receiptLabel = {
-  margin: "5px 0 0 0",
-  fontSize: "12px",
-  textTransform: "uppercase" as const,
-  color: "#666666",
-};
-
-const section = {
-  marginBottom: "40px",
-};
-
-const subHeading = {
-  fontSize: "20px",
-  fontWeight: "700",
-  margin: "0 0 10px 0",
-};
-
-const paragraph = {
-  fontSize: "16px",
-  lineHeight: "1.5",
-  margin: "0",
-  color: "#333333",
-};
-
-const paragraphSmall = {
-  fontSize: "13px",
-  lineHeight: "1.5",
-  margin: "0",
-  color: "#333333",
-};
-
-const sectionTitle = {
-  fontSize: "11px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
-  borderBottom: "1px solid #eeeeee",
-  paddingBottom: "10px",
-  marginBottom: "20px",
-  color: "#000000",
-};
-
-const summaryRow = {
-  marginBottom: "10px",
-};
-
-const labelColumn = {
-  color: "#666666",
-  fontSize: "14px",
-  padding: "5px 0",
-};
-
-const valueColumnRight = {
-  textAlign: "right" as const,
-  fontWeight: "700",
-  fontSize: "14px",
-  padding: "5px 0",
-};
-
-const totalRow = {
-  borderTop: "1px solid #000000",
-  marginTop: "10px",
-};
-
-const totalLabel = {
-  padding: "20px 0 10px 0",
-  fontSize: "16px",
-  fontWeight: "700",
-};
-
-const totalValue = {
-  padding: "20px 0 10px 0",
-  textAlign: "right" as const,
-  fontSize: "16px",
-  fontWeight: "700",
-};
-
-const itemRow = {
-  border: "1px solid #e6e6e6",
-  padding: "20px",
-  marginBottom: "10px",
-};
-
-const imageColumn = {
-  width: "100px",
-};
-
-const itemImage = {
-  objectFit: "cover" as const,
-  backgroundColor: "#f4f4f4",
-};
-
-const itemDetailsColumn = {
-  paddingLeft: "20px",
-};
-
-const itemName = {
-  fontWeight: "700",
-  fontSize: "14px",
-  marginBottom: "4px",
-  marginTop: "0",
-  color: "#000",
-};
-
-const itemQuantity = {
-  color: "#666666",
-  fontSize: "13px",
-  margin: "0",
-};
-
-const itemPriceColumn = {
-  textAlign: "right" as const,
-  fontWeight: "700",
-  fontSize: "14px",
-  verticalAlign: "top",
-  paddingTop: "5px",
-};
-
-const infoBox = {
-  border: "1px solid #000000",
-  padding: "20px",
-  marginBottom: "40px",
-};
-
-const infoBoxTitle = {
-  fontSize: "11px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  marginTop: "0",
-  marginBottom: "10px",
-};
-
-const infoBoxText = {
-  fontSize: "14px",
-  margin: "0",
-  lineHeight: "1.5",
-  color: "#333333",
-};
-
-const smallHeading = {
-  fontSize: "11px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  color: "#666666",
-  marginBottom: "10px",
-};
-
-const btnContainer = {
-  marginBottom: "60px",
-  textAlign: "center" as const,
-};
-
-const button = {
-  display: "inline-block",
-  backgroundColor: "#000000",
-  color: "#ffffff",
-  padding: "15px 40px",
-  textDecoration: "none",
-  fontSize: "12px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
-  border: "1px solid #000000",
-};
-
-const footer = {
-  borderTop: "1px solid #eeeeee",
-  paddingTop: "20px",
-  textAlign: "center" as const,
-};
-
-const footerBrand = {
-  margin: "0 0 10px 0",
-  color: "#000000",
-  fontSize: "12px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
-};
-
-const footerText = {
-  margin: "0",
-  color: "#999999",
-  fontSize: "11px",
-  letterSpacing: "0.5px",
-  lineHeight: "1.4",
-};
-
-const socialContainer = {
-  marginTop: "20px",
-};
-
-const socialLink = {
-  color: "#000",
-  textDecoration: "none",
-  margin: "0 10px",
-  fontSize: "12px",
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
-};

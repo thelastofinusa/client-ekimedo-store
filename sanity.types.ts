@@ -380,7 +380,6 @@ export type Gallery = {
   _updatedAt: string;
   _rev: string;
   title?: string;
-  year?: string;
   category?: {
     _ref: string;
     _type: "reference";
@@ -618,11 +617,10 @@ export type FAQ_QUERYResult = Array<{
 
 // Source: ./sanity/queries/gallery.ts
 // Variable: GALLERY_QUERY
-// Query: *[_type == "gallery"] | order(_createdAt desc) {    _id,    title,    year,    category -> {        _id,        name,        "slug": slug.current    },    "image": image.asset->url,    }
+// Query: *[_type == "gallery"] | order(_createdAt desc) {    _id,    title,    category -> {        _id,        name,        "slug": slug.current    },    "image": image.asset->url,    }
 export type GALLERY_QUERYResult = Array<{
   _id: string;
   title: string | null;
-  year: string | null;
   category: {
     _id: string;
     name: string | null;
@@ -845,7 +843,7 @@ declare module "@sanity/client" {
     '*[\n  _type == "customer"\n  && email == $email\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_EMAIL_QUERYResult;
     '*[\n  _type == "customer"\n  && stripeCustomerId == $stripeCustomerId\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_STRIPE_ID_QUERYResult;
     '\n*[_type == "faq"] | order(_createdAt asc) {\n_id,\n  question,\n  answer\n}\n': FAQ_QUERYResult;
-    '\n    *[_type == "gallery"] | order(_createdAt desc) {\n    _id,\n    title,\n    year,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n    "image": image.asset->url,\n    }\n': GALLERY_QUERYResult;
+    '\n    *[_type == "gallery"] | order(_createdAt desc) {\n    _id,\n    title,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n    "image": image.asset->url,\n    }\n': GALLERY_QUERYResult;
     '\n    *[_type == "hero"] | order(_createdAt desc) {\n        _id,\n        "image": image.asset->url,\n        alt\n    }\n': HERO_QUERYResult;
     '\n    *[_type == "businessHours"]{\n  hours[]\n}[0]\n': BUSINESS_HOUR_QUERYResult;
     '*[\n  _type == "order"\n  && clerkUserId == $clerkUserId\n] | order(createdAt desc) {\n  _id,\n  orderNumber,\n  total,\n  status,\n  createdAt,\n  "itemCount": count(items),\n  "itemNames": items[].product->name,\n  "itemImages": items[].product->images[0].asset->url\n}': ORDERS_BY_USER_QUERYResult;

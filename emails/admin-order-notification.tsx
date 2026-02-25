@@ -1,25 +1,64 @@
+/* eslint-disable @next/next/no-img-element */
 import { siteConfig } from "@/site.config";
 import {
   Body,
   Container,
   Head,
-  Heading,
   Html,
+  Img,
+  Link,
   Preview,
   Section,
   Text,
-  Link,
+  Heading,
   Row,
   Column,
+  Button,
 } from "@react-email/components";
 import * as React from "react";
+import {
+  main,
+  container,
+  header,
+  logo,
+  content,
+  heading,
+  paragraph,
+  detailsCard,
+  infoGrid,
+  infoRow,
+  infoLabel,
+  infoValue,
+  buttonContainer,
+  button,
+  footer,
+  footerBrand,
+  footerText,
+  socialContainer,
+  socialLink,
+  itemRow,
+  itemImage,
+  itemName,
+  itemMeta,
+  totalSection,
+  totalLabel,
+  totalValue,
+  link,
+} from "./styles";
 
 interface SocialLink {
   name: string | null;
   url: string | null;
 }
 
-interface Address {
+interface OrderItem {
+  name: string;
+  quantity: number;
+  price: number;
+  imageUrl?: string;
+}
+
+interface ShippingAddress {
   name: string;
   line1: string;
   line2?: string;
@@ -28,19 +67,12 @@ interface Address {
   country: string;
 }
 
-interface OrderItem {
-  name: string;
-  quantity: number;
-  price: string | number;
-  imageUrl?: string;
-}
-
 interface AdminOrderNotificationProps {
   orderNumber: string;
   customerEmail: string;
-  totalAmount: string | number;
+  totalAmount: number;
   items: OrderItem[];
-  shippingAddress?: Address;
+  shippingAddress: ShippingAddress;
   orderId: string;
   siteUrl?: string;
   socialLinks?: SocialLink[];
@@ -58,118 +90,166 @@ export const AdminOrderNotificationEmail = ({
 }: AdminOrderNotificationProps) => {
   return (
     <Html>
-      <Head />
-      <Preview>New Order: {orderNumber}</Preview>
+      <Head>
+        <style>
+          {`
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+          `}
+        </style>
+      </Head>
+      <Preview>
+        New Order: {orderNumber} - ${totalAmount.toFixed(2)}
+      </Preview>
       <Body style={main}>
         <Container style={container}>
           {/* Header */}
           <Section style={header}>
-            <Heading style={brandName}>{siteConfig.title}</Heading>
-            <Text style={receiptLabel}>Order Receipt</Text>
+            <Section style={logo}>
+              <Img
+                src={`${siteUrl}/logo/logo-charcoal.svg`}
+                alt={siteConfig.title}
+                width="80"
+                height="auto"
+              />
+            </Section>
           </Section>
 
-          {/* Intro */}
-          <Section style={section}>
+          {/* Main Content */}
+          <Section style={content}>
+            <Heading style={heading}>New order received</Heading>
+
+            <Text style={paragraph}>Hello Eki,</Text>
             <Text style={paragraph}>
-              A new order has been confirmed and is currently being processed.
+              An order for <strong>{orderNumber}</strong> has been placed. The
+              summary details are provided below.
             </Text>
-          </Section>
 
-          {/* Order Summary */}
-          <Section style={section}>
-            <Heading as="h2" style={sectionTitle}>
-              Order Summary
-            </Heading>
-
-            <Row style={summaryRow}>
-              <Column style={labelColumn}>Order Number</Column>
-              <Column style={valueColumnRight}>{orderNumber}</Column>
-            </Row>
-            <Row style={summaryRow}>
-              <Column style={labelColumn}>Items</Column>
-              <Column style={valueColumnRight}>
-                {items.reduce((acc, item) => acc + item.quantity, 0)} item(s)
-              </Column>
-            </Row>
-            <Row style={summaryRow}>
-              <Column style={labelColumn}>Status</Column>
-              <Column style={valueColumnRight}>PAID</Column>
-            </Row>
-            <Row style={totalRow}>
-              <Column style={totalLabel}>Total Amount</Column>
-              <Column style={totalValue}>
-                ${Number(totalAmount).toFixed(2)}
-              </Column>
-            </Row>
-          </Section>
-
-          {/* Shipping & Contact */}
-          <Section style={section}>
-            <Row>
-              <Column style={halfColumn}>
-                <Heading as="h3" style={smallHeading}>
-                  Customer
-                </Heading>
-                <Text style={addressText}>{customerEmail}</Text>
-              </Column>
-              <Column style={halfColumn}>
-                <Heading as="h3" style={smallHeading}>
-                  Shipping To
-                </Heading>
-                {shippingAddress ? (
-                  <Text style={addressText}>
-                    {shippingAddress.name}
-                    <br />
-                    {shippingAddress.line1}
-                    <br />
-                    {shippingAddress.line2 && (
-                      <>
-                        {shippingAddress.line2}
+            {/* Order Details */}
+            <Section style={detailsCard}>
+              <table style={infoGrid}>
+                <tbody>
+                  <tr style={infoRow}>
+                    <td style={infoLabel}>Order #</td>
+                    <td style={infoValue}>{orderNumber}</td>
+                  </tr>
+                  <tr style={infoRow}>
+                    <td style={infoLabel}>Customer</td>
+                    <td style={infoValue}>
+                      <Link href={`mailto:${customerEmail}`} style={link}>
+                        {customerEmail}
+                      </Link>
+                    </td>
+                  </tr>
+                  <tr style={infoRow}>
+                    <td style={infoLabel}>Shipping</td>
+                    <td style={infoValue}>
+                      {shippingAddress.name}
+                      <br />
+                      <span
+                        style={{
+                          fontWeight: "400",
+                          color: "#666",
+                          fontSize: "13px",
+                        }}
+                      >
+                        {shippingAddress.line1}
+                        {shippingAddress.line2
+                          ? `, ${shippingAddress.line2}`
+                          : ""}
                         <br />
-                      </>
-                    )}
-                    {shippingAddress.city}
-                    <br />
-                    {shippingAddress.postcode}
-                    <br />
-                    {shippingAddress.country}
-                  </Text>
-                ) : (
-                  <Text style={addressText}>No address provided</Text>
-                )}
-              </Column>
-            </Row>
-          </Section>
+                        {shippingAddress.city}, {shippingAddress.postcode}
+                        <br />
+                        {shippingAddress.country}
+                      </span>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
 
-          {/* Action */}
-          <Section style={btnContainer}>
-            <Link
-              href={`${siteUrl}/admin/structure/order;${orderId}`}
-              style={button}
-            >
-              View Order Details
-            </Link>
+              <Text
+                style={{
+                  fontSize: "12px",
+                  fontWeight: "700",
+                  textTransform: "uppercase",
+                  letterSpacing: "0.05em",
+                  color: "#111",
+                  marginTop: "32px",
+                  marginBottom: "16px",
+                }}
+              >
+                Items Ordered
+              </Text>
+              {items.map((item, index) => (
+                <Section key={index} style={itemRow}>
+                  <Row>
+                    <Column style={{ width: "48px" }}>
+                      <Img
+                        src={
+                          item.imageUrl || `${siteUrl}/placeholder-product.jpg`
+                        }
+                        alt={item.name}
+                        width="48"
+                        height="48"
+                        style={itemImage}
+                      />
+                    </Column>
+                    <Column style={{ paddingLeft: "16px" }}>
+                      <Text style={{ ...itemName, fontSize: "14px" }}>
+                        {item.name}
+                      </Text>
+                      <Text style={itemMeta}>Quantity: {item.quantity}</Text>
+                    </Column>
+                    <Column align="right">
+                      <Text style={{ ...itemName, fontSize: "14px" }}>
+                        ${(item.price * item.quantity).toFixed(2)}
+                      </Text>
+                    </Column>
+                  </Row>
+                </Section>
+              ))}
+
+              <Section style={totalSection}>
+                <table style={{ width: "100%" }}>
+                  <tbody>
+                    <tr>
+                      <td style={totalLabel}>Total Amount</td>
+                      <td align="right" style={totalValue}>
+                        ${totalAmount.toFixed(2)}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </Section>
+            </Section>
+
+            {/* CTA */}
+            <Section style={buttonContainer}>
+              <Button
+                href={`${siteUrl}/studio/structure/order;${orderId}`}
+                style={button}
+              >
+                View in Studio
+              </Button>
+            </Section>
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
-            <Text style={footerText}>
-              &copy; {new Date().getFullYear()} {siteConfig.title} MANAGEMENT
-              SYSTEM. ALL RIGHTS RESERVED.
-            </Text>
+            <Text style={footerBrand}>{siteConfig.title}</Text>
 
-            {/* Social Links */}
-            {socialLinks.length > 0 && (
-              <Section style={socialContainer}>
-                {socialLinks.map((social, index) =>
-                  social.name && social.url ? (
-                    <Link key={index} href={social.url} style={socialLink}>
-                      {social.name}
-                    </Link>
-                  ) : null,
-                )}
-              </Section>
-            )}
+            <Section style={socialContainer}>
+              {socialLinks.map((social, index) => (
+                <Link key={index} href={social.url || "#"} style={socialLink}>
+                  {social.name}
+                </Link>
+              ))}
+            </Section>
+
+            <Text style={footerText}>
+              This is an automated notification from your store system.
+              <br />© {new Date().getFullYear()} {siteConfig.title}. All rights
+              reserved.
+            </Text>
           </Section>
         </Container>
       </Body>
@@ -178,159 +258,3 @@ export const AdminOrderNotificationEmail = ({
 };
 
 export default AdminOrderNotificationEmail;
-
-const main = {
-  backgroundColor: "#ffffff",
-  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-  color: "#000000",
-};
-
-const container = {
-  maxWidth: "600px",
-  margin: "0 auto",
-  padding: "40px 20px",
-};
-
-const header = {
-  borderBottom: "2px solid #000000",
-  paddingBottom: "20px",
-  marginBottom: "40px",
-};
-
-const brandName = {
-  margin: "0",
-  fontSize: "24px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  letterSpacing: "2px",
-};
-
-const receiptLabel = {
-  margin: "5px 0 0 0",
-  fontSize: "12px",
-  textTransform: "uppercase" as const,
-  color: "#666666",
-};
-
-const section = {
-  marginBottom: "40px",
-};
-
-const paragraph = {
-  fontSize: "16px",
-  lineHeight: "1.5",
-  margin: "0",
-  color: "#333333",
-};
-
-const sectionTitle = {
-  fontSize: "12px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
-  borderBottom: "1px solid #eeeeee",
-  paddingBottom: "10px",
-  marginBottom: "20px",
-};
-
-const summaryRow = {
-  marginBottom: "10px",
-};
-
-const labelColumn = {
-  color: "#666666",
-  fontSize: "14px",
-  padding: "10px 0",
-};
-
-const valueColumnRight = {
-  textAlign: "right" as const,
-  fontWeight: "700",
-  fontSize: "14px",
-  padding: "10px 0",
-};
-
-const totalRow = {
-  borderTop: "1px solid #000000",
-  marginTop: "10px",
-};
-
-const totalLabel = {
-  padding: "20px 0 10px 0",
-  fontSize: "16px",
-  fontWeight: "700",
-  borderTop: "1px solid #000000",
-};
-
-const totalValue = {
-  padding: "20px 0 10px 0",
-  textAlign: "right" as const,
-  fontSize: "16px",
-  fontWeight: "700",
-  borderTop: "1px solid #000000",
-};
-
-const halfColumn = {
-  width: "50%",
-  verticalAlign: "top" as const,
-  paddingRight: "10px",
-};
-
-const smallHeading = {
-  fontSize: "11px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  color: "#666666",
-  marginBottom: "10px",
-};
-
-const addressText = {
-  fontSize: "13px",
-  margin: "0",
-  lineHeight: "1.4",
-  color: "#333333",
-};
-
-const btnContainer = {
-  marginBottom: "60px",
-  textAlign: "center" as const,
-};
-
-const button = {
-  display: "inline-block",
-  backgroundColor: "#000000",
-  color: "#ffffff",
-  padding: "15px 40px",
-  textDecoration: "none",
-  fontSize: "12px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
-  border: "1px solid #000000",
-};
-
-const footer = {
-  borderTop: "1px solid #eeeeee",
-  paddingTop: "20px",
-  textAlign: "center" as const,
-};
-
-const footerText = {
-  margin: "0",
-  color: "#999999",
-  fontSize: "11px",
-  letterSpacing: "0.5px",
-};
-
-const socialContainer = {
-  marginTop: "20px",
-};
-
-const socialLink = {
-  color: "#000",
-  textDecoration: "none",
-  margin: "0 10px",
-  fontSize: "12px",
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
-};

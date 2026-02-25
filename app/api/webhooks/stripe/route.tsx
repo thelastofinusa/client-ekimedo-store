@@ -134,7 +134,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             customerName={customerName}
             serviceTitle={serviceTitle}
             dateTime={dateTime}
-            location={location}
+            location={(location as "in-person") || "virtual"}
             bookingId={bookingId}
             siteUrl={siteConfig.url}
             socialLinks={socialHandles || []}
@@ -212,7 +212,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             customerName={customerName}
             serviceTitle={serviceTitle}
             dateTime={dateTime}
-            location={location}
+            location={(location as "in-person") || "virtual"}
             calendarUrl={calendarUrl}
             siteUrl={siteConfig.url}
             socialLinks={socialHandles || []}
@@ -259,7 +259,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             paymentMethod
               ? `\nPayment Method: ${String(paymentMethod).toUpperCase()}`
               : ""
-          }\n\nPlease be on time. A late fee of $20 applies after 10 mins. Canceled after 15 mins.\n\nLooking forward to meeting you.\nEki Ajibade`,
+          }\n\nPlease be on time. A late fee of $20 applies after 10 mins. Canceled after 15 mins.\n\nLooking forward to meeting you.\n${siteConfig.author.fullName}`,
           html: customerHtml,
         });
         if (customerError) {
@@ -353,16 +353,14 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
     // Extract shipping address
     const shippingAddress = session.customer_details?.address;
-    const address = shippingAddress
-      ? {
-          name: session.customer_details?.name ?? "",
-          line1: shippingAddress.line1 ?? "",
-          line2: shippingAddress.line2 ?? "",
-          city: shippingAddress.city ?? "",
-          postcode: shippingAddress.postal_code ?? "",
-          country: shippingAddress.country ?? "",
-        }
-      : undefined;
+    const address = {
+      name: session.customer_details?.name ?? "N/A",
+      line1: shippingAddress?.line1 ?? "N/A",
+      line2: shippingAddress?.line2 ?? "",
+      city: shippingAddress?.city ?? "N/A",
+      postcode: shippingAddress?.postal_code ?? "N/A",
+      country: shippingAddress?.country ?? "N/A",
+    };
 
     // Create order in Sanity with customer reference
     // Use stripePaymentId as the document _id to ensure idempotency and prevent duplicates
@@ -420,7 +418,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       return {
         name: product.name,
         quantity: item.quantity ?? 1,
-        price: (item.amount_total / 100 / (item.quantity ?? 1)).toFixed(2),
+        price: item.amount_total / 100 / (item.quantity ?? 1),
         imageUrl: product.images?.[0] || undefined,
       };
     });
@@ -575,16 +573,14 @@ async function handlePaymentIntentSucceeded(
       }
     : order.address;
 
-  const address = rawAddress
-    ? {
-        name: rawAddress.name || "",
-        line1: rawAddress.line1 || "",
-        line2: rawAddress.line2 || "",
-        city: rawAddress.city || "",
-        postcode: rawAddress.postcode || "",
-        country: rawAddress.country || "",
-      }
-    : undefined;
+  const address = {
+    name: rawAddress?.name || "N/A",
+    line1: rawAddress?.line1 || "N/A",
+    line2: rawAddress?.line2 || "",
+    city: rawAddress?.city || "N/A",
+    postcode: rawAddress?.postcode || "N/A",
+    country: rawAddress?.country || "N/A",
+  };
 
   // Generate items for email
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -593,7 +589,7 @@ async function handlePaymentIntentSucceeded(
     return {
       name: product.name || "Item",
       quantity: item.quantity || 1,
-      price: ((item.priceAtPurchase || 0) / 100).toFixed(2),
+      price: (item.priceAtPurchase || 0) / 100,
       imageUrl: product.image?.asset?.url || undefined,
     };
   });

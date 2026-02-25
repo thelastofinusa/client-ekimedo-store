@@ -5,6 +5,11 @@ const siteConfig = {
   tagline: "Where luxury meets timeless designs",
   description:
     "Custom Bridals dresses, Robes and evening Gowns for your special occasions!",
+  author: {
+    fullName: "Eki Ajibade",
+    fName: "Eki",
+    lName: "Ajibade",
+  },
   url:
     process.env.NODE_ENV === "production"
       ? env.NEXT_PUBLIC_SITE_URL

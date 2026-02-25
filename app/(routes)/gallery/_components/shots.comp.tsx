@@ -60,11 +60,11 @@ export const ShotsComp: React.FC<Props> = ({ shots }) => {
                     alt={item.title || ""}
                     width={880}
                     height={0}
-                    className="h-auto object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-50"
+                    loading="lazy"
+                    className="h-auto object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-80"
                   />
-                  <div className="bg-foreground/40 absolute inset-0 flex flex-col justify-end p-6 opacity-0 transition-opacity duration-500 group-hover:opacity-100 md:p-8">
-                    <span className="mb-1 text-[10px] tracking-widest uppercase md:mb-2">
-                      {formatSanityDate(item.year!)} —{" "}
+                  <div className="bg-foreground/20 absolute inset-0 flex flex-col justify-end p-6 opacity-0 transition-opacity duration-500 group-hover:opacity-100 md:p-8">
+                    <span className="text-background mb-1 text-xs tracking-widest uppercase md:mb-2">
                       {item.category?.name?.replace("-", " ")}
                     </span>
                     {item.title && (

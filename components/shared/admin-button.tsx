@@ -17,7 +17,7 @@ export const AdminButton = () => {
 
   return (
     <Link
-      href={"/admin" as Route}
+      href={"/studio" as Route}
       target="_blank"
       className={buttonVariants({
         size: "icon-lg",

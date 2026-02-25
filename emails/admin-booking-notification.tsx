@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import { siteConfig } from "@/site.config";
 import {
   Body,
@@ -5,14 +6,35 @@ import {
   Head,
   Html,
   Img,
+  Link,
   Preview,
   Section,
   Text,
-  Link,
-  Row,
-  Column,
+  Heading,
+  Button,
 } from "@react-email/components";
 import * as React from "react";
+import {
+  main,
+  container,
+  header,
+  logo,
+  content,
+  heading,
+  paragraph,
+  detailsCard,
+  infoGrid,
+  infoRow,
+  infoLabel,
+  infoValue,
+  buttonContainer,
+  button,
+  footer,
+  footerBrand,
+  footerText,
+  socialContainer,
+  socialLink,
+} from "./styles";
 
 interface SocialLink {
   name: string | null;
@@ -23,7 +45,7 @@ interface AdminBookingNotificationProps {
   customerName: string;
   serviceTitle: string;
   dateTime: string | Date;
-  location: string;
+  location: "in-person" | "virtual";
   bookingId: string;
   siteUrl?: string;
   socialLinks?: SocialLink[];
@@ -79,111 +101,124 @@ export const AdminBookingNotificationEmail = ({
 
   return (
     <Html>
-      <Head />
+      <Head>
+        <style>
+          {`
+            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans:wght@300;400;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap');
+          `}
+        </style>
+      </Head>
       <Preview>
         New Consultation: {serviceTitle} - {customerName}
       </Preview>
       <Body style={main}>
         <Container style={container}>
-          {/* Logo */}
-          <Section style={logoContainer}>
-            <Img
-              src={`${siteUrl}/logo/logo-vertical-charcoal.svg`}
-              alt={siteConfig.title}
-              width="120"
-              height="auto"
-              style={logo}
-            />
+          {/* Header */}
+          <Section style={header}>
+            <Section style={logo}>
+              <Img
+                src={`${siteUrl}/logo/logo-charcoal.svg`}
+                alt={siteConfig.title}
+                width="80"
+                height="auto"
+              />
+            </Section>
           </Section>
 
-          <Text style={paragraph}>Hi {siteConfig.title},</Text>
-          <Text style={paragraph}>
-            You have one confirmed <strong>{serviceTitle}</strong> appointment
-            at <strong>{location}</strong> on <strong>{dateStr}</strong> at{" "}
-            <strong>{timeStr}</strong>. The appointment is added to your
-            schedule.
-          </Text>
+          {/* Main Content */}
+          <Section style={content}>
+            <Heading style={heading}>New consultation scheduled</Heading>
 
-          <Section style={detailsBox}>
-            <Row style={row}>
-              <Column style={labelColumn}>Customer</Column>
-              <Column style={valueColumn}>{customerName}</Column>
-            </Row>
-            <Row style={row}>
-              <Column style={labelColumn}>Service</Column>
-              <Column style={valueColumn}>{serviceTitle}</Column>
-            </Row>
-            {eventDateStr && (
-              <Row style={row}>
-                <Column style={labelColumn}>Event Date</Column>
-                <Column style={valueColumn}>{eventDateStr}</Column>
-              </Row>
-            )}
-            <Row style={row}>
-              <Column style={labelColumn}>Appointment</Column>
-              <Column style={valueColumn}>
-                {dateStr} at {timeStr}
-              </Column>
-            </Row>
-            <Row style={row}>
-              <Column style={labelColumn}>Location</Column>
-              <Column style={valueColumn}>
-                {location === "in-person" &&
-                serviceTitle === "Pre-made Dresses Try On"
-                  ? "In-Person (Showroom) - 1211 Marblewood Ave, Capitol Heights, MD 20743, USA"
-                  : location === "in-person"
-                    ? "In-Person (Showroom)"
-                    : "Virtual (Zoom/Google Meet)"}
-              </Column>
-            </Row>
-            {budgetLabel && (
-              <Row style={row}>
-                <Column style={labelColumn}>Budget</Column>
-                <Column style={valueColumn}>{budgetLabel}</Column>
-              </Row>
-            )}
-            {paymentMethodLabel && (
-              <Row style={row}>
-                <Column style={labelColumn}>Payment Method</Column>
-                <Column style={valueColumn}>{paymentMethodLabel}</Column>
-              </Row>
-            )}
-          </Section>
+            <Text style={paragraph}>Hello Eki,</Text>
+            <Text style={paragraph}>
+              A new <strong>{serviceTitle}</strong> has been booked by{" "}
+              {customerName}. The details are recorded below.
+            </Text>
 
-          <Text style={paragraph}>
-            Thank you,
-            <br />
-            {siteConfig.title}
-          </Text>
+            {/* Booking Details */}
+            <Section style={detailsCard}>
+              <table style={infoGrid}>
+                <tbody>
+                  <tr style={infoRow}>
+                    <td style={infoLabel}>Customer</td>
+                    <td style={infoValue}>{customerName}</td>
+                  </tr>
+                  <tr style={infoRow}>
+                    <td style={infoLabel}>Service</td>
+                    <td style={infoValue}>{serviceTitle}</td>
+                  </tr>
+                  <tr style={infoRow}>
+                    <td style={infoLabel}>Date & Time</td>
+                    <td style={infoValue}>
+                      {dateStr}
+                      <br />
+                      <span
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: "400",
+                          color: "#666",
+                        }}
+                      >
+                        {timeStr}
+                      </span>
+                    </td>
+                  </tr>
+                  <tr style={infoRow}>
+                    <td style={infoLabel}>Location</td>
+                    <td style={infoValue}>
+                      {location === "in-person"
+                        ? "Showroom (In-Person)"
+                        : "Virtual Consultation"}
+                    </td>
+                  </tr>
+                  {eventDateStr && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Event Date</td>
+                      <td style={infoValue}>{eventDateStr}</td>
+                    </tr>
+                  )}
+                  {budgetLabel && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Budget</td>
+                      <td style={infoValue}>{budgetLabel}</td>
+                    </tr>
+                  )}
+                  <tr style={infoRow}>
+                    <td style={infoLabel}>Payment</td>
+                    <td style={infoValue}>{paymentMethodLabel}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </Section>
 
-          {/* Action */}
-          <Section style={btnContainer}>
-            <Link
-              href={`${siteUrl}/admin/structure/booking;${bookingId}`}
-              style={button}
-            >
-              View in Studio
-            </Link>
+            {/* CTA */}
+            <Section style={buttonContainer}>
+              <Button
+                href={`${siteUrl}/studio/structure/booking;${bookingId}`}
+                style={button}
+              >
+                View in Studio
+              </Button>
+            </Section>
           </Section>
 
           {/* Footer */}
           <Section style={footer}>
-            <Text style={footerText}>
-              Automated notification from your website.
-            </Text>
+            <Text style={footerBrand}>{siteConfig.title}</Text>
 
-            {/* Social Links */}
-            {socialLinks.length > 0 && (
-              <Section style={socialContainer}>
-                {socialLinks.map((social, index) =>
-                  social.name && social.url ? (
-                    <Link key={index} href={social.url} style={socialLink}>
-                      {social.name}
-                    </Link>
-                  ) : null,
-                )}
-              </Section>
-            )}
+            <Section style={socialContainer}>
+              {socialLinks.map((social, index) => (
+                <Link key={index} href={social.url || "#"} style={socialLink}>
+                  {social.name}
+                </Link>
+              ))}
+            </Section>
+
+            <Text style={footerText}>
+              This is an automated notification from your booking system.
+              <br />© {new Date().getFullYear()} {siteConfig.title}. All rights
+              reserved.
+            </Text>
           </Section>
         </Container>
       </Body>
@@ -192,102 +227,3 @@ export const AdminBookingNotificationEmail = ({
 };
 
 export default AdminBookingNotificationEmail;
-
-const main = {
-  backgroundColor: "#f9f9f9",
-  fontFamily: "'Helvetica Neue', Helvetica, Arial, sans-serif",
-  color: "#000000",
-};
-
-const container = {
-  maxWidth: "600px",
-  margin: "0 auto",
-  padding: "40px 20px",
-  backgroundColor: "#ffffff",
-};
-
-const logoContainer = {
-  textAlign: "left" as const,
-  marginBottom: "30px",
-};
-
-const logo = {
-  width: "120px",
-  height: "auto",
-};
-
-const paragraph = {
-  fontSize: "16px",
-  lineHeight: "1.6",
-  margin: "0 0 20px 0",
-  color: "#000000",
-};
-
-const detailsBox = {
-  border: "1px solid #eeeeee",
-  padding: "20px",
-  marginBottom: "30px",
-  backgroundColor: "#fcfcfc",
-};
-
-const row = {
-  marginBottom: "10px",
-};
-
-const labelColumn = {
-  width: "100px",
-  fontWeight: "700",
-  fontSize: "14px",
-  color: "#000000",
-  verticalAlign: "top",
-};
-
-const valueColumn = {
-  fontSize: "14px",
-  color: "#333333",
-};
-
-const btnContainer = {
-  textAlign: "center" as const,
-  marginBottom: "40px",
-  marginTop: "20px",
-};
-
-const button = {
-  display: "inline-block",
-  backgroundColor: "#000000",
-  color: "#ffffff",
-  padding: "15px 30px",
-  textDecoration: "none",
-  fontSize: "12px",
-  fontWeight: "700",
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
-};
-
-const footer = {
-  borderTop: "1px solid #eeeeee",
-  paddingTop: "20px",
-  textAlign: "center" as const,
-  marginTop: "40px",
-};
-
-const footerText = {
-  margin: "0",
-  color: "#999999",
-  fontSize: "11px",
-  letterSpacing: "0.5px",
-};
-
-const socialContainer = {
-  marginTop: "20px",
-};
-
-const socialLink = {
-  color: "#000",
-  textDecoration: "none",
-  margin: "0 10px",
-  fontSize: "12px",
-  textTransform: "uppercase" as const,
-  letterSpacing: "1px",
-};
