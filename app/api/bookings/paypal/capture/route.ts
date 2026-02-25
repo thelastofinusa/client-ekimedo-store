@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { paypalClient } from "@/lib/paypal";
 import checkoutNodeJssdk from "@paypal/checkout-server-sdk";
 import { writeClient } from "@/sanity/lib/client";
@@ -23,10 +24,20 @@ export async function GET(req: NextRequest) {
     const response = await paypalClient.client().execute(request);
 
     if (response.result.status === "COMPLETED") {
-      // Update booking status in Sanity
+      // Update booking status in Sanity to 'paid' (NOT 'confirmed')
       await writeClient
         .patch(bookingId)
-        .set({ status: "paid", paypalOrderId: token })
+        .set({ 
+          status: "paid", 
+          paymentStatus: "paid",
+          paypalOrderId: token 
+        })
+        .append("auditLog", [{
+          _key: randomUUID(),
+          timestamp: new Date().toISOString(),
+          action: "PAYMENT_RECEIVED",
+          note: `PayPal payment captured (${token}).`
+        }])
         .commit();
 
       return NextResponse.redirect(
