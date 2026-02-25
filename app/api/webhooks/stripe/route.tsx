@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { randomUUID } from "crypto";
 import { Resend } from "resend";
 import { render } from "@react-email/render";
 import { headers } from "next/headers";
@@ -132,12 +133,25 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         return;
       }
 
+      // Mark the booking as paid, but stay in 'paid' status for manual approval
       await writeClient
         .patch(bookingId)
-        .set({ status: "confirmed", confirmationEmailSent: true })
+        .set({
+          status: "paid",
+          paymentStatus: "paid",
+          stripePaymentId: stripePaymentId || session.id,
+        })
+        .append("auditLog", [
+          {
+            _key: randomUUID(),
+            timestamp: new Date().toISOString(),
+            action: "PAYMENT_RECEIVED",
+            note: `Stripe payment confirmed via webhook (${session.id}).`,
+          },
+        ])
         .commit();
 
-      console.log(`Booking ${bookingId} confirmed`);
+      console.log(`Booking ${bookingId} marked as paid`);
 
       const adminTo = env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
 
@@ -228,82 +242,13 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
       const customerTo = String(metadataCustomerEmail ?? "").trim() || adminTo;
 
-      if (!customerTo) {
-        console.error(
-          "Consultation webhook: No valid customer or admin email found, skipping customer confirmation",
+      // Email to customer
+      if (customerTo) {
+        // We only send the customer confirmation when the status is changed to 'confirmed' manually or via Sanity webhook.
+        // For now, we only send the ADMIN notification here so the owner knows a payment was made.
+        console.log(
+          `Skipping customer confirmation email for ${customerTo} until manual approval.`,
         );
-      } else {
-        // Add a small delay to avoid Resend rate limits (2 requests per second)
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-
-        const customerHtml = await render(
-          <AppointmentConfirmationEmail
-            customerName={customerName}
-            serviceTitle={serviceTitle}
-            dateTime={dateTime}
-            location={(location as "in-person") || "virtual"}
-            calendarUrl={calendarUrl}
-            siteUrl={siteConfig.url}
-            socialLinks={socialHandles || []}
-            eventDate={eventDate}
-            budgetType={budgetType}
-            customBudget={customBudget}
-            paymentMethod={paymentMethod}
-            rushOrder={rushOrder}
-          />,
-        );
-
-        const { error: customerError } = await resend.emails.send({
-          from: `${siteConfig.title} <${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}>`,
-          to: customerTo,
-          replyTo: adminTo,
-          subject: `${serviceTitle} Appointment`,
-          text: `Dear ${customerName},\n\nYou have successfully booked an appointment with ${siteConfig.title}!\n\nService: ${serviceTitle}\nAppointment Date & Time: ${new Date(dateTime).toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })} at ${new Date(dateTime).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}\nLocation: ${
-            location === "in-person" &&
-            serviceTitle === "Pre-made Dresses Try On"
-              ? "In-Person (Showroom) - 1211 Marblewood Ave, Capitol Heights, MD 20743, USA"
-              : location === "in-person"
-                ? "In-Person (Showroom)"
-                : "Virtual (Zoom/Google Meet)"
-          }${
-            eventDate
-              ? `\nWedding/Event Date: ${new Date(eventDate).toLocaleDateString(
-                  "en-US",
-                  {
-                    weekday: "long",
-                    year: "numeric",
-                    month: "long",
-                    day: "numeric",
-                  },
-                )}`
-              : ""
-          }${
-            budgetType || customBudget
-              ? `\nEstimated Budget: ${
-                  customBudget && customBudget.length > 0
-                    ? customBudget
-                    : budgetType
-                }`
-              : ""
-          }${
-            rushOrder
-              ? `\nRush Order: ${rushOrder === "yes" ? "Yes" : "No"}`
-              : ""
-          }${
-            paymentMethod
-              ? `\nPayment Method: ${String(paymentMethod).toUpperCase()}`
-              : ""
-          }\n\nPlease be on time. A late fee of $20 applies after 10 mins. Canceled after 15 mins.\n\nLooking forward to meeting you.\n${siteConfig.author.fullName}`,
-          html: customerHtml,
-        });
-        if (customerError) {
-          console.error(
-            "Resend customer booking confirmation failed:",
-            customerError,
-          );
-        } else {
-          console.log(`Booking confirmation email sent to ${customerTo}`);
-        }
       }
     } catch (error) {
       console.error("Error processing booking webhook:", error);

@@ -67,6 +67,7 @@ export const bookingType = defineType({
       options: {
         list: [
           { title: "Pending", value: "pending" },
+          { title: "Paid (Awaiting Confirmation)", value: "paid" },
           { title: "Confirmed", value: "confirmed" },
           { title: "Cancelled", value: "cancelled" },
           { title: "Completed", value: "completed" },
@@ -74,6 +75,37 @@ export const bookingType = defineType({
         layout: "radio",
       },
       initialValue: "pending",
+    }),
+    defineField({
+      name: "paymentStatus",
+      title: "Payment Status",
+      type: "string",
+      group: "general",
+      options: {
+        list: [
+          { title: "Unpaid", value: "unpaid" },
+          { title: "Paid", value: "paid" },
+          { title: "Refunded", value: "refunded" },
+        ],
+      },
+      initialValue: "unpaid",
+    }),
+    defineField({
+      name: "auditLog",
+      title: "Audit Log",
+      type: "array",
+      group: "general",
+      of: [
+        {
+          type: "object",
+          fields: [
+            { name: "timestamp", type: "datetime", title: "Timestamp" },
+            { name: "action", type: "string", title: "Action" },
+            { name: "note", type: "text", title: "Note" },
+          ],
+        },
+      ],
+      readOnly: true,
     }),
     defineField({
       name: "location",

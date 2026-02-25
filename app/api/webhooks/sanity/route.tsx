@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { randomUUID } from "crypto";
 import { Resend } from "resend";
 import { render } from "@react-email/render";
 import { headers } from "next/headers";
@@ -37,12 +38,18 @@ export async function POST(req: Request) {
     const jsonBody = JSON.parse(body);
     const { _id, status, confirmationEmailSent } = jsonBody;
 
+    console.log(`[Sanity Webhook] Received update for ${_id}:`, {
+      status,
+      confirmationEmailSent,
+    });
+
     // Only process if status is 'confirmed' and email hasn't been sent yet
     if (status !== "confirmed" || confirmationEmailSent === true) {
+      console.log(`[Sanity Webhook] Skipping processing for ${_id}`);
       return NextResponse.json({ message: "No action needed" });
     }
 
-    // Fetch full booking details from Sanity to ensure we have all data for the email
+    // Fetch full booking details from Sanity to double check status and flag
     const booking = await client.fetch(
       `*[_type == "booking" && _id == $id][0]{
         fName,
@@ -56,14 +63,30 @@ export async function POST(req: Request) {
         budget,
         customBudget,
         paymentMethod,
-        rushOrder
+        rushOrder,
+        status,
+        confirmationEmailSent
       }`,
       { id: _id },
     );
 
     if (!booking) {
+      console.log(`[Sanity Webhook] Booking ${_id} not found`);
       return NextResponse.json({ error: "Booking not found" }, { status: 404 });
     }
+
+    if (
+      booking.status !== "confirmed" ||
+      booking.confirmationEmailSent === true
+    ) {
+      console.log(`[Sanity Webhook] Re-verification failed for ${_id}:`, {
+        status: booking.status,
+        confirmationEmailSent: booking.confirmationEmailSent,
+      });
+      return NextResponse.json({ message: "No action needed (re-verified)" });
+    }
+
+    console.log(`[Sanity Webhook] Processing confirmation email for ${_id}`);
 
     const socialHandles = await client.fetch(SOCIAL_QUERY);
     const customerName = `${booking.fName} ${booking.lName}`.trim();
@@ -121,8 +144,19 @@ export async function POST(req: Request) {
       );
     }
 
-    // Mark as sent in Sanity to prevent duplicate sends from the webhook
-    await writeClient.patch(_id).set({ confirmationEmailSent: true }).commit();
+    // Mark as sent in Sanity and add audit log entry
+    await writeClient
+      .patch(_id)
+      .set({ confirmationEmailSent: true })
+      .append("auditLog", [
+        {
+          _key: randomUUID(),
+          timestamp: new Date().toISOString(),
+          action: "CONFIRMATION_EMAIL_SENT",
+          note: `Appointment confirmation email sent to ${booking.email} after manual approval.`,
+        },
+      ])
+      .commit();
 
     return NextResponse.json({
       success: true,
