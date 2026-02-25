@@ -9,7 +9,7 @@ import { ContactInquiryEmail } from "@/emails/contact-inquiry";
 import { CustomOrderInquiryEmail } from "@/emails/custom-order-inquiry";
 import { OrderConfirmationEmail } from "@/emails/order-confirmation";
 import { render } from "@react-email/render";
-import { notFound } from "next/navigation";
+// import { notFound } from "next/navigation";
 
 const testSocialLinks = [
   { name: "Instagram", url: "https://instagram.com/ekieajibade" },
@@ -145,7 +145,7 @@ const emails = [
 ];
 
 export default function EmailPreview() {
-  if (process.env.NODE_ENV === "production") return notFound();
+  // if (process.env.NODE_ENV === "production") return notFound();
 
   return (
     <div className="min-h-screen bg-neutral-50 py-32 md:py-40">
