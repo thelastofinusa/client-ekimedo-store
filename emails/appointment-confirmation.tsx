@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 import { siteConfig } from "@/site.config";
 import {
   Body,
@@ -53,10 +52,10 @@ interface SocialLink {
   url: string | null;
 }
 
-interface AppointmentConfirmationProps {
+export interface AppointmentConfirmationProps {
   customerName: string;
   serviceTitle: string;
-  serviceSlug?: "try-on" | "prom";
+  serviceSlug?: string;
   dateTime: string | Date;
   location: "in-person" | "virtual";
   calendarUrl: string;
@@ -66,6 +65,11 @@ interface AppointmentConfirmationProps {
   budgetType?: string | null;
   customBudget?: string | null;
   paymentMethod?: string | null;
+  rushOrder?: string | null;
+  interests?: string[];
+  dressSize?: string | null;
+  dressColor?: string | null;
+  specialRequirements?: string | null;
 }
 
 export const AppointmentConfirmationEmail = ({
@@ -81,6 +85,11 @@ export const AppointmentConfirmationEmail = ({
   budgetType,
   customBudget,
   paymentMethod,
+  rushOrder,
+  interests,
+  dressSize,
+  dressColor,
+  specialRequirements,
 }: AppointmentConfirmationProps) => {
   const dateObj = new Date(dateTime);
   const dateStr = dateObj.toLocaleDateString("en-US", {
@@ -139,7 +148,15 @@ export const AppointmentConfirmationEmail = ({
 
           {/* Main Content */}
           <Section style={content}>
-            <Heading style={heading}>We look forward to meeting you</Heading>
+            <Heading style={heading}>
+              {serviceSlug === "bridal"
+                ? "Your Bridal Journey Begins"
+                : serviceSlug === "prom"
+                  ? "Your Prom Design Session"
+                  : serviceSlug === "try-on"
+                    ? "Your Gown Fitting is Set"
+                    : "Your Consultation is Confirmed"}
+            </Heading>
 
             <Text style={paragraph}>
               Dear {customerName}, we are delighted to confirm your upcoming
@@ -207,39 +224,83 @@ export const AppointmentConfirmationEmail = ({
                       <td style={infoValue}>{paymentMethodLabel}</td>
                     </tr>
                   )}
+                  {rushOrder && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Rush Order</td>
+                      <td style={infoValue}>
+                        {rushOrder === "yes" ? "Yes" : "No"}
+                      </td>
+                    </tr>
+                  )}
+                  {interests && interests.length > 0 && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Interests</td>
+                      <td style={infoValue}>{interests.join(", ")}</td>
+                    </tr>
+                  )}
+                  {dressSize && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Size</td>
+                      <td style={infoValue}>{dressSize}</td>
+                    </tr>
+                  )}
+                  {dressColor && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Preferred Color</td>
+                      <td style={infoValue}>{dressColor}</td>
+                    </tr>
+                  )}
+                  {specialRequirements && (
+                    <tr style={infoRow}>
+                      <td style={infoLabel}>Notes</td>
+                      <td style={infoValue}>{specialRequirements}</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </Section>
 
-            {location === "in-person" && serviceSlug === "try-on" ? (
-              <Section style={accentBox}>
-                <Text style={accentTitle}>
-                  Preparing for your try-on consultation
-                </Text>
-                <Text style={accentListItem}>• Wear nude or brown panties</Text>
-                <Text style={accentListItem}>
-                  • Avoid using deodorant or body cologne
-                </Text>
-                <Text style={accentListItem}>
-                  • You may try on a maximum of 3 dresses within your 1-hour
-                  session
-                </Text>
-              </Section>
-            ) : (
-              location === "in-person" && (
-                <Section style={accentBox}>
-                  <Text style={accentTitle}>
-                    Preparing for your measurement session
-                  </Text>
-                  <Text style={accentListItem}>
-                    • Wear a fitted outfit for accurate measurements
-                  </Text>
-                  <Text style={accentListItem}>
-                    • Bring at least three style inspirations to discuss with
-                    the head designer
-                  </Text>
-                </Section>
-              )
+            {/* Dynamic Instructions based on Service and Location */}
+            {location === "in-person" && (
+              <>
+                {serviceSlug === "try-on" && (
+                  <Section style={accentBox}>
+                    <Text style={accentTitle}>
+                      Preparing for your try-on consultation
+                    </Text>
+                    <Text style={accentListItem}>
+                      • Wear nude or brown panties for a seamless look.
+                    </Text>
+                    <Text style={accentListItem}>
+                      • Avoid using deodorant or body cologne to keep the gowns
+                      pristine.
+                    </Text>
+                    <Text style={accentListItem}>
+                      • You may try on a maximum of 3 dresses within your 1-hour
+                      session.
+                    </Text>
+                  </Section>
+                )}
+
+                {serviceSlug === "prom" && (
+                  <Section style={accentBox}>
+                    <Text style={accentTitle}>
+                      Preparing for your Prom Consultation
+                    </Text>
+                    <Text style={accentListItem}>
+                      • Wear a fitted outfit for accurate body measurements.
+                    </Text>
+                    <Text style={accentListItem}>
+                      • Bring at least three style inspirations to discuss with
+                      the head designer.
+                    </Text>
+                    <Text style={accentListItem}>
+                      • Think about the color palette that best suits your skin
+                      tone and theme.
+                    </Text>
+                  </Section>
+                )}
+              </>
             )}
 
             {/* Policy Section */}

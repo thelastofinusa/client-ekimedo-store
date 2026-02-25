@@ -4,22 +4,18 @@
  */
 
 export const main = {
-  backgroundColor: "#f9f9f9",
   fontFamily:
     "'Noto Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
   padding: "0",
 };
 
 export const container = {
-  margin: "0 auto",
-  backgroundColor: "#ffffff",
   maxWidth: "600px",
   borderRadius: "0", // Clean, sharp edges for a modern look
-  boxShadow: "0 0 40px rgba(0, 0, 0, 0.03)",
 };
 
 export const header = {
-  padding: "60px 20px 40px",
+  padding: "60px 10px 40px",
   textAlign: "left" as const,
 };
 
@@ -28,7 +24,7 @@ export const logo = {
 };
 
 export const content = {
-  padding: "0 20px 60px",
+  padding: "0 10px 60px",
 };
 
 export const heading = {
@@ -181,7 +177,7 @@ export const signatureText = {
 
 export const footer = {
   backgroundColor: "#ffffff",
-  padding: "50px 20px",
+  padding: "50px 10px",
   textAlign: "center" as const,
   borderTop: "1px solid #f0f0f0",
 };
