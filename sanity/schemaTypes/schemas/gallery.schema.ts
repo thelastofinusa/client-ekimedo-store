@@ -13,12 +13,6 @@ export const galleryType = defineType({
       type: "string",
     }),
     defineField({
-      name: "year",
-      title: "Year",
-      type: "date",
-      validation: (rule) => rule.required(),
-    }),
-    defineField({
       name: "category",
       title: "Category",
       type: "reference",

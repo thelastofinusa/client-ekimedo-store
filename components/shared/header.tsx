@@ -47,6 +47,7 @@ export const Header = () => {
     "/shop/",
     "/checkout",
     "/orders",
+    "/email-preview",
   ];
   const isDynamicShopRoute =
     pathname.startsWith("/shop/") && pathname !== "/shop";
@@ -114,7 +115,7 @@ export const Header = () => {
       className={cn(
         "pointer-events-none fixed top-0 left-0 z-50 w-full max-w-full transition-all duration-300",
         {
-          "bg-card md:bg-card/80 md:backdrop-blur-md": isActive,
+          "bg-background md:bg-background/80 md:backdrop-blur-md": isActive,
           "mix-blend-difference": !isActive && isScrolling,
         },
       )}
@@ -239,7 +240,7 @@ export const Header = () => {
                         />
                         {isAdmin && (
                           <UserButton.Link
-                            label="Admin Dashboard"
+                            label="Content Management"
                             labelIcon={<RiAdminLine className="mt-px size-4" />}
                             href="/admin"
                           />

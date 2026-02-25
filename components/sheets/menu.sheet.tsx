@@ -103,7 +103,7 @@ export const MenuSheet: React.FC<Props> = ({
             <SheetClose asChild>
               <Link
                 target="_blank"
-                href={"/admin" as Route}
+                href={"/studio" as Route}
                 onClick={() => setOpenMenu(false)}
                 className={buttonVariants({
                   variant: "secondary",
