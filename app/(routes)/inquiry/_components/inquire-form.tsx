@@ -436,7 +436,7 @@ export const InquireForm = () => {
               <Button
                 type="submit"
                 className="w-full"
-                size="lg"
+                size="xl"
                 isLoading={isSubmitting}
                 loadingText="Submitting..."
               >

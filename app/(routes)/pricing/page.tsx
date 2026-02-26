@@ -53,7 +53,7 @@ export default async function PricingPage() {
         description="Because every gown is custom-designed, final pricing depends on your
             selected style, fabric, detailing and production timeline. Below are
             starting ranges to help you plan."
-        imagePath="pricing.avif"
+        imagePath="pricing.jpg"
       />
 
       {/* Main Pricing Section */}

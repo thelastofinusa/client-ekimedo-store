@@ -8,18 +8,10 @@ import { CartSheet } from "../sheets/cart.sheet";
 import { Button } from "@/ui/button";
 import { Icons } from "hugeicons-proxy";
 import { MenuSheet } from "../sheets/menu.sheet";
-import {
-  SignedIn,
-  SignedOut,
-  SignInButton,
-  UserButton,
-  useUser,
-} from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { Separator } from "@/ui/separator";
 import { PiPackageDuotone } from "react-icons/pi";
-import { RiAdminLine } from "react-icons/ri";
 import { useTotalItems } from "../providers/cart.provider";
-import { env } from "@/lib/env";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -35,10 +27,6 @@ import { headerRoutes } from "@/lib/constants/navigation";
 
 export const Header = () => {
   const pathname = usePathname();
-  const { user } = useUser();
-  const isAdmin =
-    user?.primaryEmailAddress?.emailAddress ===
-    env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const forceActiveRoutes = [
@@ -238,13 +226,6 @@ export const Header = () => {
                           }
                           href="/orders"
                         />
-                        {isAdmin && (
-                          <UserButton.Link
-                            label="Content Management"
-                            labelIcon={<RiAdminLine className="mt-px size-4" />}
-                            href="/admin"
-                          />
-                        )}
                       </UserButton.MenuItems>
                     </UserButton>
                   </Button>

@@ -17,7 +17,7 @@ export const ServicesComp = async () => {
               <Link
                 key={service.slug}
                 href={`/consultation/${service.slug}`}
-                className="group hover-lift relative aspect-square overflow-hidden md:aspect-auto md:h-[500px]"
+                className="group hover-lift relative aspect-square overflow-hidden md:aspect-auto md:h-[550px]"
               >
                 <Image
                   fill

@@ -755,7 +755,7 @@ export const consultationsData: ConsultationDataType = [
     duration: 60,
     dresses: 3,
     price: 100,
-    image: "try-on-banner.jpeg",
+    image: "try-on-banner.png",
     includes: [
       "Personal styling consultation with an in-house stylist",
       "Access to a curated selection of ready-to-wear gowns",

@@ -3,6 +3,7 @@ import React from "react";
 import { motion } from "motion/react";
 
 import { Container } from "./container";
+import Image from "next/image";
 
 export const HeroComp: React.FC<{
   title: string;
@@ -13,9 +14,13 @@ export const HeroComp: React.FC<{
   return (
     <div className="bg-foreground relative overflow-hidden py-24">
       {imagePath && (
-        <div
-          className="absolute inset-0 bg-cover bg-center opacity-20"
-          style={{ backgroundImage: `url('/assets/hero/${imagePath}')` }}
+        <Image
+          src={`/assets/hero/${imagePath}`}
+          alt={title}
+          fill
+          priority
+          quality={100}
+          className="absolute inset-0 bg-cover object-cover opacity-20"
         />
       )}
       <Container className="pt-8 md:pt-16" size="sm">

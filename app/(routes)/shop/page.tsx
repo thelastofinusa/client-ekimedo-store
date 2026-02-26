@@ -54,7 +54,7 @@ export default async function ProductsPage() {
       <HeroComp
         title="Pre-Made Dresses"
         description="Explore our curated selection of luxury fashion pieces, each crafted with unparalleled attention to detail."
-        imagePath="shop.avif"
+        imagePath="shop.jpeg"
       />
 
       <div className="py-24 lg:py-32">

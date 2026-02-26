@@ -41,6 +41,7 @@ export default function CustomOrders() {
         description="Bring your dream dress to life. Our bespoke service creates
             one-of-a-kind pieces tailored perfectly to your vision and
             measurements."
+        imagePath="inquiry.jpeg"
       />
       <InquireForm />
     </div>
