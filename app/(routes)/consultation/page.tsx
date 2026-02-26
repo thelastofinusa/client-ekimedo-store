@@ -54,7 +54,7 @@ export default async function ConsultationPage(
             .
           </span>
         }
-        imagePath="consultation.avif"
+        imagePath="consultation.png"
       />
       <Services services={consultationsData} messageType={messageType} />
     </div>
