@@ -1,9 +1,9 @@
 import { Metadata } from "next";
-import { HeroComp } from "./_components/hero.comp";
 
 import { Services } from "./_components/services";
 import { siteConfig } from "@/site.config";
 import { consultationsData } from "@/lib/constants/consultation";
+import { HeroComp } from "@/components/shared/hero";
 
 export const metadata: Metadata = {
   title: "Book a Consultation",
@@ -44,7 +44,18 @@ export default async function ConsultationPage(
 
   return (
     <div className="flex-1 overflow-x-clip">
-      <HeroComp />
+      <HeroComp
+        title="Find Your Perfect Dress"
+        description={
+          <span>
+            The Consultation fee goes toward dress production if you wish to
+            move forward with the process, otherwise The Consultation fee is{" "}
+            <strong className="text-background uppercase">nonrefundable</strong>
+            .
+          </span>
+        }
+        imagePath="consultation.avif"
+      />
       <Services services={consultationsData} messageType={messageType} />
     </div>
   );

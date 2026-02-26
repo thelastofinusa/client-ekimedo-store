@@ -5,7 +5,7 @@ import { buttonVariants } from "@/ui/button";
 import { Container } from "@/components/shared/container";
 import { siteConfig } from "@/site.config";
 
-export const HeritageComp = () => {
+export const DiscoverComp = () => {
   return (
     <div className="bg-background">
       <div className="from-secondary via-secondary/50 bg-linear-to-b to-transparent py-24 lg:py-32">
@@ -46,12 +46,12 @@ export const HeritageComp = () => {
 
             <div className="bg-card relative aspect-4/5 overflow-hidden shadow-xs">
               <Image
-                src="/heritage.avif"
-                alt="Atelier Craftsmanship"
+                src="/assets/home/dedication.jpeg"
+                alt="Dedication"
                 fill
                 priority
                 quality={100}
-                className="object-cover"
+                className="scale-105 object-cover"
               />
             </div>
           </div>

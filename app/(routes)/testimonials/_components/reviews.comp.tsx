@@ -5,17 +5,15 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { Icons } from "hugeicons-proxy";
 
-import { cn, formatSanityDate, getInitials } from "@/lib/utils";
+import { formatSanityDate, getInitials } from "@/lib/utils";
 import { Container } from "@/components/shared/container";
 import { Button } from "@/ui/button";
 import { TESTIMONIAL_QUERYResult } from "@/sanity.types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/ui/avatar";
 
-interface Props {
+export const ReviewsComp: React.FC<{
   testimonials: TESTIMONIAL_QUERYResult;
-}
-
-export const ReviewsComp: React.FC<Props> = ({ testimonials }) => {
+}> = ({ testimonials }) => {
   const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
 
   const allImages = React.useMemo(() => {

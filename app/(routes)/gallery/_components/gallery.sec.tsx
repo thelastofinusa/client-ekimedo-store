@@ -1,17 +1,24 @@
 "use client";
 
 import * as React from "react";
-import { HeroComp } from "./hero.comp";
 import { ShotsComp } from "./shots.comp";
 import { useRouter, useSearchParams } from "next/navigation";
+
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/ui/select";
+import { HeroComp } from "@/components/shared/hero";
 import { CATEGORIES_QUERYResult, GALLERY_QUERYResult } from "@/sanity.types";
 
-interface Props {
+export const GallerySection: React.FC<{
   gallery: GALLERY_QUERYResult;
   category: CATEGORIES_QUERYResult;
-}
-
-export const GallerySection: React.FC<Props> = ({ gallery, category }) => {
+}> = ({ gallery, category }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -56,18 +63,38 @@ export const GallerySection: React.FC<Props> = ({ gallery, category }) => {
     [gallery, activeCategory],
   );
 
-  const heroCompProps = React.useMemo(
-    () => ({
-      categories,
-      activeCategory,
-      setActiveCategory,
-    }),
-    [activeCategory, categories, setActiveCategory],
-  );
-
   return (
     <React.Fragment>
-      <HeroComp {...heroCompProps} />
+      <HeroComp
+        title="Our Gallery"
+        comp={
+          <div className="grid w-full max-w-sm grid-cols-1 gap-6">
+            <div className="flex flex-col gap-2">
+              <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">
+                Occasion
+              </span>
+
+              <Select
+                value={activeCategory}
+                onValueChange={(e) => setActiveCategory(e)}
+              >
+                <SelectTrigger className="w-full bg-transparent">
+                  <SelectValue placeholder="Select a category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {categories.map((year) => (
+                      <SelectItem key={year._id} value={year.slug!}>
+                        {year.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        }
+      />
       <ShotsComp shots={filteredItems} />
     </React.Fragment>
   );

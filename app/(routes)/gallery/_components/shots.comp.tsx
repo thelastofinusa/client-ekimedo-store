@@ -7,13 +7,10 @@ import { Container } from "@/components/shared/container";
 import { Icons } from "hugeicons-proxy";
 import { Button } from "@/ui/button";
 import { GALLERY_QUERYResult } from "@/sanity.types";
-import { formatSanityDate } from "@/lib/utils";
 
-interface Props {
-  shots: GALLERY_QUERYResult;
-}
-
-export const ShotsComp: React.FC<Props> = ({ shots }) => {
+export const ShotsComp: React.FC<{ shots: GALLERY_QUERYResult }> = ({
+  shots,
+}) => {
   const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
 
   const handlePrevious = React.useCallback(

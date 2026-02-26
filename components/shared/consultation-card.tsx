@@ -1,4 +1,4 @@
-import { consultationsData } from "@/lib/constants/consultation";
+import { ConsultationDataType } from "@/lib/constants/consultation";
 import { formatDuration, formatPrice } from "@/lib/utils";
 import { buttonVariants } from "@/ui/button";
 import { ArrowUpRight } from "lucide-react";
@@ -6,16 +6,14 @@ import Image from "next/image";
 import Link from "next/link";
 import React from "react";
 
-interface Props {
-  data: (typeof consultationsData)[number];
-}
-
-export const ConsultationCard: React.FC<Props> = ({ data }) => {
+export const ConsultationCard: React.FC<{
+  data: ConsultationDataType[number];
+}> = ({ data }) => {
   return (
     <div className="flex flex-col items-center justify-start gap-4 md:gap-6 lg:flex-row lg:gap-8 lg:even:flex-row-reverse xl:gap-10">
       <div className="bg-secondary relative aspect-[1.3] w-full flex-1 shadow-xs">
         <Image
-          src={data.image || "/placeholder.svg"}
+          src={data.image ? `/assets/hero/${data.image}` : "/placeholder.svg"}
           alt={data.title || "Service title"}
           fill
           priority
@@ -25,10 +23,16 @@ export const ConsultationCard: React.FC<Props> = ({ data }) => {
       </div>
 
       <div className="flex flex-1 flex-col gap-4 md:gap-6">
-        <p className="text-muted-foreground flex items-center gap-2 font-mono text-sm sm:text-base">
+        <p className="text-primary flex items-center gap-2 text-sm font-medium tracking-wider uppercase">
           <span>{formatDuration(data.duration)}</span>
           <span>•</span>
           <span>{formatPrice(data.price)}</span>
+          {"dresses" in data && data.dresses && (
+            <>
+              <span>•</span>
+              <span>For {data.dresses} Dresses</span>
+            </>
+          )}
         </p>
 
         <div className="flex flex-col gap-2 md:gap-3">
@@ -42,7 +46,9 @@ export const ConsultationCard: React.FC<Props> = ({ data }) => {
 
         {data?.includes && data.includes.length > 0 && (
           <div className="flex flex-col gap-3">
-            <p className="font-serif text-sm">What&apos;s Included:</p>
+            <p className="text-primary text-sm font-medium tracking-wider uppercase">
+              What&apos;s Included:
+            </p>
 
             <ul className="flex flex-col gap-2">
               {data.includes.map((item, i) => (
@@ -61,6 +67,7 @@ export const ConsultationCard: React.FC<Props> = ({ data }) => {
         <Link
           href={`/consultation/${data.slug}`}
           className={buttonVariants({
+            variant: "primary",
             size: "lg",
             className: "mt-4 w-max",
           })}

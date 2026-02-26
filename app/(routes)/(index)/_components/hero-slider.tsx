@@ -11,7 +11,7 @@ import { buttonVariants } from "@/ui/button";
 import { Icons } from "hugeicons-proxy";
 import { Container } from "@/components/shared/container";
 
-export const HeroSlider = ({ images }: { images: string[] }) => {
+export const HeroSlider: React.FC<{ images: string[] }> = ({ images }) => {
   const [index, setIndex] = React.useState<number>(0);
 
   React.useEffect(() => {
@@ -110,7 +110,7 @@ export const HeroSlider = ({ images }: { images: string[] }) => {
               </Link>
             </div>
             <Link
-              href={"/custom-order" as Route}
+              href={"/inquiry" as Route}
               className={buttonVariants({
                 variant: "outline",
                 size: "xl",

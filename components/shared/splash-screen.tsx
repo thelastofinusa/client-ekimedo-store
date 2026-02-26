@@ -5,7 +5,7 @@ export const SplashScreen = () => {
   return (
     <div className="bg-foreground pointer-events-none fixed top-0 left-0 z-9999 flex h-screen w-screen items-center justify-center">
       <Image
-        src="/logo/logo-vertical-bone.svg"
+        src="/assets/logo/vertical-bone.svg"
         alt={siteConfig.title}
         width={100}
         height={100}

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import "./globals.css";
+import "@/styles/globals.css";
 import { fontVariables } from "@/fonts";
 import { siteConfig } from "@/site.config";
 
@@ -36,11 +36,11 @@ export const metadata: Metadata = {
   },
   icons: [
     {
-      url: "/logo/logo-charcoal.svg",
+      url: "/assets/logo/charcoal.svg",
       media: "(prefers-color-scheme: light)",
     },
     {
-      url: "/logo/logo-bone.svg",
+      url: "/assets/logo/bone.svg",
       media: "(prefers-color-scheme: dark)",
     },
   ],

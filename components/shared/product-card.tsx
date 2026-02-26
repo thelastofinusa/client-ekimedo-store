@@ -7,11 +7,9 @@ import { formatPrice } from "@/lib/utils";
 import { StockBadge } from "./stock-badge";
 import { PRODUCT_QUERYResult } from "@/sanity.types";
 
-interface Props {
+export const ProductCard: React.FC<{
   product: PRODUCT_QUERYResult[number];
-}
-
-export const ProductCard: React.FC<Props> = ({ product }) => {
+}> = ({ product }) => {
   const stock = product.stock ?? 0;
   const isOutOfStock = stock <= 0;
 

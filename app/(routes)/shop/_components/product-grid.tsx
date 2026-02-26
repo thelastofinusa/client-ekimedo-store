@@ -21,11 +21,9 @@ import {
   PaginationPrevious,
 } from "@/ui/pagination";
 
-interface Props {
-  products: PRODUCT_QUERYResult;
-}
-
-export const ProductGrid: React.FC<Props> = ({ products }) => {
+export const ProductGrid: React.FC<{ products: PRODUCT_QUERYResult }> = ({
+  products,
+}) => {
   const searchParams = useSearchParams();
 
   const currentPage = Number(searchParams.get("page")) || 1;

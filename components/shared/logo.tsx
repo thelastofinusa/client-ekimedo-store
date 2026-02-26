@@ -8,7 +8,12 @@ import { siteConfig } from "@/site.config";
 type LogoVariant = "horizontal" | "wordmark" | "vertical";
 type LogoColor = "charcoal" | "bone";
 
-interface LogoProps {
+const getLogoSrc = (variant: LogoVariant | undefined, color: LogoColor) =>
+  variant
+    ? `/assets/logo/${variant}-${color}.svg`
+    : `/assets/logo/${color}.svg`;
+
+export const Logo: React.FC<{
   className?: string;
   href?: string;
   srcDesktop?: LogoVariant;
@@ -16,12 +21,7 @@ interface LogoProps {
   color?: LogoColor;
   desktopSize?: [number, number];
   mobileSize?: [number, number];
-}
-
-const getLogoSrc = (variant: LogoVariant | undefined, color: LogoColor) =>
-  variant ? `/logo/logo-${variant}-${color}.svg` : `/logo/logo-${color}.svg`;
-
-export const Logo: React.FC<LogoProps> = ({
+}> = ({
   color = "charcoal",
   desktopSize = [120, 42],
   mobileSize = [40, 40],

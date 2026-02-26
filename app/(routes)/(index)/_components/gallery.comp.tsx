@@ -1,13 +1,14 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import { cn } from "@/lib/utils";
+import { clientOptions, cn } from "@/lib/utils";
 import { buttonVariants } from "@/ui/button";
 import { Container } from "@/components/shared/container";
-import { GALLERY_ITEMS } from "@/lib/constants/filters";
+import { GALLERY_QUERY } from "@/sanity/queries/gallery";
+import { client } from "@/sanity/lib/client";
 
-export const LookBookComp = () => {
-  const looks = GALLERY_ITEMS.map((item) => item.image);
+export const GalleryComp = async () => {
+  const gallery = await client.fetch(GALLERY_QUERY, {}, clientOptions);
 
   return (
     <div className="bg-background">
@@ -35,27 +36,24 @@ export const LookBookComp = () => {
 
         <Container>
           <div className="flex gap-4">
-            {looks
-              .slice(0, 5)
-              .reverse()
-              .map((url, idx) => (
-                <div
-                  key={idx}
-                  className={cn("relative shrink-0 shadow-xs", {
-                    "aspect-3/4 w-[40vw] md:w-[25vw]": idx % 2 === 0,
-                    "mt-10 aspect-4/5 w-[30vw] md:w-[20vw]": idx % 2 !== 0,
-                  })}
-                >
-                  <Image
-                    src={url}
-                    alt={`Look ${idx + 1}`}
-                    fill
-                    loading="lazy"
-                    quality={100}
-                    className="object-cover transition-all duration-700"
-                  />
-                </div>
-              ))}
+            {gallery.slice(0, 5).map((item, idx) => (
+              <div
+                key={item._id}
+                className={cn("relative shrink-0 shadow-xs", {
+                  "aspect-3/4 w-[40vw] md:w-[25vw]": idx % 2 === 0,
+                  "mt-10 aspect-4/5 w-[30vw] md:w-[20vw]": idx % 2 !== 0,
+                })}
+              >
+                <Image
+                  src={item.image as string}
+                  alt={`Look ${idx + 1}`}
+                  fill
+                  loading="lazy"
+                  quality={100}
+                  className="object-cover transition-all duration-700"
+                />
+              </div>
+            ))}
           </div>
         </Container>
       </div>

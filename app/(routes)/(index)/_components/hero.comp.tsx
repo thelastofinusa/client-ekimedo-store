@@ -10,7 +10,7 @@ export const HeroComp = async () => {
   const heroImages =
     images && images.length > 0
       ? images.map((img) => img.image).filter(Boolean)
-      : ["/hero.avif"];
+      : ["/og.png"];
 
   return <HeroSlider images={heroImages as string[]} />;
 };

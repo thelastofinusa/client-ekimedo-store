@@ -25,7 +25,7 @@ export const headerRoutes: HeaderRoute[] = [
   },
   {
     label: "Inquiry",
-    path: "/custom-order",
+    path: "/inquiry",
   },
   {
     label: "Book Consultation",

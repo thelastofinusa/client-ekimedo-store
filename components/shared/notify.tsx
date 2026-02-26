@@ -2,13 +2,9 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Icons } from "hugeicons-proxy";
 
-interface CompProps {
-  type: "success" | "info" | "warning" | "error" | "loading";
-  title?: string;
-  description?: string;
-}
+type ToastType = "success" | "info" | "warning" | "error" | "loading";
 
-export const renderToastIcon = (props: CompProps["type"]) => {
+export const renderToastIcon = (props: ToastType) => {
   switch (props) {
     case "success":
       return <Icons.CheckmarkSquare03Icon className="size-4.5" />;
@@ -25,30 +21,33 @@ export const renderToastIcon = (props: CompProps["type"]) => {
   }
 };
 
-export const Notify: React.FC<CompProps> = (props) => {
-  const colorMap: Record<CompProps["type"], { wrapper: string; icon: string }> =
-    {
-      success: {
-        icon: "text-green-600",
-        wrapper: "text-green-600 bg-green-600/10 border-green-600/50",
-      },
-      info: {
-        icon: "text-blue-600",
-        wrapper: "text-blue-600 bg-blue-600/10 border-blue-600/50",
-      },
-      warning: {
-        icon: "text-yellow-600",
-        wrapper: "text-yellow-600 bg-yellow-600/10 border-yellow-600/50",
-      },
-      error: {
-        icon: "text-red-600",
-        wrapper: "text-red-600 bg-red-600/10 border-red-600/50",
-      },
-      loading: {
-        icon: "text-foreground",
-        wrapper: "bg-card",
-      },
-    };
+export const Notify: React.FC<{
+  type: ToastType;
+  title?: string;
+  description?: string;
+}> = (props) => {
+  const colorMap: Record<ToastType, { wrapper: string; icon: string }> = {
+    success: {
+      icon: "text-green-600",
+      wrapper: "text-green-600 bg-green-600/10 border-green-600/50",
+    },
+    info: {
+      icon: "text-blue-600",
+      wrapper: "text-blue-600 bg-blue-600/10 border-blue-600/50",
+    },
+    warning: {
+      icon: "text-yellow-600",
+      wrapper: "text-yellow-600 bg-yellow-600/10 border-yellow-600/50",
+    },
+    error: {
+      icon: "text-red-600",
+      wrapper: "text-red-600 bg-red-600/10 border-red-600/50",
+    },
+    loading: {
+      icon: "text-foreground",
+      wrapper: "bg-card",
+    },
+  };
 
   return (
     <div className="bg-card w-[360px]">

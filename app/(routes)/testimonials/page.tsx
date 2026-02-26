@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 
-import { HeroComp } from "./_components/hero.comp";
-import { ReviewsComp } from "./_components/reviews.comp";
-import { TESTIMONIAL_QUERY } from "@/sanity/queries/testimonial";
-import { currentUser } from "@clerk/nextjs/server";
-import { Container } from "@/components/shared/container";
-import { TestimonialSheet } from "@/components/sheets/testimonial.sheet";
-import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 import { siteConfig } from "@/site.config";
-import { client } from "@/sanity/lib/client";
 import { clientOptions } from "@/lib/utils";
+import { client } from "@/sanity/lib/client";
+import { currentUser } from "@clerk/nextjs/server";
+import { HeroComp } from "@/components/shared/hero";
+import { ReviewsComp } from "./_components/reviews.comp";
+import { Container } from "@/components/shared/container";
+import { CATEGORIES_QUERY } from "@/sanity/queries/category";
+import { TESTIMONIAL_QUERY } from "@/sanity/queries/testimonial";
+import { TestimonialSheet } from "@/components/sheets/testimonial.sheet";
 
 export const metadata: Metadata = {
   title: "Testimonials",
@@ -44,7 +44,16 @@ export default async function TestimonialsPage() {
 
   return (
     <div className="flex-1 overflow-x-clip">
-      <HeroComp />
+      <HeroComp
+        title="Stories of Transformation"
+        description={
+          <span>
+            &quot;Real experiences from individuals who trusted{" "}
+            {siteConfig.title} with their most cherished moments. Discover the
+            elegance and craftsmanship that defines our Maison.&quot;
+          </span>
+        }
+      />
 
       <ReviewsComp testimonials={testimonials} />
 
