@@ -4,15 +4,13 @@ import React, { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 import { Container } from "@/components/shared/container";
-import { consultationsData } from "@/lib/constants/consultation";
+import { ConsultationDataType } from "@/lib/constants/consultation";
 import { ConsultationCard } from "@/components/shared/consultation-card";
 
-interface Props {
-  services: typeof consultationsData;
+export const Services: React.FC<{
+  services: ConsultationDataType;
   messageType?: "success" | "canceled" | null;
-}
-
-export const Services: React.FC<Props> = ({ services, messageType }) => {
+}> = ({ services, messageType }) => {
   const router = useRouter();
 
   useEffect(() => {

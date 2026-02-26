@@ -9,6 +9,7 @@ const siteConfig = {
     fullName: "Eki Ajibade",
     fName: "Eki",
     lName: "Ajibade",
+    nickname: "Ekimedo",
   },
   url:
     process.env.NODE_ENV === "production"

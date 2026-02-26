@@ -10,10 +10,7 @@ export const inquireFormSchema = z.object({
     .email("Please enter a valid email address")
     .trim()
     .max(255, "Email must be less than 255 characters"),
-  phone: z
-    .string()
-    .trim()
-    .min(10, "Phone number must be at least 10 digits"),
+  phone: z.string().trim().min(10, "Phone number must be at least 10 digits"),
   eventType: z.string().min(1, "Please select an event type"),
   eventDate: z.date(),
   budget: z.string().min(1, "Please select an estimated budget"),

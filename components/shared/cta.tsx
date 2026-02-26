@@ -6,7 +6,7 @@ import { Container } from "./container";
 import { buttonVariants } from "@/ui/button";
 import { cn } from "@/lib/utils";
 
-interface Props {
+export const CTA: React.FC<{
   mode: "dark" | "light";
   title: string;
   description?: string;
@@ -14,9 +14,7 @@ interface Props {
     txt: string;
     path: Route;
   };
-}
-
-export const CTA: React.FC<Props> = ({ mode, title, description, route }) => {
+}> = ({ mode, title, description, route }) => {
   return (
     <div
       className={cn(

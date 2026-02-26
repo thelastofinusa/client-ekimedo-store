@@ -57,15 +57,10 @@ export const contactFormSchema = z.object({
 
 export type ContactFormSchemaType = z.infer<typeof contactFormSchema>;
 
-interface Props {
+export const ContactFormComp: React.FC<{
   categories: CATEGORIES_QUERYResult;
   socialHandles: SOCIAL_QUERYResult;
-}
-
-export const ContactFormComp: React.FC<Props> = ({
-  categories,
-  socialHandles,
-}) => {
+}> = ({ categories, socialHandles }) => {
   const [isSubmitting, setIsSubmitting] = React.useState<boolean>(false);
 
   const form = useForm<ContactFormSchemaType>({

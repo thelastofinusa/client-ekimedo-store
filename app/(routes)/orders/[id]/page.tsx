@@ -14,11 +14,9 @@ export const metadata = {
   description: "View your order details",
 };
 
-interface OrderPageProps {
-  params: Promise<{ id: string }>;
-}
-
-export default async function OrderDetailPage({ params }: OrderPageProps) {
+export default async function OrderDetailPage({
+  params,
+}: PageProps<"/orders/[id]">) {
   const { id } = await params;
   const { userId } = await auth();
 

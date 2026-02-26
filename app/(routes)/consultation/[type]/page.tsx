@@ -2,9 +2,9 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { siteConfig } from "@/site.config";
-import { HeroComp } from "./_components/hero.comp";
-import { consultationsData } from "@/lib/constants/consultation";
+import { HeroComp } from "@/components/shared/hero";
 import { BookingForm } from "./_components/booking-form";
+import { consultationsData } from "@/lib/constants/consultation";
 
 export async function generateMetadata(
   props: PageProps<"/consultation/[type]">,
@@ -57,7 +57,7 @@ export default async function ConsultationDetailsPage(
   return (
     <div className="flex-1 overflow-x-clip">
       <HeroComp
-        image={config.image}
+        imagePath={config.image}
         title={config.title}
         description={config.description}
       />

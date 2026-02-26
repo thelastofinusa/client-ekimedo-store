@@ -444,6 +444,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
             items={emailItems}
             siteUrl={siteConfig.url}
             socialLinks={socialHandles || []}
+            orderId={order._id}
           />,
         );
 
@@ -618,6 +619,7 @@ async function handlePaymentIntentSucceeded(
           items={emailItems}
           siteUrl={siteConfig.url}
           socialLinks={socialHandles || []}
+          orderId={order._id}
         />,
       );
 

@@ -1,6 +1,6 @@
 /**
- * Shared Email Design System - Luxury Editorial Version
- * Focus: High-end boutique aesthetic, generous whitespace, refined typography.
+ *? Shared Email Design System - Luxury Editorial Version
+ *? Focus: High-end boutique aesthetic, generous whitespace, refined typography.
  */
 
 export const main = {
@@ -21,6 +21,10 @@ export const header = {
 
 export const logo = {
   margin: "0",
+};
+
+export const logoSvg = {
+  fill: "#1e1e1e",
 };
 
 export const content = {

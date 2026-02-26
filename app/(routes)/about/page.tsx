@@ -51,12 +51,13 @@ export default function About() {
             <div className="space-y-12 lg:col-span-5">
               <div className="bg-secondary relative aspect-4/5 overflow-hidden shadow-xs">
                 <Image
-                  src="https://images.unsplash.com/photo-1548313093-370cf4ba3892?q=80&w=1364&auto=format&fit=crop"
-                  alt="Atelier detail"
-                  fill
+                  src="/assets/about/01.jpeg"
+                  alt={siteConfig.author.fullName}
+                  height={0}
+                  width={980}
                   priority
                   quality={100}
-                  className="origin-bottom object-cover grayscale transition-transform duration-700 hover:scale-105"
+                  className="h-auto origin-top-right object-cover transition-transform duration-1000 hover:scale-110"
                 />
               </div>
               <p className="max-w-md font-serif text-xl leading-relaxed md:text-2xl">
@@ -84,12 +85,12 @@ export default function About() {
               </div>
               <div className="bg-secondary relative h-[400px] overflow-hidden shadow-xs md:h-[600px]">
                 <Image
-                  src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?q=80&w=2000&auto=format&fit=crop"
+                  src="/assets/about/02.jpeg"
                   alt="Craftsmanship"
                   fill
                   priority
                   quality={100}
-                  className="origin-bottom-right object-cover brightness-90 transition-transform duration-700 hover:scale-105"
+                  className="origin-bottom-right object-cover transition-transform duration-1000 hover:scale-105"
                 />
               </div>
             </div>
@@ -123,8 +124,7 @@ export default function About() {
         <Container>
           <div className="flex flex-col gap-8 md:gap-12">
             <Image
-              className="rounded-(--radius) grayscale"
-              src="https://images.unsplash.com/photo-1530099486328-e021101a494a?q=80&w=2747&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+              src="/assets/about/03.jpeg"
               alt="team image"
               height={960}
               width={1420}

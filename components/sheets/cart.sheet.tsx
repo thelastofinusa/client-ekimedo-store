@@ -30,17 +30,11 @@ import { Alert, AlertTitle, AlertDescription } from "@/ui/alert";
 import { StockBadge } from "../shared/stock-badge";
 import { Badge } from "@/ui/badge";
 
-interface Props {
+export const CartSheet: React.FC<{
   children: React.ReactNode;
   openCart: boolean;
   setOpenCart: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-export const CartSheet: React.FC<Props> = ({
-  children,
-  openCart,
-  setOpenCart,
-}) => {
+}> = ({ children, openCart, setOpenCart }) => {
   const items = useCartItems();
   const totalItems = useTotalItems();
   const totalPrice = useTotalPrice();

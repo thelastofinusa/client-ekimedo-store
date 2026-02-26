@@ -4,11 +4,9 @@ import { motion, AnimatePresence } from "motion/react";
 import { ProductCard } from "@/components/shared/product-card";
 import { PRODUCT_QUERYResult } from "@/sanity.types";
 
-interface Props {
-  products: PRODUCT_QUERYResult;
-}
-
-export const Recommended: React.FC<Props> = ({ products }) => {
+export const Recommended: React.FC<{ products: PRODUCT_QUERYResult }> = ({
+  products,
+}) => {
   return (
     <motion.div
       layout

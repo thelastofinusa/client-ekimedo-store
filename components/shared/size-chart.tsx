@@ -14,11 +14,7 @@ import { cn } from "@/lib/utils";
 import { Icons } from "hugeicons-proxy";
 import { sizeChart } from "@/lib/constants/consultation";
 
-interface Props {
-  className?: string;
-}
-
-export const SizeChart: React.FC<Props> = ({ className }) => {
+export const SizeChart: React.FC<{ className?: string }> = ({ className }) => {
   return (
     <Dialog>
       <DialogTrigger asChild>

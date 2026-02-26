@@ -1,8 +1,8 @@
 import React from "react";
-import { HeroComp } from "./_components/hero.comp";
 import { InquireForm } from "./_components/inquire-form";
 import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
+import { HeroComp } from "@/components/shared/hero";
 
 export const metadata: Metadata = {
   title: "Make An Inquiry",
@@ -36,7 +36,12 @@ export const metadata: Metadata = {
 export default function CustomOrders() {
   return (
     <div className="flex-1 overflow-x-clip">
-      <HeroComp />
+      <HeroComp
+        title="Make An Inquiry"
+        description="Bring your dream dress to life. Our bespoke service creates
+            one-of-a-kind pieces tailored perfectly to your vision and
+            measurements."
+      />
       <InquireForm />
     </div>
   );

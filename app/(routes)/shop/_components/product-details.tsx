@@ -18,11 +18,9 @@ import { cn, formatPrice } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/ui/tooltip";
 import { SizeChart } from "@/components/shared/size-chart";
 
-interface Props {
+export const ProductDetails: React.FC<{
   product: PRODUCT_QUERYResult[number];
-}
-
-export const ProductDetails: React.FC<Props> = ({ product }) => {
+}> = ({ product }) => {
   const { addItem } = useCartActions();
   const quantityInCart = useProductTotalQuantity(product._id);
 

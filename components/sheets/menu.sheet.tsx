@@ -17,55 +17,33 @@ import { Route } from "next";
 import { useUser } from "@clerk/nextjs";
 import { env } from "@/lib/env";
 
-interface Props {
+export const MenuSheet: React.FC<{
   children: React.ReactNode;
   openMenu: boolean;
   setOpenMenu: React.Dispatch<React.SetStateAction<boolean>>;
-}
-
-type SubRoute = {
-  label: string;
-  path: string;
-};
-
-type RouteItem =
-  | {
-      label: string;
-      path: string;
-      subroutes?: never;
-    }
-  | {
-      label: string;
-      subroutes: SubRoute[];
-      path?: never;
-    };
-
-export const MenuSheet: React.FC<Props> = ({
-  children,
-  openMenu,
-  setOpenMenu,
-}) => {
+}> = ({ children, openMenu, setOpenMenu }) => {
   const { user } = useUser();
   const isAdmin =
     user?.primaryEmailAddress?.emailAddress ===
     env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
 
-  const flattenedRoutes: SubRoute[] = headerRoutes.flatMap((route) => {
-    if ("subroutes" in route && route.subroutes) {
-      return route.subroutes;
-    }
+  const flattenedRoutes: { label: string; path: string }[] =
+    headerRoutes.flatMap((route) => {
+      if ("subroutes" in route && route.subroutes) {
+        return route.subroutes;
+      }
 
-    if ("path" in route && route.path) {
-      return [
-        {
-          label: route.label,
-          path: route.path,
-        },
-      ];
-    }
+      if ("path" in route && route.path) {
+        return [
+          {
+            label: route.label,
+            path: route.path,
+          },
+        ];
+      }
 
-    return [];
-  });
+      return [];
+    });
 
   return (
     <Sheet open={openMenu} onOpenChange={setOpenMenu}>

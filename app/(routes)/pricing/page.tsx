@@ -1,7 +1,5 @@
-import React from "react";
 import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
-import { HeroComp } from "./_components/hero.comp";
 import { Container } from "@/components/shared/container";
 import { Card } from "@/ui/card";
 import { Icons } from "hugeicons-proxy";
@@ -10,6 +8,7 @@ import Link from "next/link";
 import { buttonVariants } from "@/ui/button";
 import { PRICING_TIERS_QUERY } from "@/sanity/queries/pricing";
 import { client } from "@/sanity/lib/client";
+import { HeroComp } from "@/components/shared/hero";
 
 export const metadata: Metadata = {
   title: "Pricing",
@@ -49,7 +48,13 @@ export default async function PricingPage() {
 
   return (
     <div className="flex-1 overflow-x-clip">
-      <HeroComp />
+      <HeroComp
+        title="Couture Pricing"
+        description="Because every gown is custom-designed, final pricing depends on your
+            selected style, fabric, detailing and production timeline. Below are
+            starting ranges to help you plan."
+        imagePath="pricing.avif"
+      />
 
       {/* Main Pricing Section */}
       <section className="bg-secondary/30 py-24">

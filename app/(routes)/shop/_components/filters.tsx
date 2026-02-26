@@ -22,13 +22,11 @@ import { cn, formatPrice } from "@/lib/utils";
 import { Slider } from "@/ui/slider";
 import { sizeFilters } from "@/lib/constants/consultation";
 
-interface Props {
+export const Filters: React.FC<{
   categories: CATEGORIES_QUERYResult;
   colors: PRODUCT_COLOR_QUERYResult;
   products: PRODUCT_QUERYResult;
-}
-
-export const Filters: React.FC<Props> = ({ categories, colors, products }) => {
+}> = ({ categories, colors, products }) => {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();

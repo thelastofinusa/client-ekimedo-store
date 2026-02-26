@@ -31,7 +31,55 @@ export const sizeFilters = [
   { name: "16-18 (XL)", value: "16-18 (XL)" },
 ];
 
-export const consultationsData = [
+export type ConsultationDataType = Array<{
+  title: string;
+  slug: string;
+  description: string;
+  duration: number;
+  price: number;
+  dresses?: number;
+  image: string;
+  includes?: Array<string>;
+  formCards: Array<{
+    id: string;
+    title: string;
+    info?: string;
+    description: string;
+    fields: Array<{
+      name: string;
+      type: string;
+      label: string;
+      placeholder?: string;
+      description?: string | { path: string; value: string; newTab?: boolean };
+      required?: boolean;
+      items?: {
+        id: string;
+        title: string;
+        description: string;
+        range: {
+          from: number;
+          to?: number;
+        };
+      }[];
+      errMsg?: string;
+      group?: string;
+      min?: number;
+      max?: number;
+      size?: number;
+      sizes?: unknown[];
+      icons?: {
+        start: {
+          icon: string;
+        };
+        end?: { value?: string };
+      };
+      defaultValue?: string | number;
+      options?: unknown[];
+    }>;
+  }>;
+}>;
+
+export const consultationsData: ConsultationDataType = [
   {
     title: "Bridal Consultation",
     slug: "bridal",
@@ -39,7 +87,7 @@ export const consultationsData = [
       "Work with our design team to create your perfect custom bridal gown. Includes 3 design consultations, fabric selection, and unlimited alterations.",
     duration: 60,
     price: 250,
-    image: "/collections/bridal.avif",
+    image: "bridal-banner.jpeg",
     includes: [
       "3 design consultations",
       "Fabric & embellishment selection",
@@ -297,7 +345,7 @@ export const consultationsData = [
       "Perfect for galas, birthdays, dinners, and red-carpet moments. Create a refined or statement look tailored to your occasion.",
     duration: 30,
     price: 150,
-    image: "/collections/special-events.avif",
+    image: "special-events-banner.jpeg",
     includes: [
       "Personal styling consultation",
       "Occasion-based design guidance",
@@ -473,7 +521,7 @@ export const consultationsData = [
       "Design a standout prom dress tailored to your style, body type, and event theme. Perfect for making a bold statement.",
     duration: 30,
     price: 150,
-    image: "/collections/prom.avif",
+    image: "prom-banner.jpeg",
     includes: [
       "1-on-1 styling consultation",
       "Custom design discussion",
@@ -634,11 +682,11 @@ export const consultationsData = [
                   from: 3000,
                   to: 6000,
                 },
-                images: [
-                  "/collections/bridal.avif",
-                  "/collections/prom.avif",
-                  "/collections/special-events.avif",
-                ],
+                // images: [
+                //   "/collections/bridal.avif",
+                //   "/collections/prom.avif",
+                //   "/collections/special-events.avif",
+                // ],
               },
               {
                 id: "bespoke",
@@ -700,14 +748,14 @@ export const consultationsData = [
     ],
   },
   {
-    title: "Pre-made Dresses Try On",
+    title: "Pre-made Dresses",
     slug: "try-on",
     description:
       "Visit our atelier to try on our curated selection of ready-to-wear gowns. Our stylists will help you find the perfect fit for your special occasion.",
     duration: 60,
     dresses: 3,
     price: 100,
-    image: "/collections/pre-made-dresses.avif",
+    image: "try-on-banner.jpeg",
     includes: [
       "Personal styling consultation with an in-house stylist",
       "Access to a curated selection of ready-to-wear gowns",
@@ -804,7 +852,7 @@ export const consultationsData = [
       },
     ],
   },
-] as const;
+];
 
 export const sizeChart = [
   {

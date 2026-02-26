@@ -1,5 +1,4 @@
 export const CART_STORAGE_KEY: string = "cart.storage";
-export const START_YEAR_KEY: number = 2020;
 
 /**
  * Stock threshold for "low stock" warnings

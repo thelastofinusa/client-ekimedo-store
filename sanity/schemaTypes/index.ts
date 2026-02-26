@@ -11,7 +11,6 @@ import { businessHoursType } from "./schemas/hours.schema";
 import { heroType } from "./schemas/hero.schema";
 import { socialType } from "./schemas/social.schema";
 import { inquiryType } from "./schemas/inquiry.schema";
-import { formFieldType } from "./schemas/form-field.schema";
 import { faqType } from "./schemas/faq.schema";
 import { pricingTierType } from "./schemas/pricing.schema";
 
@@ -29,7 +28,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     heroType,
     socialType,
     inquiryType,
-    formFieldType,
     faqType,
     pricingTierType,
   ],

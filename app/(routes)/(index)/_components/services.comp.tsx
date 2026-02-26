@@ -24,19 +24,30 @@ export const ServicesComp = async () => {
                   priority
                   quality={100}
                   alt={service.title ?? "Service title"}
-                  src={service.image ?? "/placeholder.svg"}
+                  src={
+                    service.image
+                      ? `/assets/hero/${service.image}`
+                      : "/placeholder.svg"
+                  }
                   className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                 />
                 <div className="from-foreground/80 via-foreground/50 absolute inset-0 bg-linear-to-t to-transparent" />
                 <div className="text-primary-foreground absolute right-0 bottom-0 left-0 p-5 md:p-8">
-                  <p className="luxury-subheading text-primary-foreground/70 mb-2 text-sm sm:text-base">
-                    {formatDuration(service.duration)} •{" "}
-                    {formatPrice(service.price)}
+                  <p className="mb-2 flex items-center gap-2 text-sm font-medium tracking-wider uppercase">
+                    <span>{formatDuration(service.duration)}</span>
+                    <span>•</span>
+                    <span>{formatPrice(service.price)}</span>
+                    {"dresses" in service && service.dresses && (
+                      <>
+                        <span>•</span>
+                        <span>For {service.dresses} Dresses</span>
+                      </>
+                    )}
                   </p>
                   <h3 className="mb-3 font-serif text-2xl md:text-3xl">
                     {service.title}
                   </h3>
-                  <p className="text-primary-foreground/80 mb-4 line-clamp-2 text-sm sm:text-base">
+                  <p className="text-primary-foreground mb-4 line-clamp-2 text-sm sm:text-base">
                     {service.description}
                   </p>
                   <span className="inline-flex items-center gap-2 text-sm font-medium transition-all group-hover:gap-3">
@@ -51,10 +62,10 @@ export const ServicesComp = async () => {
             <Link
               href="/consultation"
               className={buttonVariants({
-                size: "lg",
+                size: "xl",
               })}
             >
-              <span>View All Consultations</span>
+              <span>Explore Consultations</span>
               <ArrowRight className="h-4 w-4" />
             </Link>
           </div>

@@ -47,12 +47,12 @@ const testAddress = {
 const consultationEmails = consultationsData.flatMap((consultation) => {
   // Determine available locations for this consultation type
   const locationField = consultation.formCards
-    .flatMap((card) => card.fields as readonly any[])
+    .flatMap((card) => card.fields)
     .find((field) => field.name === "location");
 
-  const locations = (locationField as any)?.options?.map(
-    (opt: any) => opt.value,
-  ) || ["in-person"];
+  const locations = locationField?.options?.map((opt: any) => opt.value) || [
+    "in-person",
+  ];
 
   return locations.map((loc: string) => {
     const isVirtual = loc === "virtual";

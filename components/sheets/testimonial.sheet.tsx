@@ -45,11 +45,9 @@ import {
 import { Notify } from "../shared/notify";
 import { CATEGORIES_QUERYResult } from "@/sanity.types";
 
-interface Props {
+export const TestimonialSheet: React.FC<{
   categories: CATEGORIES_QUERYResult;
-}
-
-export function TestimonialSheet({ categories }: Props) {
+}> = ({ categories }) => {
   const { isSignedIn } = useUser();
   const [open, setOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -180,9 +178,7 @@ export function TestimonialSheet({ categories }: Props) {
     }
   }
 
-  if (!isSignedIn) {
-    return null;
-  }
+  if (!isSignedIn) return null;
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -358,4 +354,4 @@ export function TestimonialSheet({ categories }: Props) {
       </SheetContent>
     </Sheet>
   );
-}
+};

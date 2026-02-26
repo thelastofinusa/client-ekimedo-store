@@ -5,19 +5,12 @@ import { Badge } from "@/ui/badge";
 import { isLowStock as checkLowStock } from "@/lib/constants/stock";
 import { useCartItem } from "../providers/cart.provider";
 
-interface Props {
+export const StockBadge: React.FC<{
   productId: string;
   stock: number;
   className?: string;
   showRemainingStocks?: boolean;
-}
-
-export const StockBadge: React.FC<Props> = ({
-  productId,
-  stock,
-  className,
-  showRemainingStocks = false,
-}) => {
+}> = ({ productId, stock, className, showRemainingStocks = false }) => {
   const cartItem = useCartItem(productId);
 
   const quantityInCart = cartItem?.quantity ?? 0;

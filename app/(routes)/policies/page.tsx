@@ -1,10 +1,9 @@
 "use client";
 import React from "react";
 import { motion } from "motion/react";
-import { Clock, ShieldAlert, DollarSign, UserCheck } from "lucide-react";
 import { Container } from "@/components/shared/container";
 import { Icons } from "hugeicons-proxy";
-import { Alert, AlertDescription, AlertTitle } from "@/ui/alert";
+import { HeroComp } from "@/components/shared/hero";
 
 const policies = [
   {
@@ -36,25 +35,11 @@ const policies = [
 export default function CancellationPolicy() {
   return (
     <div className="flex-1 overflow-x-clip">
-      <div className="bg-foreground relative overflow-hidden py-24">
-        <div className="absolute inset-0 bg-[url('/consultation.avif')] bg-cover bg-center opacity-20" />
-        <Container className="pt-8 md:pt-16" size="sm">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-            className="relative z-10"
-          >
-            <h1 className="text-background mb-4 max-w-2xl font-serif text-5xl sm:text-6xl md:mb-6">
-              Booking & Cancellation
-            </h1>
-            <p className="text-primary-foreground/60 max-w-[600px]">
-              Transparent terms to ensure a seamless experience from your first
-              consultation to the final fitting of your custom gown.
-            </p>
-          </motion.div>
-        </Container>
-      </div>
+      <HeroComp
+        title="Booking & Cancellation"
+        description="Transparent terms to ensure a seamless experience from your first
+              consultation to the final fitting of your custom gown."
+      />
 
       <div className="py-24 lg:py-32">
         <Container size="xs" className="flex flex-col gap-6">

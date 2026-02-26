@@ -11,6 +11,7 @@ import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
 import { consultationsData } from "@/lib/constants/consultation";
 import { ConsultationCard } from "@/components/shared/consultation-card";
+import { HeroComp } from "@/components/shared/hero";
 
 export const dynamic = "force-dynamic";
 
@@ -50,18 +51,11 @@ export default async function ProductsPage() {
 
   return (
     <div className="flex flex-col">
-      <div className="bg-foreground relative overflow-hidden py-24">
-        <div className="absolute inset-0 bg-[url('/shop.avif')] bg-cover bg-center opacity-20" />
-        <Container className="relative z-10 pt-8 md:pt-16" size="sm">
-          <h1 className="text-background mb-4 font-serif text-5xl leading-[1.2] sm:text-6xl md:mb-6 md:leading-[0.98]">
-            Pre-Made Dresses
-          </h1>
-          <p className="text-primary-foreground/60 max-w-xl">
-            Explore our curated selection of luxury fashion pieces, each crafted
-            with unparalleled attention to detail.
-          </p>
-        </Container>
-      </div>
+      <HeroComp
+        title="Pre-Made Dresses"
+        description="Explore our curated selection of luxury fashion pieces, each crafted with unparalleled attention to detail."
+        imagePath="shop.avif"
+      />
 
       <div className="py-24 lg:py-32">
         <Container className="relative flex flex-col gap-6 md:flex-row md:gap-8">
