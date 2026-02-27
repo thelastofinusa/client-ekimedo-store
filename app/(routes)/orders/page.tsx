@@ -12,20 +12,15 @@ import {
 } from "@/ui/empty";
 import { ORDERS_BY_USER_QUERY } from "@/sanity/queries/orders";
 import { getOrderStatus } from "@/constants/status";
-import {
-  formatPrice,
-  formatDate,
-  formatOrderNumber,
-  clientOptions,
-} from "@/lib/utils";
+import { formatPrice, formatDate, formatOrderNumber } from "@/lib/utils";
 import { Icons } from "hugeicons-proxy";
 import { buttonVariants } from "@/ui/button";
 import Image from "next/image";
 import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
-import { client } from "@/sanity/lib/client";
 import { HeroComp } from "@/components/shared/hero";
 import { Container } from "@/components/shared/container";
+import { sanityFetch } from "@/sanity/lib/live";
 
 export const metadata: Metadata = {
   title: "Your Orders",
@@ -56,11 +51,10 @@ export const metadata: Metadata = {
 export default async function OrdersPage() {
   const { userId } = await auth();
 
-  const orders = await client.fetch(
-    ORDERS_BY_USER_QUERY,
-    { clerkUserId: userId ?? "" },
-    clientOptions,
-  );
+  const { data: orders } = await sanityFetch({
+    query: ORDERS_BY_USER_QUERY,
+    params: { clerkUserId: userId ?? "" },
+  });
 
   if (orders.length === 0) {
     return (
