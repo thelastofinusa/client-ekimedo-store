@@ -770,7 +770,7 @@ export const consultationsData: ConsultationDataType = [
           "We need your contact details to reach you about your consultation",
         info: "Accompanied by an adult 23 years and above",
         fields: [
-          {
+                    {
             name: "fName",
             type: "text",
             label: "First Name",
@@ -778,6 +778,11 @@ export const consultationsData: ConsultationDataType = [
             required: true,
             errMsg: "First name is required",
             group: "first",
+            icons: {
+              start: {
+                icon: "UserIcon",
+              },
+            },
           },
           {
             name: "lName",
@@ -787,6 +792,11 @@ export const consultationsData: ConsultationDataType = [
             required: true,
             errMsg: "Last name is required",
             group: "first",
+            icons: {
+              start: {
+                icon: "UserMultipleIcon",
+              },
+            },
           },
           {
             name: "email",

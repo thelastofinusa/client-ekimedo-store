@@ -8,6 +8,7 @@ import { ORDER_BY_ID_QUERY } from "@/sanity/queries/orders";
 import { getOrderStatus } from "@/constants/status";
 import { formatPrice, formatDate, clientOptions } from "@/lib/utils";
 import { client } from "@/sanity/lib/client";
+import { sanityFetch } from "@/sanity/lib/live";
 
 export const metadata = {
   title: "Order Details | Furniture Shop",
@@ -20,7 +21,10 @@ export default async function OrderDetailPage({
   const { id } = await params;
   const { userId } = await auth();
 
-  const order = await client.fetch(ORDER_BY_ID_QUERY, { id }, clientOptions);
+  const { data: order } = await sanityFetch({
+    query: ORDER_BY_ID_QUERY,
+    params: { id },
+  });
 
   // Verify order exists and belongs to current user
   if (!order || order.clerkUserId !== userId) return notFound();

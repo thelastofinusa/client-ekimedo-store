@@ -41,7 +41,7 @@ interface SocialLink {
   url: string | null;
 }
 
-interface AdminBookingNotificationProps {
+export interface AdminBookingNotificationProps {
   customerName: string;
   serviceTitle: string;
   dateTime: string | Date;

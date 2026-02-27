@@ -78,7 +78,7 @@ export const ProductDetails: React.FC<{
               width={600}
               height={800}
               quality={100}
-              priority
+              priority={false}
               className="h-auto w-full object-contain transition-transform duration-700 hover:scale-[1.02]"
             />
           </div>

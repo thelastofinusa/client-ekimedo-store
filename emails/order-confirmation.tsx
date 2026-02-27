@@ -58,7 +58,7 @@ interface OrderItem {
   imageUrl?: string;
 }
 
-interface OrderConfirmationProps {
+export interface OrderConfirmationProps {
   orderNumber: string;
   customerEmail: string;
   totalAmount: number;
@@ -70,6 +70,7 @@ interface OrderConfirmationProps {
 
 export const OrderConfirmationEmail = ({
   orderNumber,
+  customerEmail,
   totalAmount,
   items,
   siteUrl,

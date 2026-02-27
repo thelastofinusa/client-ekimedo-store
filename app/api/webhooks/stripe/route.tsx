@@ -14,10 +14,22 @@ import { stripe } from "@/lib/stripe";
 import { siteConfig } from "@/site.config";
 import { env } from "@/lib/env";
 
-import { AppointmentConfirmationEmail } from "@/emails/appointment-confirmation";
-import { AdminBookingNotificationEmail } from "@/emails/admin-booking-notification";
-import { OrderConfirmationEmail } from "@/emails/order-confirmation";
-import { AdminOrderNotificationEmail } from "@/emails/admin-order-notification";
+import {
+  AppointmentConfirmationEmail,
+  AppointmentConfirmationProps,
+} from "@/emails/appointment-confirmation";
+import {
+  AdminBookingNotificationEmail,
+  AdminBookingNotificationProps,
+} from "@/emails/admin-booking-notification";
+import {
+  OrderConfirmationEmail,
+  OrderConfirmationProps,
+} from "@/emails/order-confirmation";
+import {
+  AdminOrderNotificationEmail,
+  AdminOrderNotificationProps,
+} from "@/emails/admin-order-notification";
 
 if (!process.env.STRIPE_WEBHOOK_SECRET) {
   throw new Error("STRIPE_WEBHOOK_SECRET is not defined");
@@ -34,6 +46,26 @@ if (!process.env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL) {
 const resend = new Resend(process.env.RESEND_API_KEY);
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 const contactEmail = process.env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
+
+// --- Render Helpers (Safe JSX outside try/catch) ---
+
+async function renderAdminBookingEmail(props: AdminBookingNotificationProps) {
+  return await render(<AdminBookingNotificationEmail {...props} />);
+}
+
+async function renderCustomerBookingEmail(props: AppointmentConfirmationProps) {
+  return await render(<AppointmentConfirmationEmail {...props} />);
+}
+
+async function renderAdminOrderEmail(props: AdminOrderNotificationProps) {
+  return await render(<AdminOrderNotificationEmail {...props} />);
+}
+
+async function renderCustomerOrderEmail(props: OrderConfirmationProps) {
+  return await render(<OrderConfirmationEmail {...props} />);
+}
+
+// --- Webhook Handlers ---
 
 export async function POST(req: Request) {
   const body = await req.text();
@@ -160,22 +192,20 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           "Consultation webhook: NEXT_PUBLIC_RESEND_CONTACT_EMAIL is empty, skipping admin email",
         );
       } else {
-        const adminHtml = await render(
-          <AdminBookingNotificationEmail
-            customerName={customerName}
-            serviceTitle={serviceTitle}
-            dateTime={dateTime}
-            location={(location as "in-person") || "virtual"}
-            bookingId={bookingId}
-            siteUrl={siteConfig.url}
-            socialLinks={socialHandles || []}
-            eventDate={eventDate}
-            budgetType={budgetType}
-            customBudget={customBudget}
-            paymentMethod={paymentMethod}
-            rushOrder={rushOrder}
-          />,
-        );
+        const adminHtml = await renderAdminBookingEmail({
+          customerName,
+          serviceTitle,
+          dateTime,
+          location: (location as "in-person") || "virtual",
+          bookingId,
+          siteUrl: siteConfig.url,
+          socialLinks: socialHandles || [],
+          eventDate,
+          budgetType,
+          customBudget,
+          paymentMethod,
+          rushOrder,
+        });
 
         const { error: adminError } = await resend.emails.send({
           from: `${siteConfig.title} <${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}>`,
@@ -404,18 +434,16 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
 
     // Email to admin/contact
     try {
-      const adminHtml = await render(
-        <AdminOrderNotificationEmail
-          orderNumber={orderNumber}
-          customerEmail={customerEmail || "Unknown"}
-          totalAmount={(session.amount_total ?? 0) / 100}
-          items={emailItems}
-          shippingAddress={address}
-          orderId={order._id}
-          siteUrl={siteConfig.url}
-          socialLinks={socialHandles || []}
-        />,
-      );
+      const adminHtml = await renderAdminOrderEmail({
+        orderNumber,
+        customerEmail: customerEmail || "Unknown",
+        totalAmount: (session.amount_total ?? 0) / 100,
+        items: emailItems,
+        shippingAddress: address,
+        orderId: order._id,
+        siteUrl: siteConfig.url,
+        socialLinks: socialHandles || [],
+      });
 
       await resend.emails.send({
         from: `${siteConfig.title} <${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}>`,
@@ -436,19 +464,17 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         // Add a small delay to avoid Resend rate limits (2 requests per second)
         await new Promise((resolve) => setTimeout(resolve, 1000));
 
-        const customerHtml = await render(
-          <OrderConfirmationEmail
-            orderNumber={orderNumber}
-            customerEmail={customerEmail}
-            totalAmount={(session.amount_total ?? 0) / 100}
-            items={emailItems}
-            siteUrl={siteConfig.url}
-            socialLinks={socialHandles || []}
-            orderId={order._id}
-          />,
-        );
+        const customerHtml = await renderCustomerOrderEmail({
+          orderNumber,
+          customerEmail,
+          totalAmount: (session.amount_total ?? 0) / 100,
+          items: emailItems,
+          siteUrl: siteConfig.url,
+          socialLinks: socialHandles || [],
+          orderId: order._id,
+        });
 
-        await resend.emails.send({
+        const { error: customerError } = await resend.emails.send({
           from: `${siteConfig.title} <${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}>`,
           to: customerEmail,
           replyTo: contactEmail,
@@ -579,18 +605,16 @@ async function handlePaymentIntentSucceeded(
 
   // Email to admin/contact
   try {
-    const adminHtml = await render(
-      <AdminOrderNotificationEmail
-        orderNumber={orderNumber || "Unknown"}
-        customerEmail={customerEmail || "Unknown"}
-        totalAmount={(amountTotal ?? 0) / 100}
-        items={emailItems}
-        shippingAddress={address || undefined}
-        orderId={order._id}
-        siteUrl={siteConfig.url}
-        socialLinks={socialHandles || []}
-      />,
-    );
+    const adminHtml = await renderAdminOrderEmail({
+      orderNumber: orderNumber || "Unknown",
+      customerEmail: customerEmail || "Unknown",
+      totalAmount: (amountTotal ?? 0) / 100,
+      items: emailItems,
+      shippingAddress: address || undefined,
+      orderId: order._id,
+      siteUrl: siteConfig.url,
+      socialLinks: socialHandles || [],
+    });
 
     await resend.emails.send({
       from: `${siteConfig.title} <${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}>`,
@@ -611,17 +635,15 @@ async function handlePaymentIntentSucceeded(
       // Add a small delay to avoid Resend rate limits (2 requests per second)
       await new Promise((resolve) => setTimeout(resolve, 1000));
 
-      const customerHtml = await render(
-        <OrderConfirmationEmail
-          orderNumber={orderNumber || "Unknown"}
-          customerEmail={customerEmail}
-          totalAmount={(amountTotal ?? 0) / 100}
-          items={emailItems}
-          siteUrl={siteConfig.url}
-          socialLinks={socialHandles || []}
-          orderId={order._id}
-        />,
-      );
+      const customerHtml = await renderCustomerOrderEmail({
+        orderNumber: orderNumber || "Unknown",
+        customerEmail,
+        totalAmount: (amountTotal ?? 0) / 100,
+        items: emailItems,
+        siteUrl: siteConfig.url,
+        socialLinks: socialHandles || [],
+        orderId: order._id,
+      });
 
       await resend.emails.send({
         from: `${siteConfig.title} <${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}>`,

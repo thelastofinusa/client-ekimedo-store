@@ -212,7 +212,7 @@ export const Filters: React.FC<{
                       {isSelected && <span>✓</span>}
                       <div className="flex items-center gap-2">
                         <span
-                          className="mt-px size-2.5 rounded-full"
+                          className="mt-px size-3 rounded-full border"
                           style={{ backgroundColor: color.hex as string }}
                         />
                         <span className={cn(isSelected && "font-medium")}>

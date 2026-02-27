@@ -89,7 +89,7 @@ export default async function OrdersPage() {
     <div className="flex-1 overflow-x-clip">
       <HeroComp
         title="Your Orders"
-        description="Track and manage your orders"
+        description="View, track, and manage all your orders in one place. Stay up to date with order statuses, review past purchases, and follow delivery progress from checkout to arrival."
       />
 
       <div className="from-secondary/80 via-secondary/30 to-background bg-linear-to-b py-24 lg:py-32">

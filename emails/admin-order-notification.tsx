@@ -67,7 +67,7 @@ interface ShippingAddress {
   country: string;
 }
 
-interface AdminOrderNotificationProps {
+export interface AdminOrderNotificationProps {
   orderNumber: string;
   customerEmail: string;
   totalAmount: number;

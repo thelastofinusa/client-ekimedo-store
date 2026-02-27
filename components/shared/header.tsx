@@ -33,12 +33,14 @@ export const Header = () => {
     "/about",
     "/contact",
     "/shop/",
+    "/orders/",
     "/checkout",
-    "/orders",
+    "/checkout/success",
     "/email-preview",
   ];
   const isDynamicShopRoute =
-    pathname.startsWith("/shop/") && pathname !== "/shop";
+    (pathname.startsWith("/shop/") && pathname !== "/shop") ||
+    (pathname.startsWith("/orders/") && pathname !== "/orders");
 
   const totalItems: number = useTotalItems();
   const lastScrollY = React.useRef<number>(0);
