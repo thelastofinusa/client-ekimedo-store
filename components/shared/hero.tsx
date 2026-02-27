@@ -30,7 +30,7 @@ export const HeroComp: React.FC<{
           transition={{ duration: 0.8 }}
           className="relative z-10"
         >
-          <h1 className="text-background mb-4 max-w-2xl font-serif text-5xl sm:text-6xl md:mb-6">
+          <h1 className="text-background mb-4 max-w-2xl font-serif text-4xl sm:text-5xl md:mb-6 md:text-6xl">
             {title}
           </h1>
           {description && (

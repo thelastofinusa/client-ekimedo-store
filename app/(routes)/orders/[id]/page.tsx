@@ -1,20 +1,17 @@
-import { notFound } from "next/navigation";
-import Link from "next/link";
-import Image from "next/image";
-import { auth } from "@clerk/nextjs/server";
-import { ArrowLeft, CreditCard, MapPin } from "lucide-react";
-import { Badge } from "@/ui/badge";
-import { ORDER_BY_ID_QUERY } from "@/sanity/queries/orders";
-import { getOrderStatus } from "@/constants/status";
-import { formatPrice, formatDate } from "@/lib/utils";
+import { Container } from "@/components/shared/container";
+import { getOrderStatus } from "@/lib/constants/status";
+import { cn, formatDate, formatPrice } from "@/lib/utils";
 import { sanityFetch } from "@/sanity/lib/live";
+import { ORDER_BY_ID_QUERY } from "@/sanity/queries/orders";
+import { Badge } from "@/ui/badge";
+import { auth } from "@clerk/nextjs/server";
+import { Icons } from "hugeicons-proxy";
+import Image from "next/image";
+import Link from "next/link";
+import { redirect } from "next/navigation";
+import React from "react";
 
-export const metadata = {
-  title: "Order Details | Furniture Shop",
-  description: "View your order details",
-};
-
-export default async function OrderDetailPage({
+export default async function OrderDetailsPage({
   params,
 }: PageProps<"/orders/[id]">) {
   const { id } = await params;
@@ -26,180 +23,179 @@ export default async function OrderDetailPage({
   });
 
   // Verify order exists and belongs to current user
-  if (!order || order.clerkUserId !== userId) return notFound();
+  if (!order || order.clerkUserId !== userId) return redirect("/shop");
 
   const status = getOrderStatus(order.status);
-  const StatusIcon = status.icon;
+  const StatusIcon = Icons[status.icon];
 
   return (
-    <div className="mx-auto max-w-4xl px-4 py-24 sm:px-6 lg:px-8 lg:py-32">
-      {/* Header */}
-      <div className="mb-8">
-        <Link
-          href="/orders"
-          className="inline-flex items-center text-sm text-zinc-500 hover:text-zinc-700 dark:text-zinc-400 dark:hover:text-zinc-200"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Orders
-        </Link>
-        <div className="mt-4 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
-              Order {order.orderNumber}
-            </h1>
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+    <div className="py-24 lg:py-32">
+      <Container size="sm">
+        <div className="mb-8">
+          <Link
+            href="/orders"
+            className="inline-flex items-center gap-2 text-sm"
+          >
+            <Icons.ArrowLeft01Icon className="mt-px size-4.5" />
+            <span>Back to Orders</span>
+          </Link>
+          <div className="mt-4 flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <h1 className="font-sans text-xl font-bold sm:text-2xl md:text-3xl">
+                {order.orderNumber}
+              </h1>
+              <Badge
+                className={cn(
+                  "flex items-center gap-1 border",
+                  status.className,
+                )}
+              >
+                <StatusIcon className="size-3.5!" />
+                <span className="font-mono font-medium tracking-wider">
+                  {status.label}
+                </span>
+              </Badge>
+            </div>
+            <p className="text-muted-foreground text-sm">
               Placed on {formatDate(order.createdAt, "datetime")}
             </p>
           </div>
-          <Badge className={`${status.color} flex items-center gap-1.5`}>
-            <StatusIcon className="h-4 w-4" />
-            {status.label}
-          </Badge>
         </div>
-      </div>
 
-      <div className="grid gap-8 lg:grid-cols-5">
-        {/* Order Items */}
-        <div className="lg:col-span-3">
-          <div className="rounded-lg border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="border-b border-zinc-200 px-6 py-4 dark:border-zinc-800">
-              <p className="font-mono text-xs font-semibold tracking-wide uppercase">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12">
+          <div className="space-y-8 lg:col-span-8">
+            <section className="bg-card group border-border block h-auto overflow-hidden border shadow-xs">
+              <p className="border-b p-6 text-xs font-medium tracking-widest uppercase md:px-8">
                 Items ({order.items?.length ?? 0})
               </p>
-            </div>
-            <div className="divide-y divide-zinc-200 dark:divide-zinc-800">
-              {order.items?.map((item) => (
-                <div key={item._key} className="flex gap-4 px-6 py-4">
-                  {/* Image */}
-                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-md bg-zinc-100 dark:bg-zinc-800">
-                    {item.product?.image?.asset?.url ? (
-                      <Image
-                        src={item.product.image.asset.url}
-                        alt={item.product.name ?? "Product"}
-                        fill
-                        className="object-cover"
-                        sizes="80px"
-                      />
-                    ) : (
-                      <div className="flex h-full items-center justify-center text-xs text-zinc-400">
-                        No image
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Details */}
-                  <div className="flex flex-1 flex-col justify-between">
-                    <div>
-                      <Link
-                        href={`/shop/${item.product?.slug}`}
-                        className="font-medium text-zinc-900 hover:text-zinc-600 dark:text-zinc-100 dark:hover:text-zinc-300"
-                      >
-                        {item.product?.name ?? "Unknown Product"}
-                      </Link>
-                      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                        Qty: {item.quantity}
+              <div className="relative flex justify-between divide-y p-6 md:px-8">
+                {order.items?.map((item) => (
+                  <div key={item._key} className="flex flex-1 gap-4">
+                    {/* Image */}
+                    <div className="bg-secondary relative h-20 w-20 shrink-0 overflow-hidden rounded-md">
+                      {item.product?.image?.asset?.url ? (
+                        <Image
+                          src={item.product.image.asset.url}
+                          alt={item.product.name ?? "Product"}
+                          fill
+                          className="object-cover"
+                          sizes="80px"
+                        />
+                      ) : (
+                        <div className="flex h-full items-center justify-center text-xs text-zinc-400">
+                          No image
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Details */}
+                    <div className="flex flex-1 flex-col justify-between">
+                      <div className="space-y-1">
+                        <Link
+                          href={`/shop/${item.product?.slug}`}
+                          className="hover:text-primary font-medium"
+                        >
+                          {item.product?.name ?? "Unknown Product"}
+                        </Link>
+                        <p className="text-muted-foreground text-sm">
+                          Qty: {item.quantity}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Price */}
+                    <div className="space-y-1 text-right">
+                      <p className="font-medium">
+                        {formatPrice(
+                          (item.priceAtPurchase ?? 0) * (item.quantity ?? 1),
+                        )}
                       </p>
+                      {(item.quantity ?? 1) > 1 && (
+                        <p className="text-muted-foreground text-sm">
+                          {formatPrice(item.priceAtPurchase)} per unit
+                        </p>
+                      )}
                     </div>
                   </div>
-
-                  {/* Price */}
-                  <div className="text-right">
-                    <p className="font-medium text-zinc-900 dark:text-zinc-100">
-                      {formatPrice(
-                        (item.priceAtPurchase ?? 0) * (item.quantity ?? 1),
-                      )}
-                    </p>
-                    {(item.quantity ?? 1) > 1 && (
-                      <p className="text-sm text-zinc-500">
-                        {formatPrice(item.priceAtPurchase)} each
-                      </p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Order Summary & Details */}
-        <div className="space-y-6 lg:col-span-2">
-          {/* Summary */}
-          <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-            <h2 className="font-mono text-xs font-semibold tracking-wide uppercase">
-              Order Summary
-            </h2>
-            <div className="mt-4 space-y-3">
-              <div className="flex justify-between text-sm">
-                <span className="text-zinc-500 dark:text-zinc-400">
-                  Subtotal
-                </span>
-                <span className="text-zinc-900 dark:text-zinc-100">
-                  {formatPrice(order.total)}
-                </span>
+                ))}
               </div>
-              <div className="border-t border-zinc-200 pt-3 dark:border-zinc-800">
-                <div className="flex justify-between font-semibold">
-                  <span className="text-zinc-900 dark:text-zinc-100">
-                    Total
-                  </span>
-                  <span className="text-zinc-900 dark:text-zinc-100">
+            </section>
+          </div>
+
+          <aside className="flex flex-col gap-6 lg:col-span-4">
+            <div className="bg-foreground text-background border p-6 shadow-xs md:p-8">
+              <p className="text-xs font-medium tracking-widest uppercase">
+                Order Summary
+              </p>
+
+              <div className="mt-6 flex flex-col">
+                <div className="flex items-center justify-between text-sm">
+                  <p className="text-sm">Subtotal</p>
+                  <p className="text-sm font-medium">
                     {formatPrice(order.total)}
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Shipping Address */}
-          {order.address && (
-            <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-              <div className="flex items-center gap-2">
-                <MapPin className="h-5 w-5 text-zinc-400" />
-                <h2 className="font-mono text-xs font-semibold tracking-wide uppercase">
-                  Shipping Address
-                </h2>
-              </div>
-              <div className="mt-4 text-sm text-zinc-600 dark:text-zinc-400">
-                {order.address.name && <p>{order.address.name}</p>}
-                {order.address.line1 && <p>{order.address.line1}</p>}
-                {order.address.line2 && <p>{order.address.line2}</p>}
-                <p>
-                  {[order.address.city, order.address.postcode]
-                    .filter(Boolean)
-                    .join(", ")}
-                </p>
-                {order.address.country && <p>{order.address.country}</p>}
-              </div>
-            </div>
-          )}
-
-          {/* Payment Info */}
-          <div className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-950">
-            <div className="flex items-center gap-2">
-              <CreditCard className="h-5 w-5 text-zinc-400" />
-              <h2 className="font-mono text-xs font-semibold tracking-wide uppercase">
-                Payment
-              </h2>
-            </div>
-            <div className="mt-4 space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-light tracking-wide">Status</span>
-                <span className="text-sm font-medium text-green-600 capitalize">
-                  {order.status}
-                </span>
-              </div>
-              {order.email && (
-                <div className="flex items-center justify-between">
-                  <p className="text-xs font-light tracking-wide">Email</p>
-                  <p className="min-w-0 truncate text-sm text-zinc-900 dark:text-zinc-100">
-                    {order.email}
                   </p>
                 </div>
-              )}
+                <div className="border-border/30 mt-6 flex items-end justify-between border-t pt-6 text-sm">
+                  <p className="text-sm">Total</p>
+                  <p className="text-lg font-semibold sm:text-xl">
+                    {formatPrice(order.total)}
+                  </p>
+                </div>
+              </div>
             </div>
-          </div>
+
+            {order.address && (
+              <div className="bg-card border-border border p-6 shadow-xs md:p-8">
+                <div className="flex items-center gap-2">
+                  <Icons.LocationUser02Icon className="size-4" />
+                  <p className="text-xs font-medium tracking-widest uppercase">
+                    Shipping Address
+                  </p>
+                </div>
+
+                <div className="mt-6 flex flex-col">
+                  <div className="space-y-2 text-sm">
+                    {order.address.name && (
+                      <p className="font-medium">{order.address.name}</p>
+                    )}
+                    {order.address.line1 && <p>{order.address.line1}</p>}
+                    {order.address.line2 && <p>{order.address.line2}</p>}
+                    <p>
+                      {[order.address.city, order.address.postcode]
+                        .filter(Boolean)
+                        .join(", ")}
+                    </p>
+                    {order.address.country && <p>{order.address.country}</p>}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="bg-card border-border border p-6 shadow-xs md:p-8">
+              <div className="flex items-center gap-2">
+                <Icons.Payment01Icon className="size-4" />
+                <p className="text-xs font-medium tracking-widest uppercase">
+                  Customer
+                </p>
+              </div>
+
+              <div className="mt-6 flex flex-col gap-2.5">
+                <div className="flex items-center justify-between text-sm">
+                  <p className="text-sm">Email</p>
+                  <p className="text-sm font-medium">{order.email}</p>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <p className="text-sm">Payment</p>
+                  <p className="text-sm font-semibold text-green-700">
+                    Confirmed
+                  </p>
+                </div>
+              </div>
+            </div>
+          </aside>
         </div>
-      </div>
+      </Container>
     </div>
   );
 }

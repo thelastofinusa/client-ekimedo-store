@@ -12,7 +12,7 @@ import {
 } from "@/ui/empty";
 import { ORDERS_BY_USER_QUERY } from "@/sanity/queries/orders";
 import { getOrderStatus } from "@/constants/status";
-import { formatPrice, formatDate, formatOrderNumber } from "@/lib/utils";
+import { formatPrice, formatDate, formatOrderNumber, cn } from "@/lib/utils";
 import { Icons } from "hugeicons-proxy";
 import { buttonVariants } from "@/ui/button";
 import Image from "next/image";
@@ -83,7 +83,7 @@ export default async function OrdersPage() {
     <div className="flex-1 overflow-x-clip">
       <HeroComp
         title="Your Orders"
-        description="View, track, and manage all your orders in one place. Stay up to date with order statuses, review past purchases, and follow delivery progress from checkout to arrival."
+        description="Keep track of order statuses, examine previous purchases, and monitor delivery progress from the point of checkout to the point of arrival."
       />
 
       <div className="from-secondary/80 via-secondary/30 to-background bg-linear-to-b py-24 lg:py-32">
@@ -91,7 +91,7 @@ export default async function OrdersPage() {
           <div className="space-y-4">
             {orders.map((order) => {
               const status = getOrderStatus(order.status);
-              const StatusIcon = status.icon;
+              const StatusIcon = Icons[status.icon];
               const images = (order.itemImages ?? []).filter(
                 (url): url is string => url !== null,
               );
@@ -100,9 +100,9 @@ export default async function OrdersPage() {
                 <Link
                   key={order._id}
                   href={`/orders/${order._id}`}
-                  className="group block rounded-xl border border-zinc-200 bg-white transition-all hover:border-zinc-300 hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-950 dark:hover:border-zinc-700"
+                  className="bg-card group border-border mb-5 block h-auto space-y-5 overflow-hidden rounded-md border p-6 shadow-xs md:p-8"
                 >
-                  <div className="flex gap-5 p-5">
+                  <div className="flex flex-col gap-5 sm:flex-row">
                     {/* Left: Product Images Stack */}
                     <StackedProductImages
                       images={images}
@@ -119,14 +119,19 @@ export default async function OrdersPage() {
                             Order #{formatOrderNumber(order.orderNumber)}
                           </p>
                           <p className="mt-0.5 text-sm text-zinc-500 dark:text-zinc-400">
-                            {formatDate(order.createdAt)}
+                            {formatDate(order.createdAt, "datetime")}
                           </p>
                         </div>
                         <Badge
-                          className={`${status.color} flex shrink-0 items-center gap-1`}
+                          className={cn(
+                            "flex items-center gap-1 border",
+                            status.className,
+                          )}
                         >
-                          <StatusIcon className="h-3 w-3" />
-                          {status.label}
+                          <StatusIcon className="size-3.5!" />
+                          <span className="font-mono font-medium tracking-wider">
+                            {status.label}
+                          </span>
                         </Badge>
                       </div>
 
@@ -144,7 +149,7 @@ export default async function OrdersPage() {
                   </div>
 
                   {/* Footer: View Details */}
-                  <div className="flex items-center justify-between border-t border-zinc-100 px-5 py-3 dark:border-zinc-800">
+                  <div className="flex items-center justify-between border-t pt-3">
                     <p className="truncate text-sm text-zinc-500 dark:text-zinc-400">
                       {order.itemNames?.slice(0, 2).filter(Boolean).join(", ")}
                       {(order.itemNames?.length ?? 0) > 2 && "..."}

@@ -748,7 +748,7 @@ export const consultationsData: ConsultationDataType = [
     ],
   },
   {
-    title: "Pre-made Dresses",
+    title: "Pre-made Dress Try On",
     slug: "try-on",
     description:
       "Visit our atelier to try on our curated selection of ready-to-wear gowns. Our stylists will help you find the perfect fit for your special occasion.",
@@ -770,7 +770,7 @@ export const consultationsData: ConsultationDataType = [
           "We need your contact details to reach you about your consultation",
         info: "Accompanied by an adult 23 years and above",
         fields: [
-                    {
+          {
             name: "fName",
             type: "text",
             label: "First Name",

@@ -1,11 +1,4 @@
-import {
-  Package,
-  Truck,
-  XCircle,
-  CreditCard,
-  type LucideIcon,
-  Clock,
-} from "lucide-react";
+import { IconRegistry } from "hugeicons-proxy";
 
 export type OrderStatusValue =
   | "pending"
@@ -20,15 +13,11 @@ export interface OrderStatusConfig {
   /** Display label */
   label: string;
   /** Badge color classes (combined bg + text) */
-  color: string;
-  /** Lucide icon component */
-  icon: LucideIcon;
+  className: string;
+  /** Hugeicons proxy component */
+  icon: keyof IconRegistry;
   /** Emoji for AI/chat display */
   emoji: string;
-  /** Icon text color for widgets */
-  iconColor: string;
-  /** Icon background color for widgets */
-  iconBgColor: string;
 }
 
 export const ORDER_STATUS_CONFIG: Record<OrderStatusValue, OrderStatusConfig> =
@@ -36,47 +25,37 @@ export const ORDER_STATUS_CONFIG: Record<OrderStatusValue, OrderStatusConfig> =
     pending: {
       value: "pending",
       label: "Pending",
-      color: "bg-yellow-100 text-yellow-800",
-      icon: Clock,
+      className: "bg-yellow-100 text-yellow-800",
+      icon: "Time04Icon",
       emoji: "⏳",
-      iconColor: "text-yellow-600 dark:text-yellow-400",
-      iconBgColor: "bg-yellow-100 dark:bg-yellow-900/30",
     },
     paid: {
       value: "paid",
       label: "Paid",
-      color: "bg-green-100 text-green-800",
-      icon: CreditCard,
+      className: "bg-green-200 text-green-800",
+      icon: "CreditCardAcceptIcon",
       emoji: "✅",
-      iconColor: "text-emerald-600 dark:text-emerald-400",
-      iconBgColor: "bg-emerald-100 dark:bg-emerald-900/30",
     },
     shipped: {
       value: "shipped",
       label: "Shipped",
-      color: "bg-blue-100 text-blue-800",
-      icon: Truck,
+      className: "bg-blue-100 text-blue-800",
+      icon: "ShippingTruck01Icon",
       emoji: "📦",
-      iconColor: "text-blue-600 dark:text-blue-400",
-      iconBgColor: "bg-blue-100 dark:bg-blue-900/30",
     },
     delivered: {
       value: "delivered",
       label: "Delivered",
-      color: "bg-zinc-100 text-zinc-800",
-      icon: Package,
+      className: "bg-green-100 text-green-800",
+      icon: "PackageDelivered01Icon",
       emoji: "🎉",
-      iconColor: "text-emerald-600 dark:text-emerald-400",
-      iconBgColor: "bg-emerald-100 dark:bg-emerald-900/30",
     },
     cancelled: {
       value: "cancelled",
       label: "Cancelled",
-      color: "bg-red-100 text-red-800",
-      icon: XCircle,
+      className: "bg-red-100 text-red-800",
+      icon: "CancelCircleHalfDotIcon",
       emoji: "❌",
-      iconColor: "text-red-600 dark:text-red-400",
-      iconBgColor: "bg-red-100 dark:bg-red-900/30",
     },
   };
 

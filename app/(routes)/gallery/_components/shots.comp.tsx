@@ -39,7 +39,7 @@ export const ShotsComp: React.FC<{ shots: GALLERY_QUERYResult }> = ({
     <section className="py-16 md:py-24 lg:px-8">
       <Container size="lg">
         {shots.length > 0 ? (
-          <div className="columns-2 gap-4 space-y-4 md:columns-3 md:gap-5 lg:columns-4">
+          <div className="columns-2 gap-4 md:columns-3 md:gap-5 lg:columns-4">
             <AnimatePresence mode="popLayout">
               {shots.map((item, index) => (
                 <motion.div
@@ -50,7 +50,7 @@ export const ShotsComp: React.FC<{ shots: GALLERY_QUERYResult }> = ({
                   exit={{ opacity: 0, scale: 0.9 }}
                   transition={{ duration: 0.5, delay: index * 0.05 }}
                   onClick={() => setSelectedIndex(index)}
-                  className="group bg-background/5 border-border/20 relative mb-5 h-auto w-full cursor-pointer overflow-hidden border shadow-xs"
+                  className="group bg-background/5 border-border/20 relative mb-4 w-full cursor-pointer break-inside-avoid-column overflow-hidden border shadow-xs md:mb-5"
                 >
                   <Image
                     src={item.image || "/placeholder.svg"}

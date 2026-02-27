@@ -69,7 +69,7 @@ export const TestimonialComp = async () => {
                       <Icons.StarIcon
                         key={i}
                         fill={i < testimonial.rating! ? "currentColor" : "none"}
-                        className="text-background size-4"
+                        className="text-primary size-4"
                       />
                     ))}
                   </div>
