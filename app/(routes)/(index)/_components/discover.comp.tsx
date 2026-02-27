@@ -18,7 +18,7 @@ export const DiscoverComp = () => {
                 </h2>
               </header>
 
-              <div className="flex max-w-lg flex-col gap-6 md:gap-8">
+              <div className="flex flex-col gap-6 sm:max-w-lg md:gap-8">
                 <p className="text-lg leading-relaxed font-light">
                   Since its inception, {siteConfig.title} has stood at the
                   intersection of classical craftsmanship and radical modernism.

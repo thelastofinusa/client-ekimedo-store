@@ -43,11 +43,10 @@ export const testimonialType = defineType({
     }),
 
     defineField({
-      name: "category",
-      title: "Category",
-      type: "reference",
+      name: "service",
+      title: "Service Offered",
+      type: "string",
       description: "Type of service or project",
-      to: [{ type: "category" }],
       validation: (rule) => rule.required().error("Category is required"),
     }),
 
@@ -87,22 +86,7 @@ export const testimonialType = defineType({
       title: "Work Assets",
       type: "array",
       description: "Up to 4 images related to the work",
-      of: [
-        defineField({
-          name: "asset",
-          title: "Image",
-          type: "image",
-          options: { hotspot: true },
-          fields: [
-            defineField({
-              name: "description",
-              title: "Description",
-              type: "string",
-              description: "Short context for this image",
-            }),
-          ],
-        }),
-      ],
+      of: [{ type: "image", name: "asset", options: { hotspot: true } }],
       validation: (rule) =>
         rule.max(4).error("Maximum of 4 work assets allowed"),
     }),

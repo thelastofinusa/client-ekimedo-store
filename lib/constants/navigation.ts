@@ -54,10 +54,6 @@ export const headerRoutes: HeaderRoute[] = [
         label: "Let's Talk",
         path: "/contact",
       },
-      {
-        label: "Email Preview",
-        path: "/email-preview",
-      },
     ],
   },
 ];

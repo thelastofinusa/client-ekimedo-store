@@ -180,13 +180,14 @@ export const InquireForm = () => {
     <div className="from-secondary/80 via-secondary/30 to-background bg-linear-to-b py-24 lg:py-32">
       <Container size="xs" className="max-w-3xl">
         <div className="bg-card border-border rounded-md border p-6 shadow-xs md:p-8 lg:p-12">
-          <h2 className="mb-1 text-center font-serif text-xl md:text-2xl">
+          <h2 className="mb-1 font-serif text-xl md:text-2xl">
             Tell Us About Your Vision
           </h2>
-          <p className="text-muted-foreground mb-8 text-center text-sm font-normal">
+          <p className="text-muted-foreground mb-8 text-sm font-normal">
             Fill out the form below and you&apos;ll get a response email withing
             24-48 hours
           </p>
+
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
               {/* Full Name */}

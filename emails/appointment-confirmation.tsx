@@ -4,16 +4,12 @@ import {
   Container,
   Head,
   Html,
-  Img,
   Link,
   Preview,
   Section,
   Text,
   Heading,
-  Hr,
   Button,
-  Row,
-  Column,
 } from "@react-email/components";
 import * as React from "react";
 import {
@@ -45,7 +41,6 @@ import {
   socialLink,
   signatureSection,
   signatureText,
-  logoSvg,
 } from "@/styles/email.styles";
 
 interface SocialLink {
@@ -323,15 +318,16 @@ export const AppointmentConfirmationEmail = ({
               </Text>
               {location === "in-person" && (
                 <Text style={policyText}>
-                  Use the walk-way, the visitors parking lot by the
-                  building&apos;s side, or call or text{" "}
+                  Parking is available right in front of 1211. The address
+                  appears as an auto body shop/warehouse on the map, which is
+                  accurate, and our store is within.{" "}
                   <Link
                     href="tel:+12029074865"
                     style={{ ...link, fontWeight: "600" }}
                   >
                     202-907-4865
                   </Link>{" "}
-                  when you get there. Parking is free.
+                  is the number to call when you arrive. Parking is not charged.
                 </Text>
               )}
             </Section>

@@ -4,7 +4,6 @@ import {
   Container,
   Head,
   Html,
-  Img,
   Link,
   Preview,
   Section,
@@ -33,7 +32,6 @@ import {
   footerText,
   socialContainer,
   socialLink,
-  logoSvg,
 } from "@/styles/email.styles";
 
 interface SocialLink {
@@ -153,7 +151,7 @@ export const AdminBookingNotificationEmail = ({
             </Text>
             <Text style={paragraph}>
               A new <strong>{serviceTitle}</strong> has been booked by{" "}
-              {customerName}. The details are recorded below.
+              <strong>{customerName}</strong>. The details are recorded below.
             </Text>
 
             {/* Booking Details */}

@@ -36,26 +36,6 @@ export type Faq = {
   answer?: string;
 };
 
-export type FormField = {
-  _type: "formField";
-  name?: string;
-  label?: string;
-  description?: string;
-  type?:
-    | "text"
-    | "email"
-    | "tel"
-    | "textarea"
-    | "select"
-    | "number"
-    | "date"
-    | "checkbox";
-  placeholder?: string;
-  required?: boolean;
-  options?: Array<string>;
-  errorMessage?: string;
-};
-
 export type Inquiry = {
   _id: string;
   _type: "inquiry";
@@ -167,7 +147,14 @@ export type Booking = {
   service?: string;
   consultationDate?: string;
   endTime?: string;
-  status?: "pending" | "confirmed" | "cancelled" | "completed";
+  status?: "pending" | "paid" | "confirmed" | "cancelled" | "completed";
+  paymentStatus?: "unpaid" | "paid" | "refunded";
+  auditLog?: Array<{
+    timestamp?: string;
+    action?: string;
+    note?: string;
+    _key: string;
+  }>;
   location?: "virtual" | "in-person";
   guests?: number;
   eventDate?: string;
@@ -192,6 +179,7 @@ export type Booking = {
   referBy?: string;
   timeline?: boolean;
   cancellationPolicy?: boolean;
+  rushOrder?: boolean;
   dressSize?: string;
   dressColor?: string;
   specialRequirements?: string;
@@ -201,6 +189,7 @@ export type Booking = {
     value?: string;
     _key: string;
   }>;
+  confirmationEmailSent?: boolean;
 };
 
 export type ProductColor = {
@@ -236,12 +225,7 @@ export type Testimonial = {
     avatarUrl?: string;
     clerkId?: string;
   };
-  category?: {
-    _ref: string;
-    _type: "reference";
-    _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "category";
-  };
+  service?: string;
   review?: string;
   rating?: number;
   date?: string;
@@ -267,8 +251,7 @@ export type Testimonial = {
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    description?: string;
-    _type: "asset";
+    _type: "image";
     _key: string;
   }>;
 };
@@ -533,7 +516,6 @@ export type Geopoint = {
 export type AllSanitySchemaTypes =
   | PricingTier
   | Faq
-  | FormField
   | Inquiry
   | SanityImageCrop
   | SanityImageHotspot
@@ -813,7 +795,7 @@ export type SOCIAL_QUERYResult = Array<{
 
 // Source: ./sanity/queries/testimonial.ts
 // Variable: TESTIMONIAL_QUERY
-// Query: *[_type == "testimonial" && status == "approved"] | order(date desc) {    _id,    "avatar": avatar.asset->url,    clerkUser,    category -> { name },    date,    name,    rating,    review,    "workAssets": workAssets[].asset->url}
+// Query: *[_type == "testimonial" && status == "approved"] | order(date desc) {    _id,    "avatar": avatar.asset->url,    clerkUser,    service,    date,    name,    rating,    review,    "workAssets": workAssets[].asset->url}
 export type TESTIMONIAL_QUERYResult = Array<{
   _id: string;
   avatar: string | null;
@@ -823,9 +805,7 @@ export type TESTIMONIAL_QUERYResult = Array<{
     avatarUrl?: string;
     clerkId?: string;
   } | null;
-  category: {
-    name: string | null;
-  } | null;
+  service: string | null;
   date: string | null;
   name: string | null;
   rating: number | null;
@@ -855,6 +835,6 @@ declare module "@sanity/client" {
     '\n*[_type == "product" && slug.current == $slug] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    delivery,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_SLUG_QUERYResult;
     '\n*[_type == "product" && _id in $ids] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    delivery,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_IDS_QUERYResult;
     '\n    *[_type == "social"] | order(_createdAt desc) {\n        _id,\n        name,\n        url\n    }\n': SOCIAL_QUERYResult;
-    '\n*[_type == "testimonial" && status == "approved"] | order(date desc) {\n    _id,\n    "avatar": avatar.asset->url,\n    clerkUser,\n    category -> { name },\n    date,\n    name,\n    rating,\n    review,\n    "workAssets": workAssets[].asset->url\n}\n': TESTIMONIAL_QUERYResult;
+    '\n*[_type == "testimonial" && status == "approved"] | order(date desc) {\n    _id,\n    "avatar": avatar.asset->url,\n    clerkUser,\n    service,\n    date,\n    name,\n    rating,\n    review,\n    "workAssets": workAssets[].asset->url\n}\n': TESTIMONIAL_QUERYResult;
   }
 }

@@ -21,9 +21,9 @@ import {
   PaginationPrevious,
 } from "@/ui/pagination";
 
-export const ProductGrid: React.FC<{ products: PRODUCT_QUERYResult }> = ({
-  products,
-}) => {
+export const ProductGrid: React.FC<{
+  products: PRODUCT_QUERYResult;
+}> = ({ products }) => {
   const searchParams = useSearchParams();
 
   const currentPage = Number(searchParams.get("page")) || 1;
@@ -117,7 +117,10 @@ export const ProductGrid: React.FC<{ products: PRODUCT_QUERYResult }> = ({
           <PaginationContent>
             {currentPage > 1 && (
               <PaginationItem>
-                <PaginationPrevious href={createPageURL(currentPage - 1)} />
+                <PaginationPrevious
+                  className="mr-2 h-8 tracking-[0.2em]!"
+                  href={createPageURL(currentPage - 1)}
+                />
               </PaginationItem>
             )}
 
@@ -126,6 +129,7 @@ export const ProductGrid: React.FC<{ products: PRODUCT_QUERYResult }> = ({
                 <PaginationLink
                   href={createPageURL(page)}
                   isActive={currentPage === page}
+                  size="icon-sm"
                 >
                   {page}
                 </PaginationLink>
@@ -134,7 +138,10 @@ export const ProductGrid: React.FC<{ products: PRODUCT_QUERYResult }> = ({
 
             {currentPage < totalPages && (
               <PaginationItem>
-                <PaginationNext href={createPageURL(currentPage + 1)} />
+                <PaginationNext
+                  className="ml-2 h-8 tracking-[0.2em]!"
+                  href={createPageURL(currentPage + 1)}
+                />
               </PaginationItem>
             )}
           </PaginationContent>

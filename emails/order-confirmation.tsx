@@ -43,8 +43,8 @@ import {
   policyText,
   policyBox,
   link,
-  logoSvg,
 } from "@/styles/email.styles";
+import { formatPrice } from "@/lib/utils";
 
 interface SocialLink {
   name: string | null;
@@ -70,7 +70,6 @@ export interface OrderConfirmationProps {
 
 export const OrderConfirmationEmail = ({
   orderNumber,
-  customerEmail,
   totalAmount,
   items,
   siteUrl,
@@ -167,7 +166,7 @@ export const OrderConfirmationEmail = ({
                     <tr>
                       <td style={totalLabel}>Total Amount</td>
                       <td align="right" style={totalValue}>
-                        ${totalAmount.toFixed(2)}
+                        {formatPrice(Number(totalAmount))}
                       </td>
                     </tr>
                   </tbody>

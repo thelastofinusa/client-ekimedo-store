@@ -1,15 +1,24 @@
 import { z } from "zod";
 
-export const testimonialSchema = z.object({
-  review: z
-    .string()
-    .min(10, { message: "Review must be at least 10 characters." })
-    .max(500, { message: "Review must not exceed 500 characters." }),
-  rating: z.coerce
-    .number()
-    .min(1, { message: "Rating must be at least 1." })
-    .max(5, { message: "Rating must be at most 5." }),
-  categoryId: z.string().min(1, { message: "Please select a category." }),
-});
+export const testimonialSchema = z
+  .object({
+    review: z
+      .string()
+      .min(10, "Review must be at least 10 characters.")
+      .max(500, "Review must not exceed 500 characters."),
+    rating: z.string("Please select a rating").min(1, "Please select a rating"),
+    service: z.string().min(1, "Please select a service."),
+    customService: z.string().optional(),
+    workAssets: z.array(z.file()).optional(),
+  })
+  .refine(
+    (data) =>
+      data.service !== "custom" ||
+      (data.customService && data.customService.trim().length > 0),
+    {
+      path: ["customService"],
+      message: "Please specify your custom service.",
+    },
+  );
 
 export type TestimonialFormValues = z.infer<typeof testimonialSchema>;

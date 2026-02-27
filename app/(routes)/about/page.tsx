@@ -48,7 +48,7 @@ export default function About() {
           </header>
 
           <div className="grid grid-cols-1 items-end gap-12 lg:grid-cols-12 lg:gap-24">
-            <div className="space-y-12 lg:col-span-5">
+            <div className="flex flex-col gap-6 md:gap-8 lg:col-span-5 lg:gap-12">
               <div className="bg-secondary relative aspect-4/5 overflow-hidden shadow-xs">
                 <Image
                   src="/assets/about/01.jpeg"
@@ -67,8 +67,8 @@ export default function About() {
 
             <div className="space-y-16 lg:col-span-7">
               <div className="flex flex-col items-start gap-12 md:flex-row">
-                <div className="pt-4 md:w-1/3">
-                  <span className="text-muted-foreground text-[10px] tracking-[0.4em] uppercase">
+                <div className="md:w-1/3">
+                  <span className="text-muted-foreground text-xs font-medium tracking-widest uppercase">
                     The Genesis
                   </span>
                 </div>
@@ -101,7 +101,7 @@ export default function About() {
       <div className="bg-foreground text-background py-24 lg:py-32">
         <Container size="sm">
           <div className="grid gap-6 md:grid-cols-2 md:gap-12">
-            <h2 className="font-serif text-4xl capitalize md:text-5xl">
+            <h2 className="font-serif text-4xl leading-tight capitalize md:text-5xl">
               Designed with purpose. Made to endure.
             </h2>
             <div className="space-y-6">
@@ -137,8 +137,8 @@ export default function About() {
                 size: "sm",
               })}
             >
-              <h2 className="font-serif text-4xl capitalize md:text-5xl">
-                A modern atelier grounded in craftsmanship.
+              <h2 className="font-serif text-4xl leading-tight capitalize md:text-5xl">
+                Grounded in craftsmanship.
               </h2>
               <div className="space-y-6">
                 <p>
@@ -148,7 +148,10 @@ export default function About() {
                   right.
                 </p>
 
-                <Link href="/contact" className={buttonVariants()}>
+                <Link
+                  href="/contact"
+                  className={buttonVariants({ size: "lg" })}
+                >
                   <span>Let&apos;s Talk</span>
                 </Link>
               </div>

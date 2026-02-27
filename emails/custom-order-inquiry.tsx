@@ -4,7 +4,6 @@ import {
   Container,
   Head,
   Html,
-  Img,
   Link,
   Preview,
   Section,
@@ -37,7 +36,6 @@ import {
   policyTitle,
   policyText,
   link,
-  logoSvg,
 } from "@/styles/email.styles";
 
 interface SocialLink {

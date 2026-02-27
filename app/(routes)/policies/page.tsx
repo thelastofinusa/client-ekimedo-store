@@ -36,7 +36,7 @@ export default function CancellationPolicy() {
   return (
     <div className="flex-1 overflow-x-clip">
       <HeroComp
-        title="Booking & Cancellation"
+        title="Cancellation Policy"
         description="Transparent terms to ensure a seamless experience from your first
               consultation to the final fitting of your custom gown."
       />

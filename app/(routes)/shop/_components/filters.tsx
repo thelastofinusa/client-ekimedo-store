@@ -142,7 +142,7 @@ export const Filters: React.FC<{
   const content = (
     <div className="z-20 flex h-max w-full flex-col gap-8 md:sticky md:top-26 md:w-64 lg:top-32">
       <div className="flex flex-col gap-8">
-        <FilterSection title="Price Range" className="gap-2">
+        <FilterSection title="Price Range" className="relative gap-2">
           <span className="text-muted-foreground text-xs">
             Budget range <strong>{formatPrice(sliderValue[0])}</strong> -{" "}
             <strong>{formatPrice(sliderValue[1])}</strong>.
@@ -156,6 +156,17 @@ export const Filters: React.FC<{
             onValueCommit={handleSliderCommit}
             className="mt-2 w-full"
           />
+
+          {hasActiveFilters && (
+            <Button
+              size="icon-xs"
+              onClick={clearFilters}
+              className="absolute top-0 right-0"
+            >
+              <Icons.Cancel01Icon />
+              <span className="sr-only">Clear</span>
+            </Button>
+          )}
         </FilterSection>
 
         {categories.length > 0 && (
@@ -253,17 +264,6 @@ export const Filters: React.FC<{
           })}
         </FilterSection>
       </div>
-
-      {hasActiveFilters && (
-        <Button
-          size="icon-xs"
-          onClick={clearFilters}
-          className="absolute -top-0.5 right-0"
-        >
-          <Icons.Cancel01Icon />
-          <span className="sr-only">Clear</span>
-        </Button>
-      )}
     </div>
   );
 

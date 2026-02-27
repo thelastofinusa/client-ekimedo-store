@@ -9,7 +9,7 @@ import { ContactInquiryEmail } from "@/emails/contact-inquiry";
 import { CustomOrderInquiryEmail } from "@/emails/custom-order-inquiry";
 import { OrderConfirmationEmail } from "@/emails/order-confirmation";
 import { render } from "@react-email/render";
-// import { notFound } from "next/navigation";
+import { notFound } from "next/navigation";
 
 import { consultationsData } from "@/lib/constants/consultation";
 import { siteConfig } from "@/site.config";
@@ -24,13 +24,13 @@ const testOrderItems = [
   {
     name: "Classic Silk Gown",
     quantity: 1,
-    price: 1200,
+    price: 1,
     imageUrl: "https://ekimedo.com/twitter-image.png",
   },
   {
     name: "Bridal Veil",
     quantity: 1,
-    price: 150,
+    price: 1,
     imageUrl: "https://ekimedo.com/twitter-image.png",
   },
 ];
@@ -108,7 +108,7 @@ const otherEmails = [
       <AdminOrderNotificationEmail
         orderNumber="ORD-12345"
         customerEmail="jane@example.com"
-        totalAmount={1350}
+        totalAmount={2}
         items={testOrderItems}
         shippingAddress={testAddress}
         orderId="order_123"
@@ -161,7 +161,7 @@ const otherEmails = [
       <OrderConfirmationEmail
         orderNumber="ORD-12345"
         customerEmail="jane@example.com"
-        totalAmount={1350}
+        totalAmount={2}
         items={testOrderItems}
         siteUrl={siteConfig.url}
         socialLinks={testSocialLinks}
@@ -171,6 +171,8 @@ const otherEmails = [
 ];
 
 export default function EmailPreview() {
+  if (process.env.NODE_ENV === "production") return notFound();
+
   // Group consultation emails by category
   const groupedConsultations = consultationEmails.reduce(
     (acc, email) => {

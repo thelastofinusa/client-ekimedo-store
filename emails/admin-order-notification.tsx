@@ -43,8 +43,8 @@ import {
   totalLabel,
   totalValue,
   link,
-  logoSvg,
 } from "@/styles/email.styles";
+import { formatPrice } from "@/lib/utils";
 
 interface SocialLink {
   name: string | null;
@@ -225,7 +225,7 @@ export const AdminOrderNotificationEmail = ({
                     <tr>
                       <td style={totalLabel}>Total Amount</td>
                       <td align="right" style={totalValue}>
-                        ${totalAmount.toFixed(2)}
+                        {formatPrice(Number(totalAmount))}
                       </td>
                     </tr>
                   </tbody>

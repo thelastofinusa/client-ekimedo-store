@@ -32,6 +32,7 @@ export const Header = () => {
   const forceActiveRoutes = [
     "/about",
     "/contact",
+    "/testimonials/",
     "/shop/",
     "/orders/",
     "/checkout",
@@ -40,6 +41,7 @@ export const Header = () => {
   ];
   const isDynamicShopRoute =
     (pathname.startsWith("/shop/") && pathname !== "/shop") ||
+    (pathname.startsWith("/testimonials/") && pathname !== "/testimonials") ||
     (pathname.startsWith("/orders/") && pathname !== "/orders");
 
   const totalItems: number = useTotalItems();
@@ -156,7 +158,7 @@ export const Header = () => {
                   )}
                   {item.subroutes && item.subroutes.length > 0 && (
                     <NavigationMenuContent>
-                      <ul className="pointer-events-auto w-60">
+                      <ul className="pointer-events-auto w-44">
                         {item.subroutes.map((route) => (
                           <NavigationMenuLink key={route.path} asChild>
                             <Link

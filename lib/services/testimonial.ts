@@ -9,21 +9,29 @@ interface UserInfo {
   imageUrl?: string | null;
 }
 
-export async function createTestimonialService(formData: FormData, user: UserInfo) {
+export async function createTestimonialService(
+  formData: FormData,
+  user: UserInfo,
+) {
   try {
     const review = formData.get("review") as string;
-    const rating = Number(formData.get("rating"));
-    const categoryId = formData.get("categoryId") as string;
-    const images = formData.getAll("images") as File[];
+    const ratingRaw = formData.get("rating") as string;
+    const serviceRaw = formData.get("service") as string;
+    const customService = formData.get("customService") as string | null;
+    const workAssets = formData.getAll("workAssets") as File[];
 
-    if (!review || !rating || !categoryId) {
-      return { success: false, error: "Missing required fields." };
+    const rating = Number(ratingRaw);
+    const service =
+      serviceRaw === "custom" ? customService?.trim() : serviceRaw;
+
+    if (!review || !service || Number.isNaN(rating)) {
+      return { success: false, error: "Missing or invalid required fields." };
     }
 
     const uploadedAssets = [];
 
-    if (images && images.length > 0) {
-      for (const image of images) {
+    if (workAssets && workAssets.length > 0) {
+      for (const image of workAssets) {
         if (image.size > 0) {
           const buffer = await image.arrayBuffer();
           const asset = await writeClient.assets.upload(
@@ -35,7 +43,7 @@ export async function createTestimonialService(formData: FormData, user: UserInf
           );
           uploadedAssets.push({
             _key: randomUUID(),
-            _type: "image",
+            _type: "asset",
             asset: {
               _type: "reference",
               _ref: asset._id,
@@ -62,10 +70,7 @@ export async function createTestimonialService(formData: FormData, user: UserInf
       review,
       rating,
       date: new Date().toISOString(),
-      category: {
-        _type: "reference",
-        _ref: categoryId,
-      },
+      service,
       workAssets: uploadedAssets.length > 0 ? uploadedAssets : undefined,
     });
 

@@ -4,7 +4,6 @@ import {
   Container,
   Head,
   Html,
-  Img,
   Link,
   Preview,
   Section,
@@ -37,7 +36,6 @@ import {
   policyBox,
   policyTitle,
   policyText,
-  logoSvg,
 } from "@/styles/email.styles";
 
 interface SocialLink {
@@ -62,7 +60,6 @@ export const ContactInquiryEmail = ({
   inquiryType,
   message,
   socialLinks = [],
-  siteUrl,
 }: ContactInquiryProps) => {
   return (
     <Html>

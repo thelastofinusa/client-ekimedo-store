@@ -14,15 +14,11 @@ export const GalleryComp = async () => {
     <div className="bg-background">
       <div className="from-secondary via-secondary/50 overflow-x-clip bg-linear-to-b to-transparent py-24 lg:py-32">
         <Container size="sm">
-          <div className="mb-20 flex items-end justify-between">
-            <div className="space-y-4">
-              <span className="text-muted-foreground text-[10px] tracking-[0.4em] uppercase">
-                Visual Journal
-              </span>
-              <h2 className="font-serif text-4xl capitalize md:text-5xl">
-                discover our signature style
-              </h2>
-            </div>
+          <div className="mb-10 flex items-end justify-between md:mb-20">
+            <h2 className="font-serif text-4xl leading-tight capitalize md:text-5xl">
+              discover our <br className="hidden md:block" /> signature style
+            </h2>
+
             <Link
               href="/gallery"
               className={buttonVariants({
@@ -40,8 +36,8 @@ export const GalleryComp = async () => {
               <div
                 key={item._id}
                 className={cn("relative shrink-0 shadow-xs", {
-                  "aspect-3/4 w-[40vw] md:w-[25vw]": idx % 2 === 0,
-                  "mt-10 aspect-4/5 w-[30vw] md:w-[20vw]": idx % 2 !== 0,
+                  "aspect-3/4 w-[50vw] md:w-[25vw]": idx % 2 === 0,
+                  "mt-10 aspect-3/4 w-[40vw] md:w-[20vw]": idx % 2 !== 0,
                 })}
               >
                 <Image

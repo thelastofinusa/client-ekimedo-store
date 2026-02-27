@@ -122,3 +122,13 @@ export function formatDuration(
   if (h > 0) return `${h} hour${h > 1 ? "s" : ""}`;
   return `${m} min${m !== 1 ? "s" : ""}`;
 }
+
+export const truncateFilename = (value: string, start = 14, end = 10) =>
+  value.length <= start + end
+    ? value
+    : `${value.slice(0, start)}…${value.slice(-end)}`;
+
+export const formatFileSize = (bytes: number) => {
+  const kb = bytes / 1024;
+  return kb < 1024 ? `${kb.toFixed(1)} KB` : `${(kb / 1024).toFixed(1)} MB`;
+};

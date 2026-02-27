@@ -1,9 +1,10 @@
 import { HERO_QUERY } from "@/sanity/queries/hero";
 import { HeroSlider } from "./hero-slider";
-import { sanityFetch } from "@/sanity/lib/live";
+import { client } from "@/sanity/lib/client";
+import { clientOptions } from "@/lib/utils";
 
 export const HeroComp = async () => {
-  const { data: images } = await sanityFetch({ query: HERO_QUERY });
+  const images = await client.fetch(HERO_QUERY, {}, clientOptions);
 
   // Fallback if no images are found
   const heroImages =

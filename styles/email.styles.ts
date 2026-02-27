@@ -15,7 +15,7 @@ export const container = {
 };
 
 export const header = {
-  padding: "60px 10px 40px",
+  padding: "60px 6px 40px",
   textAlign: "left" as const,
 };
 
@@ -69,7 +69,7 @@ export const button = {
   display: "block",
   width: "100%",
   padding: "20px 0",
-  fontWeight: "600",
+  fontWeight: "500",
   textTransform: "uppercase" as const,
   letterSpacing: "0.25em",
   borderRadius: "0",
@@ -77,7 +77,7 @@ export const button = {
 
 export const detailsCard = {
   margin: "48px 0",
-  padding: "20px",
+  padding: "10px 20px",
   border: "1px solid #f0f0f0", // Subtle box instead of just lines
   backgroundColor: "#fafafa",
 };
@@ -98,9 +98,9 @@ export const infoLabel = {
   fontSize: "10px",
   color: "#999999",
   textTransform: "uppercase" as const,
-  letterSpacing: "0.10em",
-  fontWeight: "700",
-  width: "130px",
+  letterSpacing: "0.08em",
+  fontWeight: "600",
+  width: "120px",
   verticalAlign: "top",
 };
 
@@ -257,8 +257,8 @@ export const itemMeta = {
 };
 
 export const totalSection = {
-  marginTop: "40px",
-  padding: "30px",
+  marginTop: "10px",
+  padding: "30px 0px",
   backgroundColor: "#fafafa",
 };
 
@@ -274,8 +274,7 @@ export const totalLabel = {
 };
 
 export const totalValue = {
-  fontSize: "20px",
+  fontSize: "22px",
   fontWeight: "400",
-  fontFamily: "'Playfair Display', serif",
   color: "#111111",
 };

@@ -5,7 +5,7 @@ export const TESTIMONIAL_QUERY = defineQuery(`
     _id,
     "avatar": avatar.asset->url,
     clerkUser,
-    category -> { name },
+    service,
     date,
     name,
     rating,

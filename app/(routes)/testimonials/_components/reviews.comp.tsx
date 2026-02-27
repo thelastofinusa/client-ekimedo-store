@@ -5,7 +5,7 @@ import Image from "next/image";
 import { AnimatePresence, motion } from "motion/react";
 import { Icons } from "hugeicons-proxy";
 
-import { formatSanityDate, getInitials } from "@/lib/utils";
+import { formatDate, getInitials } from "@/lib/utils";
 import { Container } from "@/components/shared/container";
 import { Button } from "@/ui/button";
 import { TESTIMONIAL_QUERYResult } from "@/sanity.types";
@@ -86,39 +86,42 @@ export const ReviewsComp: React.FC<{
                   </blockquote>
 
                   {/* Author Profile */}
-                  <div className="flex flex-wrap items-end justify-between gap-6">
-                    <div className="flex items-center gap-3">
-                      <Avatar className="size-12">
-                        <AvatarImage
-                          src={clientAvatar || "/placeholder.svg"}
-                          alt={clientName!}
-                          className="object-cover"
-                        />
-                        <AvatarFallback>
-                          {getInitials(clientName!)}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <p className="text-sm font-medium md:text-base">
-                          {clientName}
+                  <div className="flex items-center gap-3">
+                    <Avatar className="size-12">
+                      <AvatarImage
+                        src={clientAvatar as string}
+                        alt={clientName as string}
+                        className="object-cover"
+                      />
+                      <AvatarFallback>
+                        {getInitials(clientName!)}
+                      </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex flex-1 gap-4">
+                      <div className="flex flex-col">
+                        <p className="flex items-center gap-2 text-sm font-medium md:text-base">
+                          <span>{clientName}</span>{" "}
+                          <span className="flex gap-px">
+                            {[...Array(5)].map((_, i) => (
+                              <Icons.StarIcon
+                                key={i}
+                                fill={
+                                  i < testimonial.rating!
+                                    ? "currentColor"
+                                    : "none"
+                                }
+                                className="text-primary size-4"
+                              />
+                            ))}
+                          </span>
                         </p>
                         <p className="text-muted-foreground mt-0.5 text-xs">
-                          {testimonial.category?.name}{" "}
+                          {testimonial.service}{" "}
                           {testimonial.date &&
-                            `— ${formatSanityDate(testimonial.date)}`}
+                            `- ${formatDate(testimonial.date)}`}
                         </p>
                       </div>
-                    </div>
-                    <div className="flex gap-px">
-                      {[...Array(5)].map((_, i) => (
-                        <Icons.StarIcon
-                          key={i}
-                          fill={
-                            i < testimonial.rating! ? "currentColor" : "none"
-                          }
-                          className="text-primary size-4"
-                        />
-                      ))}
                     </div>
                   </div>
 
@@ -129,12 +132,12 @@ export const ReviewsComp: React.FC<{
                         {testimonial.workAssets?.slice(0, 4).map((asset, i) => (
                           <div
                             key={i}
-                            className="bg-secondary group relative aspect-[0.8] w-full cursor-pointer overflow-hidden"
+                            className="group relative aspect-[0.8] w-full cursor-pointer overflow-hidden border shadow-xs"
                             onClick={() => setSelectedIndex(offsets[index] + i)}
                           >
                             <Image
                               src={asset || "/placeholder.svg"}
-                              alt={`Work ${i + 1}`}
+                              alt=""
                               fill
                               className="origin-top object-cover transition-transform duration-500 ease-out group-hover:scale-110"
                             />

@@ -29,7 +29,7 @@ import { Label } from "@/ui/label";
 import { Button } from "@/ui/button";
 import { Checkbox } from "@/ui/checkbox";
 import { PhoneInput } from "@/ui/phone-input";
-import { cn, formatPrice } from "@/lib/utils";
+import { cn, formatFileSize, formatPrice, truncateFilename } from "@/lib/utils";
 import { FormControl, FormLabel } from "@/ui/form";
 import { Notify } from "@/components/shared/notify";
 import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
@@ -110,7 +110,7 @@ export const RenderFormControl: React.FC<{
 
       return (
         <FormControl>
-          <InputGroup className="h-12">
+          <InputGroup>
             <RenderInput
               type={data.type}
               placeholder={data.placeholder}
@@ -555,7 +555,6 @@ export const RenderFormControl: React.FC<{
       );
     }
     case "file": {
-      const FILE_SIZE_MB = data.size * 1024 * 1024; // size in MB from config
       const fileField = data as FieldConfig;
       const files: File[] = field.value ?? [];
 
@@ -565,9 +564,23 @@ export const RenderFormControl: React.FC<{
       const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const incoming = Array.from(e.target.files || []);
 
+        const oversizedFiles = incoming.filter((file) => file.size > data.size);
+
+        if (oversizedFiles.length > 0) {
+          toast.custom(() => (
+            <Notify
+              type="error"
+              title="File too large"
+              description={`Each image must be smaller than ${formatFileSize(
+                data.size,
+              )}.`}
+            />
+          ));
+        }
+
         const validFiles = incoming.filter((file) => {
           const isImage = file.type.startsWith("image/");
-          const isUnderLimit = file.size <= FILE_SIZE_MB;
+          const isUnderLimit = file.size <= data.size;
           return isImage && isUnderLimit;
         });
 
@@ -592,23 +605,11 @@ export const RenderFormControl: React.FC<{
         field.onChange(next);
       };
 
-      const truncateMiddle = (value: string, start = 14, end = 10) =>
-        value.length <= start + end
-          ? value
-          : `${value.slice(0, start)}…${value.slice(-end)}`;
-
-      const formatFileSize = (bytes: number) => {
-        const kb = bytes / 1024;
-        return kb < 1024
-          ? `${kb.toFixed(1)} KB`
-          : `${(kb / 1024).toFixed(1)} MB`;
-      };
-
       return (
         <React.Fragment>
           <Label
             htmlFor={fileField.name}
-            className="border-border hover:border-accent/50 cursor-pointer rounded-lg border-2 border-dashed px-6 py-8 text-center transition-colors"
+            className="border-border hover:border-accent/50 cursor-pointer rounded-lg border-2 border-dashed px-6 py-8 text-center shadow-xs transition-colors"
           >
             <Input
               type="file"
@@ -628,7 +629,7 @@ export const RenderFormControl: React.FC<{
               {min > 0 && (
                 <span className="text-muted-foreground text-xs">
                   Upload <strong>{min}</strong> to <strong>{max}</strong> images{" "}
-                  <strong>{formatFileSize(FILE_SIZE_MB)}</strong> each
+                  <strong>{formatFileSize(data.size)}</strong> each
                 </span>
               )}
             </div>
@@ -649,7 +650,7 @@ export const RenderFormControl: React.FC<{
                   <div className="flex items-center gap-2">
                     <Icons.File01Icon className="text-muted-foreground size-5" />
                     <span className="flex-1 truncate text-sm">
-                      {truncateMiddle(file.name)}
+                      {truncateFilename(file.name)}
                     </span>
                     <span className="text-muted-foreground mt-0.5 font-mono text-[11px] font-medium uppercase">
                       [{formatFileSize(file.size)}]
