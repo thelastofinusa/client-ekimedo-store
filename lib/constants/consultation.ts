@@ -840,11 +840,6 @@ export const consultationsData: ConsultationDataType = [
             options: [{ value: "in-person", label: "In-Person (Showroom)" }],
             label: "Booking Location Preference",
             defaultValue: "in-person",
-            description: {
-              value: "1211 Marblewood Ave, Capitol Heights, MD 20743, USA",
-              path: "https://maps.app.goo.gl/bpVmXDswvhJ9Y72K7",
-              newTab: true,
-            },
             required: true,
             errMsg: "Booking location is required",
           },

@@ -43,7 +43,13 @@ export async function POST(req: Request) {
       confirmationEmailSent,
     });
 
-    // Only process if status is 'confirmed' and email hasn't been sent yet
+    // Only process if status is 'confirmed' and email hasn't been sent yet.
+    // NOTE: This guard runs on the webhook payload. Because the final step of this
+    // handler writes confirmationEmailSent:true back to Sanity, that write itself
+    // triggers another webhook delivery. The payload of THAT second delivery will
+    // have confirmationEmailSent:true so this early return kills the loop.
+    // Make sure the Sanity webhook GROQ filter is also set to:
+    //   status == "confirmed" && confirmationEmailSent != true
     if (status !== "confirmed" || confirmationEmailSent === true) {
       console.log(`[Sanity Webhook] Skipping processing for ${_id}`);
       return NextResponse.json({ message: "No action needed" });
@@ -85,6 +91,26 @@ export async function POST(req: Request) {
       });
       return NextResponse.json({ message: "No action needed (re-verified)" });
     }
+
+    // Acquire a soft lock by writing the flag BEFORE sending the email.
+    // This prevents a concurrent duplicate webhook delivery from also sending
+    // an email while this invocation is still awaiting the Resend API call.
+    // If this write succeeds, we are the sole sender. If it fails or if the
+    // flag is already true, another handler beat us to it — we bail out.
+    try {
+      await writeClient
+        .patch(_id)
+        .setIfMissing({ confirmationEmailSent: false })
+        .set({ confirmationEmailSent: true })
+        .commit();
+    } catch (lockError) {
+      console.error("[Sanity Webhook] Failed to acquire lock for", _id, lockError);
+      return NextResponse.json({ message: "Lock acquisition failed, another handler processed this" });
+    }
+
+    // The lock is now set. The next webhook delivery triggered by this write
+    // will be filtered on the payload check (confirmationEmailSent === true)
+    // at the top of this handler and will return early without sending an email.
 
     console.log(`[Sanity Webhook] Processing confirmation email for ${_id}`);
 
@@ -144,10 +170,10 @@ export async function POST(req: Request) {
       );
     }
 
-    // Mark as sent in Sanity and add audit log entry
+    // The confirmationEmailSent flag was already set to true above (lock step).
+    // Just append the audit log entry now.
     await writeClient
       .patch(_id)
-      .set({ confirmationEmailSent: true })
       .append("auditLog", [
         {
           _key: randomUUID(),

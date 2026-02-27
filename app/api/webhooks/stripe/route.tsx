@@ -572,7 +572,7 @@ async function handlePaymentIntentSucceeded(
     return {
       name: product.name || "Item",
       quantity: item.quantity || 1,
-      price: (item.priceAtPurchase || 0) / 100,
+      price: item.priceAtPurchase || 0, // priceAtPurchase is stored in dollars, NOT cents
       imageUrl: product.image?.asset?.url || undefined,
     };
   });

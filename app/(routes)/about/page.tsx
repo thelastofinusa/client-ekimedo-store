@@ -39,7 +39,7 @@ export default function About() {
       <div className="py-24 lg:py-32">
         <Container>
           <header className="py-24 text-center md:text-left">
-            <h1 className="font-serif text-5xl leading-none tracking-tighter uppercase md:text-[12vw] md:leading-[0.9] lg:text-[8vw]">
+            <h1 className="font-serif text-5xl leading-none tracking-tighter uppercase md:text-[12vw] md:leading-[0.9] lg:text-[9vw]">
               About <br />
               <span className="italic md:ml-[10vw] lg:ml-[12vw]">
                 {siteConfig.title}
