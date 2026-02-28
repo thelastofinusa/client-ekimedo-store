@@ -56,29 +56,6 @@ export default async function OrdersPage() {
     params: { clerkUserId: userId ?? "" },
   });
 
-  if (orders.length === 0) {
-    return (
-      <div className="mx-auto max-w-2xl px-4 py-24 sm:px-6 md:py-32 lg:px-8">
-        <Empty>
-          <EmptyHeader>
-            <EmptyMedia variant="icon">
-              <Icons.ProductLoadingIcon />
-            </EmptyMedia>
-            <EmptyTitle>No orders yet</EmptyTitle>
-            <EmptyDescription>
-              When you place an order, it will appear here.
-            </EmptyDescription>
-          </EmptyHeader>
-          <EmptyContent>
-            <Link href="/shop" className={buttonVariants({ size: "lg" })}>
-              Start Shopping
-            </Link>
-          </EmptyContent>
-        </Empty>
-      </div>
-    );
-  }
-
   return (
     <div className="flex-1 overflow-x-clip">
       <HeroComp
@@ -89,99 +66,121 @@ export default async function OrdersPage() {
       <div className="py-24 lg:py-32">
         <Container>
           <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
-            {orders.map((order) => {
-              const status = getOrderStatus(order.status);
-              const StatusIcon = Icons[status.icon];
-              const images = (order.itemImages ?? []).filter(
-                (url): url is string => Boolean(url),
-              );
+            {orders.length > 0 ? (
+              orders.map((order) => {
+                const status = getOrderStatus(order.status);
+                const StatusIcon = Icons[status.icon];
+                const images = (order.itemImages ?? []).filter(
+                  (url): url is string => Boolean(url),
+                );
 
-              const displayImage = images[0]; // single image
-              const totalItems = order.itemCount ?? images.length;
-              const extraCount = Math.max(totalItems - 1, 0);
+                const displayImage = images[0]; // single image
+                const totalItems = order.itemCount ?? images.length;
+                const extraCount = Math.max(totalItems - 1, 0);
 
-              return (
-                <Link
-                  key={order._id}
-                  href={`/orders/${order._id}`}
-                  className="bg-card group border-border block h-auto space-y-5 overflow-hidden rounded-md border p-6 shadow-xs md:p-8"
-                >
-                  <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                    <div className="bg-border/20 relative flex size-24 items-center justify-center overflow-hidden border shadow-xs">
-                      {displayImage.length === 0 ? (
-                        <Icons.ShoppingBag02Icon className="text-muted-foreground size-8" />
-                      ) : (
-                        <React.Fragment>
-                          <Image
-                            src={displayImage}
-                            alt=""
-                            fill
-                            quality={100}
-                            loading="lazy"
-                            className="object-cover"
-                          />
-                          {extraCount > 0 && (
-                            <div className="bg-foreground text-background absolute right-1.5 bottom-1.5 flex size-8 items-center justify-center border-2 text-sm font-medium">
-                              +{extraCount}
-                            </div>
-                          )}
-                        </React.Fragment>
-                      )}
-                    </div>
-
-                    {/* Right: Order Details */}
-                    <div className="flex min-w-0 flex-1 flex-col py-1">
-                      <div className="flex items-center justify-between">
-                        <p className="font-semibold text-zinc-900 dark:text-zinc-100">
-                          Order #{formatOrderNumber(order.orderNumber)}
-                        </p>
-                        <Badge
-                          className={cn(
-                            "flex items-center gap-1 border",
-                            status.className,
-                          )}
-                        >
-                          <StatusIcon
-                            className={cn(
-                              "size-3.5!",
-                              status.value === "pending" && "animate-spin",
+                return (
+                  <Link
+                    key={order._id}
+                    href={`/orders/${order._id}`}
+                    className="bg-card group border-border block h-auto space-y-5 overflow-hidden rounded-md border p-6 shadow-xs md:p-8"
+                  >
+                    <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
+                      <div className="bg-border/20 relative flex size-24 items-center justify-center overflow-hidden border shadow-xs">
+                        {displayImage.length === 0 ? (
+                          <Icons.ShoppingBag02Icon className="text-muted-foreground size-8" />
+                        ) : (
+                          <React.Fragment>
+                            <Image
+                              src={displayImage}
+                              alt=""
+                              fill
+                              quality={100}
+                              loading="lazy"
+                              className="object-cover"
+                            />
+                            {extraCount > 0 && (
+                              <div className="bg-foreground text-background absolute right-1.5 bottom-1.5 flex size-8 items-center justify-center border-2 text-sm font-medium">
+                                +{extraCount}
+                              </div>
                             )}
-                          />
-                          <span className="font-sans text-xs font-medium">
-                            {status.label}
-                          </span>
-                        </Badge>
+                          </React.Fragment>
+                        )}
                       </div>
-                      <p className="text-muted-foreground mt-0.5 mb-6 text-xs font-medium sm:mb-4">
-                        {formatDate(order.createdAt, "datetime")}
-                      </p>
 
-                      <div className="mt-auto flex items-center justify-between">
-                        <p className="text-muted-foreground text-sm">
-                          Total of <strong>{order.itemCount}</strong>{" "}
-                          {order.itemCount === 1 ? "item" : "items"}
+                      {/* Right: Order Details */}
+                      <div className="flex min-w-0 flex-1 flex-col py-1">
+                        <div className="flex items-center justify-between">
+                          <p className="font-semibold text-zinc-900 dark:text-zinc-100">
+                            Order #{formatOrderNumber(order.orderNumber)}
+                          </p>
+                          <Badge
+                            className={cn(
+                              "flex items-center gap-1 border",
+                              status.className,
+                            )}
+                          >
+                            <StatusIcon
+                              className={cn(
+                                "size-3.5!",
+                                status.value === "pending" && "animate-spin",
+                              )}
+                            />
+                            <span className="font-sans text-xs font-medium">
+                              {status.label}
+                            </span>
+                          </Badge>
+                        </div>
+                        <p className="text-muted-foreground mt-0.5 mb-6 text-xs font-medium sm:mb-4">
+                          {formatDate(order.createdAt, "datetime")}
                         </p>
-                        <p className="text-foreground text-lg font-semibold">
-                          {formatPrice(order.total)}
-                        </p>
+
+                        <div className="mt-auto flex items-center justify-between">
+                          <p className="text-muted-foreground text-sm">
+                            Total of <strong>{order.itemCount}</strong>{" "}
+                            {order.itemCount === 1 ? "item" : "items"}
+                          </p>
+                          <p className="text-foreground text-lg font-semibold">
+                            {formatPrice(order.total)}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Footer: View Details */}
-                  <div className="flex items-center justify-between gap-6 border-t pt-3">
-                    <p className="text-muted-foreground truncate text-sm">
-                      {order.itemNames?.slice(0, 2).filter(Boolean).join(", ")}
-                      {(order.itemNames?.length ?? 0) > 2 && "..."}
-                    </p>
-                    <p className="flex shrink-0 items-center gap-1 text-sm font-medium transition-colors">
-                      <span>View order</span>
-                      <Icons.ArrowRight01Icon className="mt-0.5 size-4.5 transition-transform group-hover:translate-x-0.5" />
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
+                    {/* Footer: View Details */}
+                    <div className="flex items-center justify-between gap-6 border-t pt-3">
+                      <p className="text-muted-foreground truncate text-sm">
+                        {order.itemNames
+                          ?.slice(0, 2)
+                          .filter(Boolean)
+                          .join(", ")}
+                        {(order.itemNames?.length ?? 0) > 2 && "..."}
+                      </p>
+                      <p className="flex shrink-0 items-center gap-1 text-sm font-medium transition-colors">
+                        <span>View order</span>
+                        <Icons.ArrowRight01Icon className="mt-0.5 size-4.5 transition-transform group-hover:translate-x-0.5" />
+                      </p>
+                    </div>
+                  </Link>
+                );
+              })
+            ) : (
+              <Empty>
+                <EmptyHeader>
+                  <EmptyMedia variant="icon">
+                    <Icons.ProductLoadingIcon />
+                  </EmptyMedia>
+                  <EmptyTitle>No orders yet</EmptyTitle>
+                  <EmptyDescription>
+                    When you place an order, it will appear here.
+                  </EmptyDescription>
+                </EmptyHeader>
+                <EmptyContent>
+                  <Link href="/shop" className={buttonVariants({ size: "lg" })}>
+                    Start Shopping
+                  </Link>
+                </EmptyContent>
+              </Empty>
+            )}
           </div>
         </Container>
       </div>
