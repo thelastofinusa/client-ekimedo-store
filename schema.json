@@ -949,13 +949,6 @@
         },
         "optional": true
       },
-      "customBudget": {
-        "type": "objectAttribute",
-        "value": {
-          "type": "string"
-        },
-        "optional": true
-      },
       "priceRange": {
         "type": "objectAttribute",
         "value": {

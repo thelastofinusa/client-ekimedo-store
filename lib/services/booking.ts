@@ -30,26 +30,30 @@ export async function createBookingService(formData: FormData) {
     const phone = formData.get("phone") as string;
     const location = formData.get("location") as string;
     const budget = formData.get("budget") as string | null;
-    const customBudget = formData.get("customBudget") as string | null;
     const referBy = formData.get("referBy") as string | null;
     const dressSize = formData.get("dressSize") as string | null;
     const dressColor = formData.get("dressColor") as string | null;
-    const specialRequirements = formData.get("specialRequirements") as string | null;
+    const paymentMethod = formData.get("paymentMethod") as string;
+    const specialRequirements = formData.get("specialRequirements") as
+      | string
+      | null;
     const priceRange = formData.get("priceRange") as string | null;
 
     const timelineValues = formData.getAll("timeline") as string[];
     const timeline = timelineValues.includes("timeline-acknowledged");
     const rushOrder = timelineValues.includes("rush-required");
 
-    const cancellationPolicyValues = formData.getAll("cancellationPolicy") as string[];
-    const cancellationPolicy = cancellationPolicyValues.includes("cancellation-accepted");
+    const cancellationPolicyValues = formData.getAll(
+      "cancellationPolicy",
+    ) as string[];
+    const cancellationPolicy = cancellationPolicyValues.includes(
+      "cancellation-accepted",
+    );
 
     const interests = formData.getAll("interests") as string[];
 
     // Handle multiple files
-    const inspirationFiles = [
-      ...(formData.getAll("inspiration") as File[]),
-    ];
+    const inspirationFiles = [...(formData.getAll("inspiration") as File[])];
 
     if (!serviceSlug) {
       throw new Error("Missing service type");
@@ -61,9 +65,6 @@ export async function createBookingService(formData: FormData) {
     if (!service) {
       throw new Error("Service not found");
     }
-
-    // Process dynamic form fields
-    const responses: { key: string; label: string; value: string }[] = [];
 
     const imageAssetIds: string[] = [];
     const imageUrls: string[] = [];
@@ -101,10 +102,12 @@ export async function createBookingService(formData: FormData) {
       endTime: endTime ? new Date(endTime).toISOString() : undefined,
       eventDate: eventDate ? new Date(eventDate).toISOString() : undefined,
       status: "pending",
+      paymentStatus: "unpaid",
+      paymentMethod,
+      createdAt: new Date().toISOString(),
       location,
       guests,
       budget: budget || undefined,
-      customBudget: customBudget || undefined,
       priceRange: priceRange || undefined,
       interests,
       referBy: referBy || undefined,
@@ -114,7 +117,6 @@ export async function createBookingService(formData: FormData) {
       dressSize: dressSize || undefined,
       dressColor: dressColor || undefined,
       specialRequirements: specialRequirements || undefined,
-      responses,
       inspiration: imageAssetIds.map((id) => ({
         _key: randomUUID(),
         _type: "image",
@@ -126,8 +128,6 @@ export async function createBookingService(formData: FormData) {
     };
 
     const createdBooking = await writeClient.create(bookingDoc);
-
-    const paymentMethod = formData.get("paymentMethod") as string;
 
     const baseUrl =
       siteConfig.url ||
@@ -165,11 +165,17 @@ export async function createBookingService(formData: FormData) {
           location,
           eventDate,
           budgetType: budget || "",
-          customBudget: customBudget || "",
           paymentMethod,
           rushOrder: rushOrder ? "yes" : "no",
         },
       });
+
+      await writeClient
+        .patch(createdBooking._id)
+        .set({
+          stripePaymentId: session.id,
+        })
+        .commit();
 
       return { success: true, url: session.url };
     } else if (paymentMethod === "paypal") {
@@ -227,6 +233,10 @@ export async function createBookingService(formData: FormData) {
         }
       } catch (e) {
         // Not a JSON error message, use the raw message
+        return {
+          success: false,
+          error: e instanceof Error ? e.message : "Something went wrong",
+        };
       }
     }
 

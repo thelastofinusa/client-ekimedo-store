@@ -49,7 +49,6 @@ export interface AdminBookingNotificationProps {
   socialLinks?: SocialLink[];
   eventDate?: string | Date | null;
   budgetType?: string | null;
-  customBudget?: string | null;
   paymentMethod?: string | null;
   rushOrder?: string | null;
   interests?: string[];
@@ -68,7 +67,6 @@ export const AdminBookingNotificationEmail = ({
   socialLinks = [],
   eventDate,
   budgetType,
-  customBudget,
   paymentMethod,
   rushOrder,
   interests,
@@ -97,9 +95,7 @@ export const AdminBookingNotificationEmail = ({
       })
     : null;
 
-  const budgetLabel =
-    (customBudget && customBudget.length > 0 ? customBudget : budgetType) ||
-    null;
+  const budgetLabel = budgetType || null;
 
   const paymentMethodLabel = paymentMethod
     ? paymentMethod === "stripe"

@@ -159,7 +159,6 @@ export type Booking = {
   guests?: number;
   eventDate?: string;
   budget?: string;
-  customBudget?: string;
   priceRange?: string;
   paymentMethod?: "stripe" | "paypal";
   inspiration?: Array<{

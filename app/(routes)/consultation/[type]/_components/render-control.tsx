@@ -29,30 +29,17 @@ import { Label } from "@/ui/label";
 import { Button } from "@/ui/button";
 import { Checkbox } from "@/ui/checkbox";
 import { PhoneInput } from "@/ui/phone-input";
-import { cn, formatFileSize, formatPrice, truncateFilename } from "@/lib/utils";
+import {
+  cn,
+  formatDateTimeLocal,
+  formatFileSize,
+  formatPrice,
+  parseDateTimeLocal,
+  truncateFilename,
+} from "@/lib/utils";
 import { FormControl, FormLabel } from "@/ui/form";
 import { Notify } from "@/components/shared/notify";
 import { RadioGroup, RadioGroupItem } from "@/ui/radio-group";
-
-const formatDateTimeLocal = (date?: Date): string => {
-  if (!(date instanceof Date) || isNaN(date.getTime())) {
-    return "";
-  }
-  const pad = (value: number) => String(value).padStart(2, "0");
-  const year = date.getFullYear();
-  const month = pad(date.getMonth() + 1);
-  const day = pad(date.getDate());
-  const hours = pad(date.getHours());
-  const minutes = pad(date.getMinutes());
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-};
-
-const parseDateTimeLocal = (value: string): Date | undefined => {
-  if (!value) return undefined;
-  const date = new Date(value);
-  if (isNaN(date.getTime())) return undefined;
-  return date;
-};
 
 export const RenderFormControl: React.FC<{
   isSubmitting: boolean;
@@ -64,6 +51,23 @@ export const RenderFormControl: React.FC<{
     number | null
   >(null);
   const [selectedImageIndex, setSelectedImageIndex] = React.useState(0);
+  const [disabledDates, setDisabledDates] = React.useState<Set<string>>(
+    new Set(),
+  );
+
+  React.useEffect(() => {
+    (async () => {
+      const res = await fetch("/api/bookings/dates");
+      const dates: string[] = await res.json();
+
+      // Normalize to datetime-local format
+      const normalized = dates
+        .map((d) => formatDateTimeLocal(new Date(d)))
+        .filter(Boolean);
+
+      setDisabledDates(new Set(normalized));
+    })();
+  }, []);
 
   const handlePrevious = React.useCallback(
     (e?: React.MouseEvent) => {
@@ -169,6 +173,7 @@ export const RenderFormControl: React.FC<{
           : field.value
             ? String(field.value)
             : "";
+
       return (
         <FormControl>
           <Input
@@ -177,7 +182,23 @@ export const RenderFormControl: React.FC<{
             min={formatDateTimeLocal(new Date())}
             value={value}
             onChange={(e) => {
-              const date = parseDateTimeLocal(e.target.value);
+              const rawValue = e.target.value;
+
+              if (disabledDates.has(rawValue)) {
+                toast.custom(() => (
+                  <Notify
+                    type="error"
+                    title="Time unavailable"
+                    description="This consultation time is already booked. Please choose another slot."
+                  />
+                ));
+
+                // Reset input
+                field.onChange(undefined);
+                return;
+              }
+
+              const date = parseDateTimeLocal(rawValue);
               field.onChange(date);
             }}
           />

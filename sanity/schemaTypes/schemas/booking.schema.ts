@@ -91,23 +91,6 @@ export const bookingType = defineType({
       initialValue: "unpaid",
     }),
     defineField({
-      name: "auditLog",
-      title: "Audit Log",
-      type: "array",
-      group: "general",
-      of: [
-        {
-          type: "object",
-          fields: [
-            { name: "timestamp", type: "datetime", title: "Timestamp" },
-            { name: "action", type: "string", title: "Action" },
-            { name: "note", type: "text", title: "Note" },
-          ],
-        },
-      ],
-      readOnly: true,
-    }),
-    defineField({
       name: "location",
       title: "Location",
       type: "string",
@@ -134,12 +117,6 @@ export const bookingType = defineType({
     defineField({
       name: "budget",
       title: "Budget",
-      type: "string",
-      group: "bridal",
-    }),
-    defineField({
-      name: "customBudget",
-      title: "Custom Budget",
       type: "string",
       group: "bridal",
     }),
@@ -218,33 +195,26 @@ export const bookingType = defineType({
       group: "prom",
     }),
     defineField({
-      name: "responses",
-      title: "Form Responses",
-      type: "array",
-      group: "general",
-      of: [
-        {
-          type: "object",
-          fields: [
-            { name: "key", type: "string", title: "Field Key" },
-            { name: "label", type: "string", title: "Field Label" },
-            { name: "value", type: "string", title: "Value" },
-          ],
-          preview: {
-            select: {
-              title: "label",
-              subtitle: "value",
-            },
-          },
-        },
-      ],
-    }),
-    defineField({
       name: "confirmationEmailSent",
       title: "Confirmation Email Sent",
       type: "boolean",
       group: "general",
       initialValue: false,
+      readOnly: true,
+    }),
+    defineField({
+      name: "stripePaymentId",
+      title: "Stripe Payment Id",
+      type: "string",
+      group: "general",
+      readOnly: true,
+    }),
+    defineField({
+      name: "createdAt",
+      title: "Created At",
+      type: "datetime",
+      group: "general",
+      initialValue: () => new Date().toISOString(),
       readOnly: true,
     }),
   ],

@@ -132,3 +132,23 @@ export const formatFileSize = (bytes: number) => {
   const kb = bytes / 1024;
   return kb < 1024 ? `${kb.toFixed(1)} KB` : `${(kb / 1024).toFixed(1)} MB`;
 };
+
+export const formatDateTimeLocal = (date?: Date): string => {
+  if (!(date instanceof Date) || isNaN(date.getTime())) {
+    return "";
+  }
+  const pad = (value: number) => String(value).padStart(2, "0");
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+export const parseDateTimeLocal = (value: string): Date | undefined => {
+  if (!value) return undefined;
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return undefined;
+  return date;
+};

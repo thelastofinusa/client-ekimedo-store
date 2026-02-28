@@ -65,9 +65,9 @@ export default async function OrdersPage() {
 
       <div className="py-24 lg:py-32">
         <Container>
-          <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
-            {orders.length > 0 ? (
-              orders.map((order) => {
+          {orders.length > 0 ? (
+            <div className="grid grid-cols-1 gap-5 lg:grid-cols-2 lg:gap-6">
+              {orders.map((order) => {
                 const status = getOrderStatus(order.status);
                 const StatusIcon = Icons[status.icon];
                 const images = (order.itemImages ?? []).filter(
@@ -162,8 +162,10 @@ export default async function OrdersPage() {
                     </div>
                   </Link>
                 );
-              })
-            ) : (
+              })}
+            </div>
+          ) : (
+            <div className="mx-auto w-full">
               <Empty>
                 <EmptyHeader>
                   <EmptyMedia variant="icon">
@@ -180,8 +182,8 @@ export default async function OrdersPage() {
                   </Link>
                 </EmptyContent>
               </Empty>
-            )}
-          </div>
+            </div>
+          )}
         </Container>
       </div>
     </div>

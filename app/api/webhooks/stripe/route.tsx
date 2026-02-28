@@ -141,7 +141,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       location,
       eventDate,
       budgetType,
-      customBudget,
       paymentMethod,
       rushOrder,
     } = metadata;
@@ -171,6 +170,7 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
         .set({
           status: "paid",
           paymentStatus: "paid",
+          paymentMethod: "stripe",
           stripePaymentId: stripePaymentId || session.id,
         })
         .append("auditLog", [
@@ -202,7 +202,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
           socialLinks: socialHandles || [],
           eventDate,
           budgetType,
-          customBudget,
           paymentMethod,
           rushOrder,
         });
@@ -230,14 +229,6 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
                     day: "numeric",
                   },
                 )}`
-              : ""
-          }${
-            budgetType || customBudget
-              ? `\nEstimated Budget: ${
-                  customBudget && customBudget.length > 0
-                    ? customBudget
-                    : budgetType
-                }`
               : ""
           }${
             rushOrder

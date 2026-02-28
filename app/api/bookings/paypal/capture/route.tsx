@@ -6,11 +6,20 @@ import { paypalClient } from "@/lib/paypal";
 import checkoutNodeJssdk from "@paypal/checkout-server-sdk";
 import { client, writeClient } from "@/sanity/lib/client";
 import { SOCIAL_QUERY } from "@/sanity/queries/social";
-import { AdminBookingNotificationEmail } from "@/emails/admin-booking-notification";
+import {
+  AdminBookingNotificationEmail,
+  AdminBookingNotificationProps,
+} from "@/emails/admin-booking-notification";
 import { siteConfig } from "@/site.config";
 import { env } from "@/lib/env";
 
 const resend = new Resend(env.RESEND_API_KEY);
+
+async function renderAdminBookingNotification(
+  props: AdminBookingNotificationProps,
+) {
+  return await render(<AdminBookingNotificationEmail {...props} />);
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -63,7 +72,6 @@ export async function GET(req: NextRequest) {
             location,
             eventDate,
             budget,
-            customBudget,
             paymentMethod,
             rushOrder
           }`,
@@ -76,22 +84,19 @@ export async function GET(req: NextRequest) {
           const adminTo = env.NEXT_PUBLIC_RESEND_CONTACT_EMAIL;
 
           if (adminTo) {
-            const adminHtml = await render(
-              <AdminBookingNotificationEmail
-                customerName={customerName}
-                serviceTitle={booking.service}
-                dateTime={booking.consultationDate}
-                location={(booking.location as "in-person") || "virtual"}
-                bookingId={bookingId}
-                siteUrl={siteConfig.url}
-                socialLinks={socialHandles || []}
-                eventDate={booking.eventDate}
-                budgetType={booking.budget}
-                customBudget={booking.customBudget}
-                paymentMethod="paypal"
-                rushOrder={booking.rushOrder ? "yes" : "no"}
-              />,
-            );
+            const adminHtml = await renderAdminBookingNotification({
+              customerName: customerName,
+              serviceTitle: booking.service,
+              dateTime: booking.consultationDate,
+              location: (booking.location as "in-person") || "virtual",
+              bookingId: bookingId,
+              siteUrl: siteConfig.url,
+              socialLinks: socialHandles || [],
+              eventDate: booking.eventDate,
+              budgetType: booking.budget,
+              paymentMethod: "paypal",
+              rushOrder: booking.rushOrder ? "yes" : "no",
+            });
 
             const { error: adminError } = await resend.emails.send({
               from: `${siteConfig.title} <${env.NEXT_PUBLIC_RESEND_INFO_EMAIL}>`,

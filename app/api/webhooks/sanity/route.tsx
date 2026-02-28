@@ -67,7 +67,6 @@ export async function POST(req: Request) {
         location,
         eventDate,
         budget,
-        customBudget,
         paymentMethod,
         rushOrder,
         status,
@@ -104,8 +103,14 @@ export async function POST(req: Request) {
         .set({ confirmationEmailSent: true })
         .commit();
     } catch (lockError) {
-      console.error("[Sanity Webhook] Failed to acquire lock for", _id, lockError);
-      return NextResponse.json({ message: "Lock acquisition failed, another handler processed this" });
+      console.error(
+        "[Sanity Webhook] Failed to acquire lock for",
+        _id,
+        lockError,
+      );
+      return NextResponse.json({
+        message: "Lock acquisition failed, another handler processed this",
+      });
     }
 
     // The lock is now set. The next webhook delivery triggered by this write
@@ -148,7 +153,6 @@ export async function POST(req: Request) {
       socialLinks: socialHandles || [],
       eventDate: booking.eventDate,
       budgetType: booking.budget,
-      customBudget: booking.customBudget,
       paymentMethod: booking.paymentMethod,
       rushOrder: booking.rushOrder ? "yes" : "no",
     });
