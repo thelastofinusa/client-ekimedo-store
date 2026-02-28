@@ -82,9 +82,13 @@ export const ShotsComp: React.FC<{
               </div>
             </div>
           ))}
-
-          {isLoading && <MasonrySkeleton count={GALLERY_PAGE_SIZE} />}
         </div>
+
+        {isLoading && (
+          <div className="columns-2 gap-4 md:columns-3 md:gap-5 lg:columns-4">
+            <MasonrySkeleton count={GALLERY_PAGE_SIZE} />
+          </div>
+        )}
 
         {hasMore && <div ref={observerRef} className="h-10" />}
       </Container>
