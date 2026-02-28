@@ -42,6 +42,7 @@
     "@t3-oss/env-nextjs": "^0.13.10",
     "@types/paypal__checkout-server-sdk": "^1.0.8",
     "@vercel/analytics": "^1.6.1",
+    "canvas-confetti": "^1.9.4",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
@@ -72,6 +73,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
+    "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^20.19.29",
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",

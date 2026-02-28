@@ -6,17 +6,23 @@ import { Container } from "./container";
 import Image from "next/image";
 
 export const HeroComp: React.FC<{
-  title: string;
+  title: string | React.ReactElement;
   description?: string | React.ReactElement;
   imagePath?: string;
   comp?: React.ReactElement;
 }> = ({ title, description, imagePath, comp }) => {
+  const imageSrc = imagePath?.startsWith("/")
+    ? imagePath
+    : imagePath
+      ? `/assets/hero/${imagePath}`
+      : undefined;
+
   return (
     <div className="bg-foreground relative overflow-hidden py-24">
-      {imagePath && (
+      {imageSrc && (
         <Image
-          src={`/assets/hero/${imagePath}`}
-          alt={title}
+          src={imageSrc}
+          alt={typeof title === "string" ? title : "Hero background image"}
           fill
           priority
           quality={100}

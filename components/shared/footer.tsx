@@ -117,7 +117,7 @@ export const Footer = async () => {
 
           {footerRoutes.map((item) => (
             <div className="space-y-6" key={item.title}>
-              <h4 className="text-muted-foreground font-mono text-[11px] font-medium tracking-[0.3em] uppercase">
+              <h4 className="text-muted-foreground font-sans text-xs font-medium tracking-widest uppercase">
                 {item.title}
               </h4>
               <nav className="flex flex-col gap-4">

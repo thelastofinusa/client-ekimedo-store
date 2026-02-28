@@ -177,7 +177,7 @@ export const InquireForm = () => {
   }
 
   return (
-    <div className="from-secondary/80 via-secondary/30 to-background bg-linear-to-b py-24 lg:py-32">
+    <div className="py-24 lg:py-32">
       <Container size="xs" className="max-w-3xl">
         <div className="bg-card border-border rounded-md border p-6 shadow-xs md:p-8 lg:p-12">
           <h2 className="mb-1 font-serif text-xl md:text-2xl">

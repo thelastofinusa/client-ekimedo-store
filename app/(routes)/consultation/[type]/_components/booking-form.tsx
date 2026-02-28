@@ -489,7 +489,7 @@ export const BookingForm: React.FC<{
   };
 
   return (
-    <div className="from-secondary/80 via-secondary/30 to-background bg-linear-to-b py-24 lg:py-32">
+    <div className="py-24 lg:py-32">
       <Container size="default">
         <Form {...form}>
           <form

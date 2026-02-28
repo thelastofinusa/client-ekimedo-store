@@ -96,7 +96,7 @@ export default async function ContactPage() {
 
   return (
     <div className="flex-1 overflow-x-clip">
-      <div className="from-secondary/80 via-secondary/30 to-background flex flex-col gap-10 bg-linear-to-b py-24 lg:py-32">
+      <div className="flex flex-col gap-10 py-24 lg:py-32">
         <ContactFormComp
           categories={categories}
           socialHandles={socialHandles}
@@ -108,11 +108,9 @@ export default async function ContactPage() {
           <Container size="sm">
             <div className="flex flex-col gap-10 md:flex-row md:gap-16">
               <div className="md:w-1/3">
-                <div className="sticky top-20">
-                  <h2 className="font-serif text-4xl capitalize md:text-5xl">
-                    Frequently Asked Questions
-                  </h2>
-                </div>
+                <h2 className="font-serif text-4xl capitalize md:text-5xl">
+                  Frequently Asked Questions
+                </h2>
               </div>
               <div className="md:w-2/3">
                 <Accordion
@@ -146,10 +144,7 @@ export default async function ContactPage() {
         </div>
       )}
 
-      <div
-        className="from-secondary/80 via-secondary/30 to-background bg-linear-to-b py-24 lg:py-32"
-        id="productionProcess"
-      >
+      <div className="py-24 lg:py-32" id="productionProcess">
         <Container size="sm">
           <div className="flex flex-col gap-10 md:gap-16">
             <div className="mx-auto max-w-xl text-center">

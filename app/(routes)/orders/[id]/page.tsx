@@ -36,7 +36,7 @@ export default async function OrderDetailsPage({
             href="/orders"
             className="inline-flex items-center gap-2 text-sm"
           >
-            <Icons.ArrowLeft01Icon className="mt-px size-4.5" />
+            <Icons.ArrowLeft01Icon className="size-4.5" />
             <span>Back to Orders</span>
           </Link>
           <div className="mt-4 flex flex-col gap-1">
@@ -50,13 +50,18 @@ export default async function OrderDetailsPage({
                   status.className,
                 )}
               >
-                <StatusIcon className="size-3.5!" />
-                <span className="font-mono font-medium tracking-wider">
+                <StatusIcon
+                  className={cn(
+                    "size-3.5!",
+                    status.value === "pending" && "animate-spin",
+                  )}
+                />
+                <span className="font-sans text-xs font-medium">
                   {status.label}
                 </span>
               </Badge>
             </div>
-            <p className="text-muted-foreground text-sm">
+            <p className="text-sm">
               Placed on {formatDate(order.createdAt, "datetime")}
             </p>
           </div>
@@ -69,11 +74,11 @@ export default async function OrderDetailsPage({
                 Items ({order.items?.length ?? 0})
               </p>
 
-              <div className="relative flex justify-between divide-y p-6 md:px-8">
+              <div className="relative flex flex-col divide-y px-6 md:px-8">
                 {order.items?.map((item) => (
-                  <div key={item._key} className="flex flex-1 gap-4">
+                  <div key={item._key} className="flex flex-1 gap-4 py-6">
                     {/* Image */}
-                    <div className="bg-secondary relative h-20 w-20 shrink-0 overflow-hidden rounded-md">
+                    <div className="bg-border/20 relative flex size-24 items-center justify-center overflow-hidden border shadow-xs">
                       {item.product?.image?.asset?.url ? (
                         <Image
                           src={item.product.image.asset.url}
@@ -83,9 +88,7 @@ export default async function OrderDetailsPage({
                           sizes="80px"
                         />
                       ) : (
-                        <div className="flex h-full items-center justify-center text-xs text-zinc-400">
-                          No image
-                        </div>
+                        <Icons.ShoppingBag02Icon className="text-muted-foreground size-8" />
                       )}
                     </div>
 
@@ -176,20 +179,26 @@ export default async function OrderDetailsPage({
               <div className="flex items-center gap-2">
                 <Icons.Payment01Icon className="size-4" />
                 <p className="text-xs font-medium tracking-widest uppercase">
-                  Customer
+                  Payment
                 </p>
               </div>
 
               <div className="mt-6 flex flex-col gap-2.5">
                 <div className="flex items-center justify-between text-sm">
-                  <p className="text-sm">Email</p>
-                  <p className="text-sm font-medium">{order.email}</p>
+                  <p className="text-sm">Status</p>
+                  <p className="flex items-center gap-1 text-sm font-semibold">
+                    <StatusIcon
+                      className={cn(
+                        "size-4",
+                        status.value === "pending" && "animate-spin",
+                      )}
+                    />
+                    <span>{status.label}</span>
+                  </p>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <p className="text-sm">Payment</p>
-                  <p className="text-sm font-semibold text-green-700">
-                    Confirmed
-                  </p>
+                  <p className="text-sm">Email</p>
+                  <p className="text-sm font-medium">{order.email}</p>
                 </div>
               </div>
             </div>

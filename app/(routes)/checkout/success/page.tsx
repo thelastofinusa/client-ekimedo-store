@@ -4,8 +4,9 @@ import {
   getCheckoutSession,
   getOrderByPaymentIntent,
 } from "@/lib/services/checkout";
-import { SuccessClient } from "../_components/success-card";
+
 import { siteConfig } from "@/site.config";
+import { SuccessCard } from "../_components/success-card";
 
 export const metadata = {
   title: "Order Confirmed",
@@ -47,11 +48,9 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
   const paymentIntentId = params.payment_intent;
 
   const { userId } = await auth();
-  if (!userId) redirect("/");
+  if (!userId) return redirect("/");
 
-  if (!sessionId && !paymentIntentId) {
-    redirect("/");
-  }
+  if (!sessionId && !paymentIntentId) return redirect("/");
 
   let result;
 
@@ -60,14 +59,16 @@ export default async function SuccessPage({ searchParams }: SuccessPageProps) {
   } else if (paymentIntentId) {
     result = await getOrderByPaymentIntent(paymentIntentId, userId);
   } else {
-    redirect("/");
+    return redirect("/");
   }
 
-  if (!result.success || !result.session) {
-    // If order not found or unauthorized, redirect home
-    // We could also show an error page here
-    redirect("/");
-  }
+  if (!result.success || !result.session) return redirect("/");
 
-  return <SuccessClient session={result.session} />;
+  return (
+    <div className="flex-1 overflow-x-clip">
+      <div className="py-24 lg:py-32">
+        <SuccessCard session={result.session} />
+      </div>
+    </div>
+  );
 }

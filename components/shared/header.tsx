@@ -10,7 +10,6 @@ import { Icons } from "hugeicons-proxy";
 import { MenuSheet } from "../sheets/menu.sheet";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { Separator } from "@/ui/separator";
-import { PiPackageDuotone } from "react-icons/pi";
 import { useTotalItems } from "../providers/cart.provider";
 import {
   NavigationMenu,
@@ -32,7 +31,6 @@ export const Header = () => {
   const forceActiveRoutes = [
     "/about",
     "/contact",
-    "/testimonials/",
     "/shop/",
     "/orders/",
     "/checkout",
@@ -41,7 +39,6 @@ export const Header = () => {
   ];
   const isDynamicShopRoute =
     (pathname.startsWith("/shop/") && pathname !== "/shop") ||
-    (pathname.startsWith("/testimonials/") && pathname !== "/testimonials") ||
     (pathname.startsWith("/orders/") && pathname !== "/orders");
 
   const totalItems: number = useTotalItems();
@@ -216,20 +213,29 @@ export const Header = () => {
                   >
                     <UserButton
                       afterSwitchSessionUrl="/"
-                      appearance={{
-                        elements: {
-                          avatarBox: "h-9 w-9",
-                        },
-                      }}
+                      appearance={{ elements: { avatarBox: "h-9 w-9" } }}
                     >
                       <UserButton.MenuItems>
+                        {/* Custom actions FIRST */}
                         <UserButton.Link
                           label="My Orders"
                           labelIcon={
-                            <PiPackageDuotone className="mt-px size-4" />
+                            <Icons.PayByCheckIcon className="text-foreground mt-0.5 size-3.5" />
                           }
                           href="/orders"
                         />
+
+                        <UserButton.Action label="manageAccount" />
+
+                        <UserButton.Link
+                          label="Write a Review"
+                          labelIcon={
+                            <Icons.ChatPreview01Icon className="text-foreground mt-0.5 size-3.5" />
+                          }
+                          href="/testimonials/create"
+                        />
+
+                        <UserButton.Action label="signOut" />
                       </UserButton.MenuItems>
                     </UserButton>
                   </Button>

@@ -8,7 +8,7 @@ import { siteConfig } from "@/site.config";
 export const DiscoverComp = () => {
   return (
     <div className="bg-background">
-      <div className="from-secondary via-secondary/50 bg-linear-to-b to-transparent py-24 lg:py-32">
+      <div className="py-24 lg:py-32">
         <Container>
           <div className="grid grid-cols-1 items-center gap-20 md:grid-cols-2">
             <div className="flex flex-col gap-6 md:gap-8">
