@@ -8,4 +8,4 @@ export const LOW_STOCK_THRESHOLD = 3;
 
 export const FILE_SIZE_MB = 5 * 1024 * 1024;
 
-export const GALLERY_PAGE_SIZE = 20;
+export const GALLERY_PAGE_SIZE = 10;

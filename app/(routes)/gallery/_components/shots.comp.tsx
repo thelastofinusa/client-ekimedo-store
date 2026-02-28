@@ -7,10 +7,7 @@ import { Container } from "@/components/shared/container";
 import { Icons } from "hugeicons-proxy";
 import { Button } from "@/ui/button";
 import { GALLERY_QUERYResult } from "@/sanity.types";
-import { Skeleton } from "@/ui/skeleton";
-import { GALLERY_PAGE_SIZE } from "@/lib/constants/keys";
-
-const HEIGHTS = [300, 320, 360, 400, 440, 480];
+import { siteConfig } from "@/site.config";
 
 export const ShotsComp: React.FC<{
   shots: GALLERY_QUERYResult;
@@ -84,20 +81,21 @@ export const ShotsComp: React.FC<{
               </div>
             </div>
           ))}
-
-          {isLoading &&
-            Array.from({ length: GALLERY_PAGE_SIZE }).map((_, idx) => {
-              const height = HEIGHTS[idx % HEIGHTS.length];
-
-              return (
-                <Skeleton
-                  key={idx}
-                  className="bg-border/50 mb-3 break-inside-avoid shadow-xs sm:mb-4 md:mb-5"
-                  style={{ height }}
-                />
-              );
-            })}
         </div>
+
+        {isLoading && (
+          <div className="mt-6 sm:mt-10 md:mt-12">
+            <Image
+              src="/assets/logo/charcoal.svg"
+              alt={siteConfig.title}
+              width={80}
+              height={80}
+              priority
+              quality={100}
+              className="pointer-events-none mx-auto animate-pulse object-contain"
+            />
+          </div>
+        )}
 
         {hasMore && <div ref={observerRef} className="h-10" />}
       </Container>
