@@ -14,13 +14,38 @@ import {
 } from "@/ui/select";
 import { HeroComp } from "@/components/shared/hero";
 import { CATEGORIES_QUERYResult, GALLERY_QUERYResult } from "@/sanity.types";
+import { GALLERY_PAGE_SIZE } from "@/lib/constants/keys";
 
 export const GallerySection: React.FC<{
-  gallery: GALLERY_QUERYResult;
   category: CATEGORIES_QUERYResult;
-}> = ({ gallery, category }) => {
+}> = ({ category }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const activeCategory = searchParams.get("category");
+
+  const [items, setItems] = React.useState<GALLERY_QUERYResult>([]);
+  const [page, setPage] = React.useState(0);
+  const [hasMore, setHasMore] = React.useState(true);
+  const [loading, setLoading] = React.useState(false);
+
+  const loadMore = React.useCallback(async () => {
+    if (loading || !hasMore) return;
+
+    setLoading(true);
+
+    const res = await fetch(
+      `/api/gallery?start=${page * GALLERY_PAGE_SIZE}&limit=${GALLERY_PAGE_SIZE}${
+        activeCategory ? `&category=${activeCategory}` : ""
+      }`,
+    );
+
+    const data = await res.json();
+
+    setItems((prev) => [...prev, ...data.items]);
+    setHasMore(data.hasMore);
+    setPage((p) => p + 1);
+    setLoading(false);
+  }, [page, hasMore, loading, activeCategory]);
 
   const categories: CATEGORIES_QUERYResult = React.useMemo(
     () => [
@@ -32,7 +57,7 @@ export const GallerySection: React.FC<{
 
   const categoryParam = searchParams.get("category") ?? "";
 
-  const activeCategory =
+  const paramCategory =
     categories.find((c) => c.slug === categoryParam)?.slug ?? "";
 
   const setActiveCategory = React.useCallback(
@@ -50,18 +75,17 @@ export const GallerySection: React.FC<{
     [router, searchParams],
   );
 
-  const filteredItems = React.useMemo(
-    () =>
-      gallery.filter((item) => {
-        const categoryMatch =
-          !activeCategory ||
-          item.category?.slug ===
-            activeCategory.toLowerCase().replace(" ", "-");
+  // Reset on category change
+  React.useEffect(() => {
+    setItems([]);
+    setPage(0);
+    setHasMore(true);
+  }, [activeCategory]);
 
-        return categoryMatch;
-      }),
-    [gallery, activeCategory],
-  );
+  // Load first page
+  React.useEffect(() => {
+    loadMore();
+  }, []);
 
   return (
     <React.Fragment>
@@ -70,15 +94,11 @@ export const GallerySection: React.FC<{
         comp={
           <div className="grid w-full max-w-sm grid-cols-1 gap-6">
             <div className="flex flex-col gap-2">
-              <span className="text-muted-foreground text-[10px] tracking-[0.2em] uppercase">
-                Occasion
-              </span>
-
               <Select
-                value={activeCategory}
+                value={paramCategory}
                 onValueChange={(e) => setActiveCategory(e)}
               >
-                <SelectTrigger className="w-full bg-transparent">
+                <SelectTrigger className="text-background w-full bg-transparent">
                   <SelectValue placeholder="Select a category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -95,7 +115,12 @@ export const GallerySection: React.FC<{
           </div>
         }
       />
-      <ShotsComp shots={filteredItems} />
+      <ShotsComp
+        shots={items}
+        loadMore={loadMore}
+        hasMore={hasMore}
+        isLoading={loading}
+      />
     </React.Fragment>
   );
 };

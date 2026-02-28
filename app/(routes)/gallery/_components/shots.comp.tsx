@@ -7,10 +7,15 @@ import { Container } from "@/components/shared/container";
 import { Icons } from "hugeicons-proxy";
 import { Button } from "@/ui/button";
 import { GALLERY_QUERYResult } from "@/sanity.types";
+import { Skeleton } from "@/ui/skeleton";
+import { GALLERY_PAGE_SIZE } from "@/lib/constants/keys";
 
-export const ShotsComp: React.FC<{ shots: GALLERY_QUERYResult }> = ({
-  shots,
-}) => {
+export const ShotsComp: React.FC<{
+  shots: GALLERY_QUERYResult;
+  loadMore: () => void;
+  hasMore: boolean;
+  isLoading: boolean;
+}> = ({ shots, loadMore, hasMore, isLoading }) => {
   const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
 
   const handlePrevious = React.useCallback(
@@ -35,63 +40,53 @@ export const ShotsComp: React.FC<{ shots: GALLERY_QUERYResult }> = ({
     [selectedIndex, shots.length],
   );
 
+  const observerRef = React.useRef<HTMLDivElement | null>(null);
+
+  React.useEffect(() => {
+    if (!hasMore || isLoading) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) loadMore();
+      },
+      { rootMargin: "200px" },
+    );
+
+    if (observerRef.current) observer.observe(observerRef.current);
+
+    return () => observer.disconnect();
+  }, [loadMore, hasMore, isLoading]);
+
   return (
     <section className="py-16 md:py-24 lg:px-8">
       <Container size="lg">
-        {shots.length > 0 ? (
-          <div className="columns-2 gap-4 md:columns-3 md:gap-5 lg:columns-4">
-            <AnimatePresence mode="popLayout">
-              {shots.map((item, index) => (
-                <motion.div
-                  key={item._id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.5, delay: index * 0.05 }}
-                  onClick={() => setSelectedIndex(index)}
-                  className="group bg-background/5 border-border/20 relative mb-4 w-full cursor-pointer break-inside-avoid-column overflow-hidden border shadow-xs md:mb-5"
-                >
-                  <Image
-                    src={item.image || "/placeholder.svg"}
-                    alt={item.title || ""}
-                    width={880}
-                    height={0}
-                    loading="lazy"
-                    className="h-auto object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-80"
-                  />
-                  <div className="bg-foreground/20 absolute inset-0 flex flex-col justify-end p-6 opacity-0 transition-opacity duration-500 group-hover:opacity-100 md:p-8">
-                    <span className="text-background mb-1 text-xs tracking-widest uppercase md:mb-2">
-                      {item.category?.name?.replace("-", " ")}
-                    </span>
-                    {item.title && (
-                      <h3 className="font-serif text-xl md:text-2xl">
-                        {item.title}
-                      </h3>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex flex-col items-center justify-center space-y-6 py-10 text-center"
-          >
-            <div className="flex h-20 w-20 items-center justify-center rounded-full border">
-              <Icons.DeliveryBox02Icon className="h-8 w-8" />
+        <div className="columns-2 gap-4 md:columns-3 md:gap-5 lg:columns-4">
+          {shots.map((item, index) => (
+            <div
+              key={item._id}
+              onClick={() => setSelectedIndex(index)}
+              className="group bg-background/5 border-border/20 relative mb-4 w-full cursor-pointer break-inside-avoid-column overflow-hidden border shadow-xs md:mb-5"
+            >
+              <Image
+                src={item.image || "/placeholder.svg"}
+                alt=""
+                width={880}
+                height={0}
+                loading="lazy"
+                className="h-auto object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-80"
+              />
+              <div className="absolute inset-0 flex flex-col justify-end bg-linear-to-b from-transparent via-black/20 to-black/70 p-6 duration-500 md:px-8">
+                <span className="text-background mb-1 text-sm font-medium tracking-widest uppercase md:mb-2">
+                  {item.category?.name?.replace("-", " ")}
+                </span>
+              </div>
             </div>
-            <div className="space-y-2">
-              <h3 className="font-serif text-2xl">No Archive Found</h3>
-              <p className="max-w-xs text-sm leading-relaxed tracking-wider opacity-40">
-                We have no curated selections for this specific criteria in our
-                historical archives.
-              </p>
-            </div>
-          </motion.div>
-        )}
+          ))}
+
+          {isLoading && <MasonrySkeleton count={GALLERY_PAGE_SIZE} />}
+        </div>
+
+        {hasMore && <div ref={observerRef} className="h-10" />}
       </Container>
 
       <AnimatePresence>
@@ -142,7 +137,7 @@ export const ShotsComp: React.FC<{ shots: GALLERY_QUERYResult }> = ({
               <div className="relative h-full w-full">
                 <Image
                   src={shots[selectedIndex].image || "/placeholder.svg"}
-                  alt={shots[selectedIndex].title ?? ""}
+                  alt=""
                   fill
                   className="object-contain"
                   priority
@@ -152,7 +147,7 @@ export const ShotsComp: React.FC<{ shots: GALLERY_QUERYResult }> = ({
 
               <div className="absolute right-0 -bottom-16 left-0 text-center">
                 <h2 className="font-serif text-xl md:text-3xl">
-                  {shots[selectedIndex].title}
+                  {shots[selectedIndex].category?.name}
                 </h2>
               </div>
             </motion.div>
@@ -160,5 +155,25 @@ export const ShotsComp: React.FC<{ shots: GALLERY_QUERYResult }> = ({
         )}
       </AnimatePresence>
     </section>
+  );
+};
+
+const HEIGHTS = [300, 320, 360, 400, 440, 480];
+
+const MasonrySkeleton: React.FC<{ count?: number }> = ({ count = 20 }) => {
+  return (
+    <React.Fragment>
+      {Array.from({ length: count }).map((_, idx) => {
+        const height = HEIGHTS[idx % HEIGHTS.length];
+
+        return (
+          <Skeleton
+            key={idx}
+            className="bg-border/50 mb-4 break-inside-avoid shadow-xs"
+            style={{ height }}
+          />
+        );
+      })}
+    </React.Fragment>
   );
 };

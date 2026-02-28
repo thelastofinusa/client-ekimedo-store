@@ -4,11 +4,9 @@ import { Metadata } from "next";
 import { siteConfig } from "@/site.config";
 import { GallerySection } from "./_components/gallery.sec";
 import { SplashScreen } from "@/components/shared/splash-screen";
-import { GALLERY_QUERY } from "@/sanity/queries/gallery";
 import { CATEGORIES_QUERY } from "@/sanity/queries/category";
 import { client } from "@/sanity/lib/client";
 import { clientOptions } from "@/lib/utils";
-import { sanityFetch } from "@/sanity/lib/live";
 
 export const dynamic = "force-dynamic";
 
@@ -39,14 +37,12 @@ export const metadata: Metadata = {
 };
 
 export default async function GalleryPage() {
-  // const gallery = await client.fetch(GALLERY_QUERY, {}, clientOptions);
-  const { data: gallery } = await sanityFetch({ query: GALLERY_QUERY });
   const category = await client.fetch(CATEGORIES_QUERY, {}, clientOptions);
 
   return (
     <div className="flex-1 overflow-x-clip">
       <React.Suspense fallback={<SplashScreen />}>
-        <GallerySection gallery={gallery} category={category} />
+        <GallerySection category={category} />
       </React.Suspense>
     </div>
   );

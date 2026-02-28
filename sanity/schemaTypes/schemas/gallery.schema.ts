@@ -8,16 +8,17 @@ export const galleryType = defineType({
   icon: LuGalleryVerticalEnd,
   fields: [
     defineField({
-      name: "title",
-      title: "Title",
-      type: "string",
-    }),
-    defineField({
       name: "category",
       title: "Category",
       type: "reference",
       to: [{ type: "category" }],
       validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "featured",
+      title: "Featured",
+      type: "boolean",
+      initialValue: false,
     }),
     defineField({
       name: "image",
@@ -26,4 +27,18 @@ export const galleryType = defineType({
       validation: (rule) => rule.required(),
     }),
   ],
+  preview: {
+    select: {
+      title: "category.name",
+      featured: "featured",
+      media: "image",
+    },
+    prepare({ title, featured, media }) {
+      return {
+        title,
+        subtitle: `Featured: ${featured ? "Yes" : "No"}`,
+        media,
+      };
+    },
+  },
 });

@@ -149,12 +149,6 @@ export type Booking = {
   endTime?: string;
   status?: "pending" | "paid" | "confirmed" | "cancelled" | "completed";
   paymentStatus?: "unpaid" | "paid" | "refunded";
-  auditLog?: Array<{
-    timestamp?: string;
-    action?: string;
-    note?: string;
-    _key: string;
-  }>;
   location?: "virtual" | "in-person";
   guests?: number;
   eventDate?: string;
@@ -182,13 +176,9 @@ export type Booking = {
   dressSize?: string;
   dressColor?: string;
   specialRequirements?: string;
-  responses?: Array<{
-    key?: string;
-    label?: string;
-    value?: string;
-    _key: string;
-  }>;
   confirmationEmailSent?: boolean;
+  stripePaymentId?: string;
+  createdAt?: string;
 };
 
 export type ProductColor = {
@@ -250,7 +240,7 @@ export type Testimonial = {
     media?: unknown;
     hotspot?: SanityImageHotspot;
     crop?: SanityImageCrop;
-    _type: "image";
+    _type: "asset";
     _key: string;
   }>;
 };
@@ -361,7 +351,7 @@ export type Gallery = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  title?: string;
+  featured?: boolean;
   category?: {
     _ref: string;
     _type: "reference";
@@ -598,16 +588,26 @@ export type FAQ_QUERYResult = Array<{
 
 // Source: ./sanity/queries/gallery.ts
 // Variable: GALLERY_QUERY
-// Query: *[_type == "gallery"] | order(_createdAt desc) {    _id,    title,    category -> {        _id,        name,        "slug": slug.current    },    "image": image.asset->url,    }
+// Query: *[_type == "gallery"  && (!defined($category) || category->slug.current == $category)]| order(_createdAt asc)[$start...$end]{  _id,  "image": image.asset->url,  featured,  category->{    name,    "slug": slug.current  }}
 export type GALLERY_QUERYResult = Array<{
   _id: string;
-  title: string | null;
+  image: string | null;
+  featured: boolean | null;
   category: {
-    _id: string;
     name: string | null;
     slug: string | null;
   } | null;
+}>;
+// Variable: FEATURED_GALLERY_QUERY
+// Query: *[_type == "gallery"  && (!defined($category) || category->slug.current == $category)]| order(_createdAt asc)[$start...$end]{  _id,  featured,  "image": image.asset->url,  category->{    name,    "slug": slug.current  }}
+export type FEATURED_GALLERY_QUERYResult = Array<{
+  _id: string;
+  featured: boolean | null;
   image: string | null;
+  category: {
+    name: string | null;
+    slug: string | null;
+  } | null;
 }>;
 
 // Source: ./sanity/queries/hero.ts
@@ -822,7 +822,8 @@ declare module "@sanity/client" {
     '*[\n  _type == "customer"\n  && email == $email\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_EMAIL_QUERYResult;
     '*[\n  _type == "customer"\n  && stripeCustomerId == $stripeCustomerId\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_STRIPE_ID_QUERYResult;
     '\n*[_type == "faq"] | order(_createdAt asc) {\n_id,\n  question,\n  answer\n}\n': FAQ_QUERYResult;
-    '\n    *[_type == "gallery"] | order(_createdAt desc) {\n    _id,\n    title,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n    "image": image.asset->url,\n    }\n': GALLERY_QUERYResult;
+    '\n*[_type == "gallery"\n  && (!defined($category) || category->slug.current == $category)\n]\n| order(_createdAt asc)\n[$start...$end]{\n  _id,\n  "image": image.asset->url,\n  featured,\n  category->{\n    name,\n    "slug": slug.current\n  }\n}\n': GALLERY_QUERYResult;
+    '\n*[_type == "gallery"\n  && (!defined($category) || category->slug.current == $category)\n]\n| order(_createdAt asc)\n[$start...$end]{\n  _id,\n  featured,\n  "image": image.asset->url,\n  category->{\n    name,\n    "slug": slug.current\n  }\n}\n': FEATURED_GALLERY_QUERYResult;
     '\n    *[_type == "hero"] | order(_createdAt desc) {\n        _id,\n        "image": image.asset->url,\n        alt\n    }\n': HERO_QUERYResult;
     '\n    *[_type == "businessHours"]{\n  hours[]\n}[0]\n': BUSINESS_HOUR_QUERYResult;
     '*[\n  _type == "order"\n  && clerkUserId == $clerkUserId\n] | order(createdAt desc) {\n  _id,\n  orderNumber,\n  total,\n  status,\n  createdAt,\n  "itemCount": count(items),\n  "itemNames": items[].product->name,\n  "itemImages": items[].product->images[0].asset->url\n}': ORDERS_BY_USER_QUERYResult;

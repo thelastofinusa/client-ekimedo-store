@@ -8,6 +8,7 @@
     "start": "(pnpm run stripe) & (pnpm run dev)",
     "lint": "eslint",
     "typegen": "sanity schema extract && sanity typegen generate --enforce-required-fields",
+    "seed:gallery": "tsx scripts/seedGallery.ts && npx sanity dataset import gallery.ndjson production --replace",
     "stripe": "stripe listen --forward-to localhost:3000/api/webhooks/stripe"
   },
   "dependencies": {

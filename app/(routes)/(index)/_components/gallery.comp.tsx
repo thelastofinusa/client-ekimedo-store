@@ -4,11 +4,20 @@ import Image from "next/image";
 import { clientOptions, cn } from "@/lib/utils";
 import { buttonVariants } from "@/ui/button";
 import { Container } from "@/components/shared/container";
-import { GALLERY_QUERY } from "@/sanity/queries/gallery";
+import { FEATURED_GALLERY_QUERY } from "@/sanity/queries/gallery";
 import { client } from "@/sanity/lib/client";
+import { GALLERY_QUERYResult } from "@/sanity.types";
 
 export const GalleryComp = async () => {
-  const gallery = await client.fetch(GALLERY_QUERY, {}, clientOptions);
+  const gallery = await client.fetch(
+    FEATURED_GALLERY_QUERY,
+    {
+      category: null,
+      start: 0,
+      end: 5,
+    },
+    clientOptions,
+  );
 
   return (
     <div className="bg-background">
@@ -32,21 +41,24 @@ export const GalleryComp = async () => {
 
         <Container>
           <div className="flex gap-4">
-            {gallery.slice(0, 5).map((item, idx) => (
+            {gallery.map((item: GALLERY_QUERYResult[number], idx: number) => (
               <div
                 key={item._id}
-                className={cn("relative shrink-0 shadow-xs", {
-                  "aspect-3/4 w-[50vw] md:w-[25vw]": idx % 2 === 0,
-                  "mt-10 aspect-3/4 w-[40vw] md:w-[20vw]": idx % 2 !== 0,
-                })}
+                className={cn(
+                  "group bg-background/5 border-border/20 relative shrink-0 overflow-hidden border shadow-xs",
+                  {
+                    "aspect-3/4 w-[50vw] md:w-[25vw]": idx % 2 === 0,
+                    "mt-12 aspect-3/4 w-[40vw] md:mt-20 md:w-[20vw]":
+                      idx % 2 !== 0,
+                  },
+                )}
               >
                 <Image
-                  src={item.image as string}
-                  alt={`Look ${idx + 1}`}
+                  src={item.image || "/placeholder.svg"}
+                  alt=""
                   fill
                   loading="lazy"
-                  quality={100}
-                  className="object-cover transition-all duration-700"
+                  className="origin-top object-cover transition-all duration-1000 ease-out group-hover:scale-110 group-hover:brightness-80"
                 />
               </div>
             ))}
