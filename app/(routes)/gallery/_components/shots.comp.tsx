@@ -10,6 +10,8 @@ import { GALLERY_QUERYResult } from "@/sanity.types";
 import { Skeleton } from "@/ui/skeleton";
 import { GALLERY_PAGE_SIZE } from "@/lib/constants/keys";
 
+const HEIGHTS = [300, 320, 360, 400, 440, 480];
+
 export const ShotsComp: React.FC<{
   shots: GALLERY_QUERYResult;
   loadMore: () => void;
@@ -60,12 +62,12 @@ export const ShotsComp: React.FC<{
   return (
     <section className="py-16 md:py-24 lg:px-8">
       <Container size="lg">
-        <div className="columns-2 gap-4 md:columns-3 md:gap-5 lg:columns-4">
+        <div className="columns-2 gap-3 sm:gap-4 md:columns-3 md:gap-5 lg:columns-4">
           {shots.map((item, index) => (
             <div
               key={item._id}
               onClick={() => setSelectedIndex(index)}
-              className="group bg-background/5 border-border/20 relative mb-4 w-full cursor-pointer break-inside-avoid-column overflow-hidden border shadow-xs md:mb-5"
+              className="group bg-background/5 border-border/20 relative mb-3 w-full cursor-pointer break-inside-avoid-column overflow-hidden border shadow-xs sm:mb-4 md:mb-5"
             >
               <Image
                 src={item.image || "/placeholder.svg"}
@@ -83,7 +85,18 @@ export const ShotsComp: React.FC<{
             </div>
           ))}
 
-          {isLoading && <MasonrySkeleton count={GALLERY_PAGE_SIZE} />}
+          {isLoading &&
+            Array.from({ length: GALLERY_PAGE_SIZE }).map((_, idx) => {
+              const height = HEIGHTS[idx % HEIGHTS.length];
+
+              return (
+                <Skeleton
+                  key={idx}
+                  className="bg-border/50 mb-3 break-inside-avoid shadow-xs sm:mb-4 md:mb-5"
+                  style={{ height }}
+                />
+              );
+            })}
         </div>
 
         {hasMore && <div ref={observerRef} className="h-10" />}
@@ -155,25 +168,5 @@ export const ShotsComp: React.FC<{
         )}
       </AnimatePresence>
     </section>
-  );
-};
-
-const HEIGHTS = [300, 320, 360, 400, 440, 480];
-
-const MasonrySkeleton: React.FC<{ count?: number }> = ({ count = 20 }) => {
-  return (
-    <React.Fragment>
-      {Array.from({ length: count }).map((_, idx) => {
-        const height = HEIGHTS[idx % HEIGHTS.length];
-
-        return (
-          <Skeleton
-            key={idx}
-            className="bg-border/50 mb-4 break-inside-avoid shadow-xs"
-            style={{ height }}
-          />
-        );
-      })}
-    </React.Fragment>
   );
 };
