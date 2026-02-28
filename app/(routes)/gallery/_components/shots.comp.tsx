@@ -75,8 +75,8 @@ export const ShotsComp: React.FC<{
                 loading="lazy"
                 className="h-auto object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-80"
               />
-              <div className="absolute inset-0 flex flex-col justify-end bg-linear-to-b from-transparent via-black/20 to-black/70 p-6 duration-500 md:px-8">
-                <span className="text-background mb-1 text-sm font-medium tracking-widest uppercase md:mb-2">
+              <div className="absolute inset-0 flex flex-col justify-end bg-linear-to-b from-transparent via-black/20 to-black/70 p-4 duration-500 sm:p-6 md:px-8">
+                <span className="text-background mb-1 text-xs font-medium tracking-widest uppercase md:mb-2 md:text-sm">
                   {item.category?.name?.replace("-", " ")}
                 </span>
               </div>
