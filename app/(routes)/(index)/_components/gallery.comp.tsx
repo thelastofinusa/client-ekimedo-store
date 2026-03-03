@@ -6,7 +6,6 @@ import { buttonVariants } from "@/ui/button";
 import { Container } from "@/components/shared/container";
 import { FEATURED_GALLERY_QUERY } from "@/sanity/queries/gallery";
 import { client } from "@/sanity/lib/client";
-import { GALLERY_QUERYResult } from "@/sanity.types";
 
 export const GalleryComp = async () => {
   const gallery = await client.fetch(
@@ -41,7 +40,7 @@ export const GalleryComp = async () => {
 
         <Container>
           <div className="flex gap-4">
-            {gallery.map((item: GALLERY_QUERYResult[number], idx: number) => (
+            {gallery.map((item, idx) => (
               <div
                 key={item._id}
                 className={cn(

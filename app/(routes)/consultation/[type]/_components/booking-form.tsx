@@ -565,7 +565,8 @@ export const BookingForm: React.FC<{
                             "border-input has-data-[state=checked]:border-primary has-focus-visible:border-ring has-focus-visible:ring-ring relative flex w-full cursor-pointer items-start gap-2 rounded-md border p-5 shadow-xs transition-[color,box-shadow] outline-none has-focus-visible:ring-2",
                             {
                               "border-destructive": !paymentMethod,
-                              "pointer-events-none opacity-50": isSubmitting,
+                              "pointer-events-none opacity-50":
+                                isSubmitting || method.disabled,
                             },
                           )}
                         >
@@ -579,7 +580,8 @@ export const BookingForm: React.FC<{
                             <div className="flex w-full items-center gap-2">
                               <method.icon className="size-4" />
                               <span className="text-[11px]">
-                                {method.label}
+                                {method.label}{" "}
+                                {method.disabled && "(Coming soon)"}
                               </span>
                             </div>
                             <p className="text-muted-foreground">

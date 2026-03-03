@@ -84,7 +84,8 @@ export const structure: StructureResolver = (S) =>
       S.divider(),
 
       // Settings
+      S.documentTypeListItem("pricingTier").title("Pricing Tiers"), // ✅
       S.documentTypeListItem("businessHours").title("Business Hours"), // ✅
       S.documentTypeListItem("faq").title("Frequently Asked Questions"), // ✅
-      S.documentTypeListItem("pricingTier").title("Pricing Tiers"), // ✅
+      S.documentTypeListItem("permissions").title("Testimonial Permission"), // ✅
     ]);

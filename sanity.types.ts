@@ -13,6 +13,16 @@
  */
 
 // Source: schema.json
+export type Permissions = {
+  _id: string;
+  _type: "permissions";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  customerName?: string;
+  customerEmail?: string;
+};
+
 export type PricingTier = {
   _id: string;
   _type: "pricingTier";
@@ -351,13 +361,13 @@ export type Gallery = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  featured?: boolean;
   category?: {
     _ref: string;
     _type: "reference";
     _weak?: boolean;
     [internalGroqTypeReferenceTo]?: "category";
   };
+  featured?: boolean;
   image?: {
     asset?: {
       _ref: string;
@@ -503,6 +513,7 @@ export type Geopoint = {
 };
 
 export type AllSanitySchemaTypes =
+  | Permissions
   | PricingTier
   | Faq
   | Inquiry
@@ -599,10 +610,9 @@ export type GALLERY_QUERYResult = Array<{
   } | null;
 }>;
 // Variable: FEATURED_GALLERY_QUERY
-// Query: *[_type == "gallery"  && (!defined($category) || category->slug.current == $category)]| order(_createdAt asc)[$start...$end]{  _id,  featured,  "image": image.asset->url,  category->{    name,    "slug": slug.current  }}
+// Query: *[_type == "gallery" && featured == true  && (!defined($category) || category->slug.current == $category)]| order(_createdAt asc)[$start...$end]{  _id,  "image": image.asset->url,  category->{    name,    "slug": slug.current  }}
 export type FEATURED_GALLERY_QUERYResult = Array<{
   _id: string;
-  featured: boolean | null;
   image: string | null;
   category: {
     name: string | null;
@@ -702,6 +712,19 @@ export type RECENT_ORDERS_QUERYResult = Array<{
 // Query: *[  _type == "order"  && stripePaymentId == $stripePaymentId][0]{ _id }
 export type ORDER_BY_STRIPE_PAYMENT_ID_QUERYResult = {
   _id: string;
+} | null;
+
+// Source: ./sanity/queries/permission.ts
+// Variable: TESTIMONIAL_PERMISSION_QUERY
+// Query: *[_type == "permissions" && lower(customerEmail) == lower($email)][0]
+export type TESTIMONIAL_PERMISSION_QUERYResult = {
+  _id: string;
+  _type: "permissions";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  customerName?: string;
+  customerEmail?: string;
 } | null;
 
 // Source: ./sanity/queries/pricing.ts
@@ -823,13 +846,14 @@ declare module "@sanity/client" {
     '*[\n  _type == "customer"\n  && stripeCustomerId == $stripeCustomerId\n][0]{\n  _id,\n  email,\n  name,\n  clerkUserId,\n  stripeCustomerId,\n  createdAt\n}': CUSTOMER_BY_STRIPE_ID_QUERYResult;
     '\n*[_type == "faq"] | order(_createdAt asc) {\n_id,\n  question,\n  answer\n}\n': FAQ_QUERYResult;
     '\n*[_type == "gallery"\n  && (!defined($category) || category->slug.current == $category)\n]\n| order(_createdAt asc)\n[$start...$end]{\n  _id,\n  "image": image.asset->url,\n  featured,\n  category->{\n    name,\n    "slug": slug.current\n  }\n}\n': GALLERY_QUERYResult;
-    '\n*[_type == "gallery"\n  && (!defined($category) || category->slug.current == $category)\n]\n| order(_createdAt asc)\n[$start...$end]{\n  _id,\n  featured,\n  "image": image.asset->url,\n  category->{\n    name,\n    "slug": slug.current\n  }\n}\n': FEATURED_GALLERY_QUERYResult;
+    '\n*[_type == "gallery"\n && featured == true\n  && (!defined($category) || category->slug.current == $category)\n]\n| order(_createdAt asc)\n[$start...$end]{\n  _id,\n  "image": image.asset->url,\n  category->{\n    name,\n    "slug": slug.current\n  }\n}\n': FEATURED_GALLERY_QUERYResult;
     '\n    *[_type == "hero"] | order(_createdAt desc) {\n        _id,\n        "image": image.asset->url,\n        alt\n    }\n': HERO_QUERYResult;
     '\n    *[_type == "businessHours"]{\n  hours[]\n}[0]\n': BUSINESS_HOUR_QUERYResult;
     '*[\n  _type == "order"\n  && clerkUserId == $clerkUserId\n] | order(createdAt desc) {\n  _id,\n  orderNumber,\n  total,\n  status,\n  createdAt,\n  "itemCount": count(items),\n  "itemNames": items[].product->name,\n  "itemImages": items[].product->images[0].asset->url\n}': ORDERS_BY_USER_QUERYResult;
     '*[\n  _type == "order"\n  && _id == $id\n][0] {\n  _id,\n  orderNumber,\n  clerkUserId,\n  email,\n  items[]{\n    _key,\n    quantity,\n    priceAtPurchase,\n    product->{\n      _id,\n      name,\n      "slug": slug.current,\n      "image": images[0]{\n        asset->{\n          _id,\n          url\n        }\n      }\n    }\n  },\n  total,\n  status,\n  address{\n    name,\n    line1,\n    line2,\n    city,\n    postcode,\n    country\n  },\n  stripePaymentId,\n  createdAt\n}': ORDER_BY_ID_QUERYResult;
     '*[\n  _type == "order"\n] | order(createdAt desc) [0...$limit] {\n  _id,\n  orderNumber,\n  email,\n  total,\n  status,\n  createdAt\n}': RECENT_ORDERS_QUERYResult;
     '*[\n  _type == "order"\n  && stripePaymentId == $stripePaymentId\n][0]{ _id }': ORDER_BY_STRIPE_PAYMENT_ID_QUERYResult;
+    '*[_type == "permissions" && lower(customerEmail) == lower($email)][0]': TESTIMONIAL_PERMISSION_QUERYResult;
     '\n*[_type == "pricingTier"] | order(order asc, _createdAt asc) {\n  _id,\n  name,\n  price,\n  description,\n  features\n}\n': PRICING_TIERS_QUERYResult;
     '\n*[_type == "product"] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    delivery,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    delivery,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_QUERYResult;
     '\n*[_type == "product" && slug.current == $slug] | order(_createdAt desc) {\n    _id,\n    name,\n    "slug": slug.current,\n    price,\n    colors[]->{name, "value": value.hex},\n    description,\n    "images": images[].asset->url,\n    sizes,\n    stock,\n    delivery,\n    category -> {\n        _id,\n        name,\n        "slug": slug.current\n    },\n}\n': PRODUCT_BY_SLUG_QUERYResult;

@@ -21,6 +21,7 @@ export const preferredPaymentMethod = [
     label: "PayPal",
     icon: Icons.PaypalIcon,
     description: "Quick checkout with PayPal.",
+    disabled: true,
   },
 ];
 

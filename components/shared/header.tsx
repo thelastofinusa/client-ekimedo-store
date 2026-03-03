@@ -2,13 +2,19 @@
 
 import React from "react";
 import { containerVariants } from "./container";
-import { cn } from "@/lib/utils";
+import { clientOptions, cn } from "@/lib/utils";
 import { Logo } from "./logo";
 import { CartSheet } from "../sheets/cart.sheet";
 import { Button } from "@/ui/button";
 import { Icons } from "hugeicons-proxy";
 import { MenuSheet } from "../sheets/menu.sheet";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  UserButton,
+  useUser,
+} from "@clerk/nextjs";
 import { Separator } from "@/ui/separator";
 import { useTotalItems } from "../providers/cart.provider";
 import {
@@ -23,9 +29,15 @@ import Link from "next/link";
 import { Route } from "next";
 import { usePathname } from "next/navigation";
 import { headerRoutes } from "@/lib/constants/navigation";
+import { client } from "@/sanity/lib/client";
+import { TESTIMONIAL_PERMISSION_QUERY } from "@/sanity/queries/permission";
 
 export const Header = () => {
   const pathname = usePathname();
+  const { user } = useUser();
+  const customerEmail =
+    user?.primaryEmailAddress?.emailAddress ??
+    user?.emailAddresses?.[0]?.emailAddress;
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const forceActiveRoutes = [
@@ -48,6 +60,7 @@ export const Header = () => {
   const [openCart, setOpenCart] = React.useState<boolean>(false);
   const [isActive, setIsActive] = React.useState<boolean>(false);
   const [isScrolling, setIsScrolling] = React.useState<boolean>(false);
+  const [hasPermission, setHasPermission] = React.useState<boolean>(false);
 
   const forceActive = React.useMemo(
     () => isDynamicShopRoute || forceActiveRoutes.includes(pathname),
@@ -97,6 +110,20 @@ export const Header = () => {
       if (scrollTimeout.current) clearTimeout(scrollTimeout.current);
     };
   }, [forceActive]);
+
+  React.useEffect(() => {
+    if (!customerEmail) return;
+
+    (async () => {
+      const result = await client.fetch(
+        TESTIMONIAL_PERMISSION_QUERY,
+        { email: customerEmail },
+        clientOptions,
+      );
+
+      setHasPermission(Boolean(result));
+    })();
+  }, [customerEmail]);
 
   return (
     <NavigationMenu
@@ -227,13 +254,15 @@ export const Header = () => {
 
                         <UserButton.Action label="manageAccount" />
 
-                        <UserButton.Link
-                          label="Write a Review"
-                          labelIcon={
-                            <Icons.ChatPreview01Icon className="text-foreground mt-0.5 size-3.5" />
-                          }
-                          href="/testimonials/create"
-                        />
+                        {hasPermission && (
+                          <UserButton.Link
+                            label="Write a Review"
+                            labelIcon={
+                              <Icons.ChatPreview01Icon className="text-foreground mt-0.5 size-3.5" />
+                            }
+                            href="/testimonials/create"
+                          />
+                        )}
 
                         <UserButton.Action label="signOut" />
                       </UserButton.MenuItems>

@@ -13,6 +13,7 @@ import { socialType } from "./schemas/social.schema";
 import { inquiryType } from "./schemas/inquiry.schema";
 import { faqType } from "./schemas/faq.schema";
 import { pricingTierType } from "./schemas/pricing.schema";
+import { permissionType } from "./schemas/permission.schema";
 
 export const schema: { types: SchemaTypeDefinition[] } = {
   types: [
@@ -30,5 +31,6 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     inquiryType,
     faqType,
     pricingTierType,
+    permissionType,
   ],
 };
