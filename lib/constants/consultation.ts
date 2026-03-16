@@ -15,12 +15,14 @@ export const preferredPaymentMethod = [
     label: "Stripe",
     icon: Icons.StripeIcon,
     description: "Fast, secure card payment.",
+    disabled: false,
   },
   {
     id: "paypal",
     label: "PayPal",
     icon: Icons.PaypalIcon,
     description: "Quick checkout with PayPal.",
+    disabled: false,
   },
 ];
 
