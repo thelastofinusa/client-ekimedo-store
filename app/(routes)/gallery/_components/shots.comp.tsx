@@ -7,14 +7,10 @@ import { Container } from "@/components/shared/container";
 import { Icons } from "hugeicons-proxy";
 import { Button } from "@/ui/button";
 import { GALLERY_QUERYResult } from "@/sanity.types";
-import { siteConfig } from "@/site.config";
 
 export const ShotsComp: React.FC<{
   shots: GALLERY_QUERYResult;
-  loadMore: () => void;
-  hasMore: boolean;
-  isLoading: boolean;
-}> = ({ shots, loadMore, hasMore, isLoading }) => {
+}> = ({ shots }) => {
   const [selectedIndex, setSelectedIndex] = React.useState<number | null>(null);
 
   const handlePrevious = React.useCallback(
@@ -39,23 +35,6 @@ export const ShotsComp: React.FC<{
     [selectedIndex, shots.length],
   );
 
-  const observerRef = React.useRef<HTMLDivElement | null>(null);
-
-  React.useEffect(() => {
-    if (!hasMore || isLoading) return;
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) loadMore();
-      },
-      { rootMargin: "200px" },
-    );
-
-    if (observerRef.current) observer.observe(observerRef.current);
-
-    return () => observer.disconnect();
-  }, [loadMore, hasMore, isLoading]);
-
   return (
     <section className="py-16 md:py-24 lg:px-8">
       <Container size="lg">
@@ -70,8 +49,9 @@ export const ShotsComp: React.FC<{
                 src={item.image || "/placeholder.svg"}
                 alt=""
                 width={880}
-                height={0}
+                height={200}
                 loading="lazy"
+                priority={false}
                 className="h-auto object-cover transition-all duration-700 group-hover:scale-110 group-hover:brightness-80"
               />
               <div className="absolute inset-0 flex flex-col justify-end bg-linear-to-b from-transparent via-black/20 to-black/70 p-4 duration-500 sm:p-6 md:px-8">
@@ -82,22 +62,6 @@ export const ShotsComp: React.FC<{
             </div>
           ))}
         </div>
-
-        {isLoading && (
-          <div className="mt-6 sm:mt-10 md:mt-12">
-            <Image
-              src="/assets/logo/charcoal.svg"
-              alt={siteConfig.title}
-              width={80}
-              height={80}
-              priority
-              quality={100}
-              className="pointer-events-none mx-auto animate-pulse object-contain"
-            />
-          </div>
-        )}
-
-        {hasMore && <div ref={observerRef} className="h-10" />}
       </Container>
 
       <AnimatePresence>

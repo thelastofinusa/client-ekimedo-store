@@ -14,38 +14,13 @@ import {
 } from "@/ui/select";
 import { HeroComp } from "@/components/shared/hero";
 import { CATEGORIES_QUERYResult, GALLERY_QUERYResult } from "@/sanity.types";
-import { GALLERY_PAGE_SIZE } from "@/lib/constants/keys";
 
 export const GallerySection: React.FC<{
   category: CATEGORIES_QUERYResult;
-}> = ({ category }) => {
+  galleries: GALLERY_QUERYResult;
+}> = ({ category, galleries }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const activeCategory = searchParams.get("category");
-
-  const [items, setItems] = React.useState<GALLERY_QUERYResult>([]);
-  const [page, setPage] = React.useState(0);
-  const [hasMore, setHasMore] = React.useState(true);
-  const [loading, setLoading] = React.useState(false);
-
-  const loadMore = React.useCallback(async () => {
-    if (loading || !hasMore) return;
-
-    setLoading(true);
-
-    const res = await fetch(
-      `/api/gallery?start=${page * GALLERY_PAGE_SIZE}&limit=${GALLERY_PAGE_SIZE}${
-        activeCategory ? `&category=${activeCategory}` : ""
-      }`,
-    );
-
-    const data = await res.json();
-
-    setItems((prev) => [...prev, ...data.items]);
-    setHasMore(data.hasMore);
-    setPage((p) => p + 1);
-    setLoading(false);
-  }, [page, hasMore, loading, activeCategory]);
 
   const categories: CATEGORIES_QUERYResult = React.useMemo(
     () => [
@@ -75,17 +50,15 @@ export const GallerySection: React.FC<{
     [router, searchParams],
   );
 
-  // Reset on category change
-  React.useEffect(() => {
-    setItems([]);
-    setPage(0);
-    setHasMore(true);
-  }, [activeCategory]);
+  const filteredGalleries = React.useMemo(() => {
+    if (!paramCategory || paramCategory === "all") {
+      return galleries;
+    }
 
-  // Load first page
-  React.useEffect(() => {
-    loadMore();
-  }, []);
+    return galleries.filter(
+      (gallery) => gallery.category?.slug === paramCategory,
+    );
+  }, [galleries, paramCategory]);
 
   return (
     <React.Fragment>
@@ -115,12 +88,8 @@ export const GallerySection: React.FC<{
           </div>
         }
       />
-      <ShotsComp
-        shots={items}
-        loadMore={loadMore}
-        hasMore={hasMore}
-        isLoading={loading}
-      />
+
+      <ShotsComp shots={filteredGalleries} />
     </React.Fragment>
   );
 };
