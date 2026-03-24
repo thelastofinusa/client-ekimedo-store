@@ -63,7 +63,39 @@ The application follows modern React best practices with a component-driven arch
 
 ## Environment Variables
 
-The application requires several environment variables to be set. Refer to [`.env.example`](https://github.com/thelastofinusa/client-ekimedo-store/blob/main/.env.example) for the complete list of required variables.
+The application requires several environment variables to be set.
+
+```bash
+NEXT_PUBLIC_SITE_URL="http://localhost:3000"
+
+# Clerk
+CLERK_SECRET_KEY="clerk_secret_key"
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="clerk_publishable_key"
+CLERK_WEBHOOK_SIGNING_SECRET="clerk_webhook_signing_key"
+
+# SANITY
+SANITY_WEBHOOK_SECRET="random_webhook_secret"
+SANITY_API_WRITE_TOKEN="sanity_api_write_token"
+NEXT_PUBLIC_SANITY_DATASET="sanity_dataset" # production or development
+NEXT_PUBLIC_SANITY_PROJECT_ID="sanity_project_id"
+NEXT_PUBLIC_SANITY_API_VERSION="sanity_api_version" # 2026-01-16
+
+# Stripe
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="stripe_publishable_key"
+STRIPE_SECRET_KEY="stripe_secret_key"
+# stripe listen --forward-to localhost:3000/api/webhooks/stripe
+STRIPE_WEBHOOK_SECRET="stripe_webhook_secret" # run the command above for development
+
+# Paypal
+PAYPAL_CLIENT_ID="paypal_client_id"
+PAYPAL_CLIENT_SECRET="paypal_client_secret"
+
+# Resend
+RESEND_API_KEY="resend_api_key"
+NEXT_PUBLIC_RESEND_CONTACT_EMAIL="resend_loggedin_email"
+NEXT_PUBLIC_RESEND_INFO_EMAIL="resend_custom_email"
+
+```
 
 ## Deployment
 
