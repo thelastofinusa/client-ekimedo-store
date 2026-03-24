@@ -31,6 +31,8 @@ export const Filters: React.FC<{
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const { isMobile } = useIsMobile();
+  const [isPending, startTransition] = React.useTransition();
+  const [localParams, setLocalParams] = React.useState(searchParams.toString());
 
   // Memoized params
   const {
@@ -94,20 +96,24 @@ export const Filters: React.FC<{
 
   const pushParams = React.useCallback(
     (params: URLSearchParams) => {
-      router.push(`${pathname}?${params.toString()}` as Route, {
-        scroll: false,
+      startTransition(() => {
+        router.push(`${pathname}?${params.toString()}` as Route, {
+          scroll: false,
+        });
       });
     },
     [router, pathname],
   );
 
   const clearFilters = React.useCallback(() => {
-    router.push(pathname as Route, { scroll: false });
+    startTransition(() => {
+      router.push(pathname as Route, { scroll: false });
+    });
   }, [router, pathname]);
 
   const toggleParam = React.useCallback(
     (key: string, value: string) => {
-      const params = new URLSearchParams(searchParams.toString());
+      const params = new URLSearchParams(localParams);
 
       if (params.get(key) === value) {
         params.delete(key);
@@ -115,29 +121,43 @@ export const Filters: React.FC<{
         params.set(key, value);
       }
 
-      pushParams(params);
+      const newParams = params.toString();
+
+      setLocalParams(newParams); // instant UI
+      pushParams(params); // sync URL
     },
-    [searchParams, pushParams],
+    [localParams, pushParams],
   );
 
-  const getProductCount = React.useCallback(
-    (type: "category" | "color" | "size" | "price", value: string) => {
-      if (!products) return 0;
-      return products.filter((product) => {
-        switch (type) {
-          case "category":
-            return product.category?.slug === value;
-          case "color":
-            return product.colors?.some((c) => c.name === value);
-          case "size":
-            return product.sizes?.includes(value);
-          default:
-            return false;
-        }
-      }).length;
-    },
-    [products],
-  );
+  const productCounts = React.useMemo(() => {
+    const map = {
+      category: new Map<string, number>(),
+      color: new Map<string, number>(),
+      size: new Map<string, number>(),
+    };
+
+    products.forEach((product) => {
+      if (product.category?.slug) {
+        map.category.set(
+          product.category.slug,
+          (map.category.get(product.category.slug) || 0) + 1,
+        );
+      }
+
+      product.colors?.forEach((c) => {
+        return map.color.set(
+          c.name as string,
+          (map.color.get(c.name as string) || 0) + 1,
+        );
+      });
+
+      product.sizes?.forEach((s) => {
+        map.size.set(s, (map.size.get(s) || 0) + 1);
+      });
+    });
+
+    return map;
+  }, [products]);
 
   const content = (
     <div className="z-20 flex h-max w-full flex-col gap-8 md:sticky md:top-26 md:w-64 lg:top-32">
@@ -157,15 +177,22 @@ export const Filters: React.FC<{
             className="mt-2 w-full"
           />
 
-          {hasActiveFilters && (
-            <Button
-              size="icon-xs"
-              onClick={clearFilters}
-              className="absolute top-0 right-0"
-            >
-              <Icons.Cancel01Icon />
-              <span className="sr-only">Clear</span>
+          {isPending ? (
+            <Button size="icon-xs" isLoading className="absolute top-0 right-0">
+              <Icons.Loading03Icon />
+              <span className="sr-only">Rendering</span>
             </Button>
+          ) : (
+            hasActiveFilters && (
+              <Button
+                size="icon-xs"
+                onClick={clearFilters}
+                className="absolute top-0 right-0"
+              >
+                <Icons.Cancel01Icon />
+                <span className="sr-only">Clear</span>
+              </Button>
+            )
           )}
         </FilterSection>
 
@@ -173,7 +200,7 @@ export const Filters: React.FC<{
           <FilterSection title="Categories">
             {categories.map((category) => {
               const isSelected = categoriesValue.includes(category.slug!);
-              const count = getProductCount("category", category.slug!);
+              const count = productCounts.category.get(category.slug!) || 0;
 
               return (
                 <div
@@ -187,8 +214,14 @@ export const Filters: React.FC<{
                   onClick={() => toggleParam("category", category.slug!)}
                 >
                   <div className="flex items-center gap-2">
-                    {isSelected && <span>✓</span>}
+                    {isSelected && (
+                      <Icons.ShoppingBagCheckIcon
+                        className="mt-px size-4"
+                        strokeWidth={2}
+                      />
+                    )}
                     <span>{category.name}</span>
+                    <span>-</span>
                     <span>({count})</span>
                   </div>
                 </div>
@@ -206,7 +239,7 @@ export const Filters: React.FC<{
               .map((color) => {
                 const name = color.name as string;
                 const isSelected = colorsValue.includes(name);
-                const count = getProductCount("color", name);
+                const count = productCounts.category.get(name) || 0;
 
                 return (
                   <div
@@ -220,7 +253,12 @@ export const Filters: React.FC<{
                     onClick={() => toggleParam("color", name)}
                   >
                     <div className="flex items-center gap-2">
-                      {isSelected && <span>✓</span>}
+                      {isSelected && (
+                        <Icons.ShoppingBagCheckIcon
+                          className="mt-px size-4"
+                          strokeWidth={2}
+                        />
+                      )}
                       <div className="flex items-center gap-2">
                         <span
                           className="mt-px size-3 rounded-full border"
@@ -230,6 +268,7 @@ export const Filters: React.FC<{
                           {name}
                         </span>
                       </div>
+                      <span>-</span>
                       <span>({count})</span>
                     </div>
                   </div>
@@ -241,7 +280,7 @@ export const Filters: React.FC<{
         <FilterSection title="Sizes">
           {sizeFilters.map((size) => {
             const isSelected = sizesValue.includes(size.value);
-            const count = getProductCount("size", size.value);
+            const count = productCounts.category.get(size.value) || 0;
 
             return (
               <div
@@ -255,8 +294,14 @@ export const Filters: React.FC<{
                 onClick={() => toggleParam("size", size.value)}
               >
                 <div className="flex items-center gap-2">
-                  {isSelected && <span>✓</span>}
+                  {isSelected && (
+                    <Icons.ShoppingBagCheckIcon
+                      className="mt-px size-4"
+                      strokeWidth={2}
+                    />
+                  )}
                   <span>{size.name}</span>
+                  <span>-</span>
                   <span>({count})</span>
                 </div>
               </div>

@@ -1,5 +1,6 @@
 import { defineField, defineType } from "sanity";
 import { RiCalendarCheckLine } from "react-icons/ri";
+import { formatSanityDate } from "@/lib/utils";
 
 export const bookingType = defineType({
   name: "booking",
@@ -222,15 +223,14 @@ export const bookingType = defineType({
     select: {
       fName: "fName",
       lName: "lName",
+      paymentStatus: "paymentStatus",
       subtitle: "consultationDate",
       media: "inspiration.0",
     },
-    prepare({ fName, lName, subtitle, media }) {
+    prepare({ fName, lName, subtitle, media, paymentStatus }) {
       return {
         title: `${fName || ""} ${lName || ""}`.trim() || "Unknown Customer",
-        subtitle: subtitle
-          ? new Date(subtitle).toLocaleString()
-          : "No date set",
+        subtitle: `${subtitle ? formatSanityDate(subtitle) : "No date set"} - ${paymentStatus}`,
         media,
       };
     },

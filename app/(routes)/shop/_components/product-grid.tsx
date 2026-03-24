@@ -79,6 +79,9 @@ export const ProductGrid: React.FC<{
     return `?${params.toString()}`;
   };
 
+  const isEmptyProducts = products.length === 0;
+  const isEmptyFiltered = filteredProducts.length === 0;
+
   return (
     <div className="flex-1">
       <div className="mb-6 flex items-center">
@@ -89,63 +92,80 @@ export const ProductGrid: React.FC<{
           results
         </p>
       </div>
-
-      {paginatedProducts.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-y-12">
-          {paginatedProducts.map((product, idx) => (
-            <ProductCard key={`${product._id}-${idx}`} product={product} />
-          ))}
-        </div>
-      ) : (
+      {isEmptyProducts ? (
         <div className="flex h-96 flex-col items-center justify-center text-center">
           <Empty>
             <EmptyHeader>
               <EmptyMedia variant="icon">
                 <Icons.ProductLoadingIcon />
               </EmptyMedia>
-              <EmptyTitle>No Product Found</EmptyTitle>
+              <EmptyTitle>No Dresses Available</EmptyTitle>
               <EmptyDescription>
-                There are no products matching your filters.
+                There are no dresses in the store yet.
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
         </div>
-      )}
-
-      {totalPages > 1 && (
-        <Pagination className="mt-6">
-          <PaginationContent>
-            {currentPage > 1 && (
-              <PaginationItem>
-                <PaginationPrevious
-                  className="mr-2 h-8 tracking-[0.2em]!"
-                  href={createPageURL(currentPage - 1)}
-                />
-              </PaginationItem>
-            )}
-
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  href={createPageURL(page)}
-                  isActive={currentPage === page}
-                  size="icon-sm"
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
+      ) : isEmptyFiltered ? (
+        <div className="flex h-96 flex-col items-center justify-center text-center">
+          <Empty>
+            <EmptyHeader>
+              <EmptyMedia variant="icon">
+                <Icons.ProductLoadingIcon />
+              </EmptyMedia>
+              <EmptyTitle>No Dress Found</EmptyTitle>
+              <EmptyDescription>
+                No pre-made dresses match your selected filters.
+              </EmptyDescription>
+            </EmptyHeader>
+          </Empty>
+        </div>
+      ) : (
+        <>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-y-12">
+            {paginatedProducts.map((product, idx) => (
+              <ProductCard key={`${product._id}-${idx}`} product={product} />
             ))}
+          </div>
 
-            {currentPage < totalPages && (
-              <PaginationItem>
-                <PaginationNext
-                  className="ml-2 h-8 tracking-[0.2em]!"
-                  href={createPageURL(currentPage + 1)}
-                />
-              </PaginationItem>
-            )}
-          </PaginationContent>
-        </Pagination>
+          {totalPages > 1 && (
+            <Pagination className="mt-6">
+              <PaginationContent>
+                {currentPage > 1 && (
+                  <PaginationItem>
+                    <PaginationPrevious
+                      className="mr-2 h-8 tracking-[0.2em]!"
+                      href={createPageURL(currentPage - 1)}
+                    />
+                  </PaginationItem>
+                )}
+
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <PaginationItem key={page}>
+                      <PaginationLink
+                        href={createPageURL(page)}
+                        isActive={currentPage === page}
+                        size="icon-sm"
+                      >
+                        {page}
+                      </PaginationLink>
+                    </PaginationItem>
+                  ),
+                )}
+
+                {currentPage < totalPages && (
+                  <PaginationItem>
+                    <PaginationNext
+                      className="ml-2 h-8 tracking-[0.2em]!"
+                      href={createPageURL(currentPage + 1)}
+                    />
+                  </PaginationItem>
+                )}
+              </PaginationContent>
+            </Pagination>
+          )}
+        </>
       )}
     </div>
   );

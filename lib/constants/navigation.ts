@@ -91,8 +91,8 @@ export const footerRoutes = [
         newTab: true,
       },
       {
-        label: "Capitol Heights, MD 20743, USA",
-        path: "https://maps.app.goo.gl/GPmSTjbNLuXrPMZ59",
+        label: "Capitol Heights, Maryland, USA",
+        path: "https://maps.app.goo.gl/aDtqB59JHJeUUfXz9",
         newTab: true,
       },
     ],
