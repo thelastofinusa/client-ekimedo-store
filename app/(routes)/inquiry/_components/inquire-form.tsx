@@ -167,7 +167,11 @@ export const InquireForm = () => {
         <Notify
           type="error"
           title="Submission Failed"
-          description="An unexpected error occurred. Please try again later."
+          description={
+            error instanceof Error
+              ? error.message
+              : "An unexpected error occurred. Please try again later."
+          }
         />
       ));
       console.error(error);
@@ -284,7 +288,6 @@ export const InquireForm = () => {
                     </FormItem>
                   )}
                 />
-
                 <FormField
                   control={form.control}
                   name="eventDate"

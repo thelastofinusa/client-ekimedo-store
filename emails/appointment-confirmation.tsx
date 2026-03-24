@@ -316,7 +316,7 @@ export const AppointmentConfirmationEmail = ({
                 <Text style={policyText}>
                   Parking is available right in front of 1211. The address
                   appears as an auto body shop/warehouse on the map, which is
-                  accurate, and our store is within.{" "}
+                  accurate, and our store is located inside the building.{" "}
                   <Link
                     href="tel:+12029074865"
                     style={{ ...link, fontWeight: "600" }}

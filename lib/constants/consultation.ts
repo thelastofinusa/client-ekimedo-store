@@ -22,7 +22,7 @@ export const preferredPaymentMethod = [
     label: "PayPal",
     icon: Icons.PaypalIcon,
     description: "Quick checkout with PayPal.",
-    disabled: false,
+    disabled: true,
   },
 ];
 
@@ -89,7 +89,7 @@ export const consultationsData: ConsultationDataType = [
     description:
       "Work with our design team to create your perfect custom bridal gown. Includes 3 design consultations, fabric selection, and unlimited alterations.",
     duration: 60,
-    price: 1,
+    price: 250,
     image: "bridal-banner.jpeg",
     includes: [
       "3 design consultations",
@@ -347,7 +347,7 @@ export const consultationsData: ConsultationDataType = [
     description:
       "Perfect for galas, birthdays, dinners, and red-carpet moments. Create a refined or statement look tailored to your occasion.",
     duration: 30,
-    price: 1,
+    price: 150,
     image: "special-events-banner.jpeg",
     includes: [
       "Personal styling consultation",
@@ -523,7 +523,7 @@ export const consultationsData: ConsultationDataType = [
     description:
       "Design a standout prom dress tailored to your style, body type, and event theme. Perfect for making a bold statement.",
     duration: 30,
-    price: 1,
+    price: 150,
     image: "prom-banner.jpeg",
     includes: [
       "1-on-1 styling consultation",
@@ -757,7 +757,7 @@ export const consultationsData: ConsultationDataType = [
       "Visit our atelier to try on our curated selection of ready-to-wear gowns. Our stylists will help you find the perfect fit for your special occasion.",
     duration: 60,
     dresses: 3,
-    price: 1,
+    price: 150,
     image: "try-on-banner.jpeg",
     includes: [
       "Personal styling consultation with an in-house stylist",
