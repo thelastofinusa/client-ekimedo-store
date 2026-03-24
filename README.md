@@ -11,11 +11,13 @@ Ekimedo Atelier is a premium ecommerce platform specializing in bespoke fashion 
 ## Technology Stack
 
 ### Frontend Framework
+
 - **Next.js 16** - React-based framework for production-ready applications with App Router
 - **React 19** - Latest version of the popular JavaScript library for building user interfaces
 - **TypeScript** - Strongly typed programming language that builds on JavaScript
 
 ### Styling & UI
+
 - **Tailwind CSS v4** - Utility-first CSS framework for rapid UI development
 - **Shadcn/ui** - Reusable component library built with Radix UI and Tailwind CSS
 - **Radix UI** - Unstyled, accessible UI components
@@ -23,6 +25,7 @@ Ekimedo Atelier is a premium ecommerce platform specializing in bespoke fashion 
 - **Framer Motion** - Production-ready motion library for React
 
 ### Backend & Services
+
 - **Sanity CMS** - Headless CMS for managing content, products, and site data
 - **Stripe** - Payment processing for credit card transactions
 - **PayPal** - Alternative payment processing option
@@ -30,12 +33,14 @@ Ekimedo Atelier is a premium ecommerce platform specializing in bespoke fashion 
 - **Resend** - Email delivery service for transactional emails
 
 ### Development & Tooling
+
 - **PNPM** - Fast, disk space efficient package manager
 - **ESLint** - Code quality and linting
 - **Prettier** - Code formatting
 - **Vercel** - Deployment platform (inferred from Next.js configuration)
 
 ### Key Features
+
 - Custom product browsing and filtering
 - Shopping cart functionality with Zustand state management
 - Secure checkout with multiple payment options
@@ -56,20 +61,9 @@ The application follows modern React best practices with a component-driven arch
 - **React Hook Form** - Performant, flexible forms with easy validation
 - **Zustand** - Lightweight state management for the shopping cart
 
-## Getting Started
-
-To run the development server:
-
-```bash
-pnpm install
-pnpm dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
-
 ## Environment Variables
 
-The application requires several environment variables to be set. Refer to `.env.example` for the complete list of required variables.
+The application requires several environment variables to be set. Refer to [`.env.example`](https://github.com/thelastofinusa/client-ekimedo-store/blob/main/.env.example) for the complete list of required variables.
 
 ## Deployment
 
